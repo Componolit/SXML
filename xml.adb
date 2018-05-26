@@ -40,6 +40,17 @@ is
       return Result;
    end To_Name;
 
+   function To_String (Name : Name_Type) return String
+   is
+      Len : Natural := 0;
+   begin
+      loop
+         exit when Len >= Name'Last or else Name (Len + 1) = Character'Val (0);
+         Len := Len + 1;
+      end loop;
+      return String (Name (1 .. Len));
+   end To_String;
+
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    is
@@ -66,9 +77,9 @@ is
          case Tree (I).Kind
          is
             when Kind_Element_Open =>
-               Put ("<" & String (Tree (I).Name) & ">");
+               Put ("<" & To_String (Tree (I).Name) & ">");
             when Kind_Element_Close =>
-               Put ("</" & String (Tree (I).Name) & ">");
+               Put ("</" & To_String (Tree (I).Name) & ">");
             when Kind_Invalid =>
                Put ("INVALID");
          end case;
