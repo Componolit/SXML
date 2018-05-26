@@ -2,7 +2,7 @@ package body XML
    with SPARK_Mode
 is
 
-   type Kind_Type is (Kind_Invalid, Kind_Element);
+   type Kind_Type is (Kind_Invalid, Kind_Element_Open, Kind_Element_Close);
 
    type Node_Type is
    record
@@ -27,8 +27,19 @@ is
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    is
+      Index : Natural;
    begin
-      return Null_Tree;
+      return Result : Subtree_Type (1 .. Children'Length + 2)
+      do
+         Result (Result'First) := (Kind => Kind_Element_Open, Name => Name);
+         Index := 2;
+         for Child of Children
+         loop
+            Result (Index) := Child;
+            Index := Index + 1;
+         end loop;
+         Result (Result'Last) := (Kind => Kind_Element_Close, Name => Name);
+      end return;
    end E;
 
    procedure Exec (Program   : String;
