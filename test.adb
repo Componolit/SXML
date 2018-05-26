@@ -3,7 +3,7 @@ use XML;
 
 procedure Test
 is
-   A : constant Arguments_Type (1..1) := (others => (others => ' '));
+   A : constant Arguments_Type := (+"foo", +"bar", +"baz");
 begin
    XML.Exec ("foo", A);
 end Test;

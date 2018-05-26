@@ -8,5 +8,7 @@ is
    -- Print XML suitable for sub-init
    procedure Exec (Program   : String;
                    Arguments : Arguments_Type);
+
+   function "+" (Value : String) return Argument_Type;
                    
 end XML;
