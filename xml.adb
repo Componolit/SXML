@@ -1,13 +1,18 @@
+with Ada.Text_IO;
+use Ada.Text_IO;
+
 package body XML
    with SPARK_Mode
 is
 
    type Kind_Type is (Kind_Invalid, Kind_Element_Open, Kind_Element_Close);
 
+   type Name_Type is new String (1..100);
+
    type Node_Type is
    record
       Kind : Kind_Type;
-      Name : String (1..100);
+      Name : Name_Type;
    end record;
    Null_Node : constant Node_Type := (Kind => Kind_Invalid, Name => (others => Character'Val (0)));
 
@@ -19,10 +24,21 @@ is
       Len : constant Natural := Left'Length + Right'Length;
       Result : Subtree_Type (1 .. Len);
    begin
-      Result (1 .. Left'Length - 1) := Left; 
-      Result (Left'Length .. Result'Last) := Right; 
+      Result (1 .. Left'Length) := Left;
+      Result (Left'Length + 1 .. Result'Last) := Right;
       return Result;
    end "&";
+
+   function To_Name (Name : String) return Name_Type
+   is
+      Result : Name_Type := (others => Character'Val (0));
+   begin
+      for I in Name'Range
+      loop
+         Result (I) := Name (I);
+      end loop;
+      return Result;
+   end To_Name;
 
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
@@ -31,16 +47,34 @@ is
    begin
       return Result : Subtree_Type (1 .. Children'Length + 2)
       do
-         Result (Result'First) := (Kind => Kind_Element_Open, Name => Name);
+         Result (Result'First) := (Kind => Kind_Element_Open, Name => To_Name (Name));
          Index := 2;
          for Child of Children
          loop
             Result (Index) := Child;
             Index := Index + 1;
          end loop;
-         Result (Result'Last) := (Kind => Kind_Element_Close, Name => Name);
+         Result (Result'Last) := (Kind => Kind_Element_Close, Name => To_Name (Name));
       end return;
    end E;
+
+   procedure Print (Tree : Subtree_Type)
+   is
+   begin
+      for I in Tree'Range
+      loop
+         case Tree (I).Kind
+         is
+            when Kind_Element_Open =>
+               Put ("<" & String (Tree (I).Name) & ">");
+            when Kind_Element_Close =>
+               Put ("</" & String (Tree (I).Name) & ">");
+            when Kind_Invalid =>
+               Put ("INVALID");
+         end case;
+         New_Line;
+      end loop;
+   end Print;
 
    procedure Exec (Program   : String;
                    Arguments : Arguments_Type)
@@ -53,49 +87,7 @@ is
          E ("bar")
        );
    begin
-      null;
+      Print (Tree);
    end Exec;
 
-   -- <config>
-   -- 	<report delay_ms="500"/>
-   -- 	<parent-provides>
-   -- 		<service name="CAP"/>
-   -- 		<service name="CPU"/>
-   -- 		<service name="LOG"/>
-   -- 		<service name="PD"/>
-   -- 		<service name="ROM"/>
-   -- 		<service name="File_system"/>
-   -- 		<service name="Timer"/>
-   -- 		<service name="Rtc"/>
-   -- 		<service name="Report"/>
-   -- 	</parent-provides>
-   -- 	<start name="write(0)" caps="500">
-   -- 		<binary name="write"/>
-   -- 		<resource name="RAM" quantum="16MB"/>
-   -- 		<config>
-   -- 			<argv progname="write">
-   -- 				<arg value="/tmp/test"/>
-   -- 				<arg value="This value"/>
-   -- 			</argv>
-   -- 			<environ>
-   -- 				<env name="ENVVAR" value="42"/>
-   -- 			</environ>
-   -- 			<vfs>
-   -- 				<dir name="dev">
-   -- 					<log/>
-   -- 					<rtc/>
-   -- 					<null/>
-   -- 				</dir>
-   -- 				<fs/>
-   -- 			</vfs>
-   -- 			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc"/>
-   -- 		</config>
-   -- 		<route>
-   -- 			<any-service>
-   -- 				<parent/>
-   -- 			</any-service>
-   -- 		</route>
-   -- 	</start>
-   -- </config>
-   
 end XML;

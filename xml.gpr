@@ -2,10 +2,11 @@ project XML
 is
 
    for Source_Dirs use (".");
-
    for Object_Dir use "obj";
-   for Library_Name use "xml";
-   for Library_Dir use "adalib";
-   for Library_Kind use "dynamic";
+
+   -- for Library_Name use "xml";
+   -- for Library_Dir use "adalib";
+   -- for Library_Kind use "dynamic";
+   for Main use ("test.adb");
 
 end XML;
