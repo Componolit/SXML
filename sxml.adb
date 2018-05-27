@@ -56,10 +56,6 @@ is
    -- To_String --
    ---------------
 
-   function To_String (Value : Float) return String;
-   -- with
-   --    SPARK_Mode => On;
-
    function To_String (Value : Float) return String
    with
       SPARK_Mode => Off
@@ -71,10 +67,6 @@ is
    ---------------
    -- To_String --
    ---------------
-
-   function To_String (Value : Integer) return String;
-   -- with
-   --    SPARK_Mode => Off;
 
    function To_String (Value : Integer) return String
    with

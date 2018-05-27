@@ -71,4 +71,8 @@ private
           Is_Attr (Left (Left'Last)) or
           Left (Left'Last).Kind = Kind_Element_Open);
 
+   function To_String (Value : Float) return String;
+   function To_String (Value : Integer) return String;
+
+
 end SXML;
