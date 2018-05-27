@@ -2,19 +2,25 @@ package body SXML
    with SPARK_Mode
 is
 
+   -------------
+   -- Is_Attr --
+   -------------
+
+   function Is_Attr (Node : Node_Type) return Boolean
+   is
+   begin
+      return
+         Node.Kind = Kind_Attr_Integer or
+         Node.Kind = Kind_Attr_Float or
+         Node.Kind = Kind_Attr_String;
+   end Is_Attr;
+
    -------
    -- & --
    -------
 
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   is
-      Len : constant Natural := Left'Length + Right'Length;
-      Result : Subtree_Type (1 .. Len);
-   begin
-      Result (1 .. Left'Length) := Left;
-      Result (Left'Length + 1 .. Result'Last) := Right;
-      return Result;
-   end "&";
+   is (Ampersand (Left, Right));
 
    -------------
    -- To_Name --

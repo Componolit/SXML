@@ -5,6 +5,17 @@ is
    type Node_Type is private;
    type Subtree_Type is array (Natural range <>) of Node_Type;
 
+   function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   with
+      Ghost;
+
+   function Ampersand (Left, Right : Subtree_Type) return Subtree_Type
+      renames "&";
+
+   function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   with
+      Pre => Is_Valid (Left, Right);
+
    Null_Tree : constant Subtree_Type;
 
    function E (Name     : String;
@@ -51,4 +62,13 @@ private
 
    Null_Node : constant Node_Type := (Kind => Kind_Invalid, Name => Null_Name);
    Null_Tree : constant Subtree_Type (1..0) := (others => Null_Node);
+
+   function Is_Attr (Node : Node_Type) return Boolean;
+
+   function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   is
+      (if Is_Attr (Right (Right'First)) then
+          Is_Attr (Left (Left'Last)) or
+          Left (Left'Last).Kind = Kind_Element_Open);
+
 end SXML;
