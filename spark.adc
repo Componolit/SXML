@@ -1,0 +1,2 @@
+pragma SPARK_Mode (On);
+pragma Assertion_Policy (Check);

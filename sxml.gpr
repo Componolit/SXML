@@ -8,4 +8,8 @@ is
    for Library_Dir use "adalib";
    for Library_Kind use "dynamic";
 
+   package Builder is
+      for Global_Configuration_Pragmas use "spark.adc";
+   end Builder;
+
 end SXML;
