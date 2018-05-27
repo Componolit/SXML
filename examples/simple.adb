@@ -24,7 +24,7 @@ is
    -- 			</vfs>
    -- 			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc"/>
    -- 		</config>
-   -- 		<route>
+   -- 		<route foo="54.1234>
    -- 			<any-service>
    -- 				<parent/>
    -- 			</any-service>
@@ -54,7 +54,7 @@ is
            E ("libc", A ("stdout", "/dev/log") & A ("stderr", "/dev/log") & A ("rtc", "/dev/rtc")
            )
         ) &
-        E ("route",
+        E ("route", A ("foo", 54.1234) &
            E ("any-service",
               E ("parent")
            )
