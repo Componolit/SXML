@@ -1,0 +1,7 @@
+with "../sxml";
+
+project Simple
+is
+   for Main use ("simple.adb");
+   for Object_Dir use "../obj";
+end Simple;
