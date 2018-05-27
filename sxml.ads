@@ -19,7 +19,7 @@ is
    function A (Name  : String;
                Value : String) return Subtree_Type;
 
-   procedure Print (Tree : Subtree_Type);
+   function To_String (Tree : Subtree_Type) return String;
 
 private
    type Kind_Type is (Kind_Invalid,
@@ -29,6 +29,7 @@ private
                       Kind_Attr_Float,
                       Kind_Attr_String);
 
+   -- FIXME: The length should become a generic parameter
    type Name_Type is new String (1..100);
    Null_Name : constant Name_Type := (others => Character'Val (0));
 

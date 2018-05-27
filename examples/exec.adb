@@ -1,5 +1,5 @@
-with SXML;
-use SXML;
+with SXML; use SXML;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Exec
 with
@@ -126,7 +126,7 @@ is
          )
        );
    begin
-      Print (Doc);
+      Put_Line (To_String (Doc));
    end Execute;
 
    A : constant Arguments_Type := (+"foo", +"bar", +"baz");

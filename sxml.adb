@@ -1,9 +1,10 @@
-with Ada.Text_IO;
-use Ada.Text_IO;
-
 package body SXML
    with SPARK_Mode
 is
+
+   -------
+   -- & --
+   -------
 
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    is
@@ -14,6 +15,10 @@ is
       Result (Left'Length + 1 .. Result'Last) := Right;
       return Result;
    end "&";
+
+   -------------
+   -- To_Name --
+   -------------
 
    function To_Name (Name : String) return Name_Type
    is
@@ -26,6 +31,10 @@ is
       return Result;
    end To_Name;
 
+   ---------------
+   -- To_String --
+   ---------------
+
    function To_String (Name : Name_Type) return String
    is
       Len : Natural := 0;
@@ -36,6 +45,10 @@ is
       end loop;
       return String (Name (1 .. Len));
    end To_String;
+
+   -------
+   -- E --
+   -------
 
    function E (Name       : String;
                Children   : Subtree_Type := Null_Tree) return Subtree_Type
@@ -55,6 +68,10 @@ is
       end return;
    end E;
 
+   -------
+   -- A --
+   -------
+
    function A (Name  : String;
                Value : Integer) return Subtree_Type
    is
@@ -63,6 +80,10 @@ is
                     Name          => To_Name (Name),
                     Integer_Value => Value));
    end A;
+
+   -------
+   -- A --
+   -------
 
    function A (Name  : String;
                Value : Float) return Subtree_Type
@@ -73,6 +94,10 @@ is
                     Float_Value => Value));
    end A;
 
+   -------
+   -- A --
+   -------
+
    function A (Name  : String;
                Value : String) return Subtree_Type
    is
@@ -82,39 +107,90 @@ is
                     String_Value => To_Name (Value)));
    end A;
 
-   procedure Print (Tree : Subtree_Type)
+   --------------
+   -- Text_Len --
+   --------------
+
+   function Text_Len (Tree : Subtree_Type) return Natural
    is
-      Is_Open : Boolean := False;
+      Result : Natural := 0;
    begin
-      for I in Tree'Range
+      for E of Tree
       loop
-         case Tree (I).Kind
+         Result := Result + To_String (E.Name)'Length;
+         case E.Kind
          is
             when Kind_Element_Open =>
-               if Is_Open
-               then
-                  Is_Open := False;
-                  Put (">");
-               end if;
-               Is_Open := True;
-               Put ("<" & To_String (Tree (I).Name));
+               Result := Result + 2;
             when Kind_Element_Close =>
-               if Is_Open
-               then
-                  Is_Open := False;
-                  Put (">");
-               end if;
-               Put ("</" & To_String (Tree (I).Name) & ">");
+               Result := Result + 3;
             when Kind_Attr_Integer =>
-               Put (" " & To_String (Tree (I).Name) & "=""" & Tree (I).Integer_Value'Img & """");
+               Result := Result + E.Integer_Value'Img'Length + 4;
             when Kind_Attr_String =>
-               Put (" " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).String_Value) & """");
+               Result := Result + To_String (E.String_Value)'Length + 4;
             when Kind_Attr_Float =>
-               Put (" " & To_String (Tree (I).Name) & "=""" & Tree (I).Float_Value'Img & """");
+               Result := Result + E.Float_Value'Img'Length + 4;
             when Kind_Invalid =>
-               Put ("INVALID");
+               return 0;
          end case;
       end loop;
-   end Print;
+      return Result;
+   end Text_Len;
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   function To_String (Tree : Subtree_Type) return String
+   is
+      Position : Natural := 1;
+      Is_Open  : Boolean := False;
+
+      procedure Append (Result : in out String;
+                        Data   :        String)
+      is
+      begin
+         for C of Data
+         loop
+            Result (Position) := C;
+            Position := Position + 1;
+         end loop;
+      end Append;
+
+   begin
+      return Result : String (1 .. Text_Len (Tree))
+      do
+         for I in Tree'Range
+         loop
+            case Tree (I).Kind
+            is
+               when Kind_Element_Open =>
+                  if Is_Open
+                  then
+                     Is_Open := False;
+                     Append (Result, ">");
+                  end if;
+                  Is_Open := True;
+                  Append (Result, "<" & To_String (Tree (I).Name));
+               when Kind_Element_Close =>
+                  if Is_Open
+                  then
+                     Is_Open := False;
+                     Append (Result, ">");
+                  end if;
+                  Append (Result, "</" & To_String (Tree (I).Name) & ">");
+               when Kind_Attr_Integer =>
+                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & Tree (I).Integer_Value'Img & """");
+               when Kind_Attr_String =>
+                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).String_Value) & """");
+               when Kind_Attr_Float =>
+                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & Tree (I).Float_Value'Img & """");
+               when Kind_Invalid =>
+                  Result := (others => Character'Val (0));
+                  return;
+            end case;
+         end loop;
+      end return;
+   end To_String;
 
 end SXML;
