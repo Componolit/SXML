@@ -206,7 +206,7 @@ is
       end Append;
 
    begin
-      return Result : String (1 .. Text_Len (Tree))
+      return Result : String (1 .. Text_Len (Tree)) := (others => Character'Val (0))
       do
          for I in Tree'Range
          loop
@@ -215,7 +215,6 @@ is
                when Kind_Element_Open =>
                   if Is_Open
                   then
-                     Is_Open := False;
                      Append (Result, ">");
                   end if;
                   Is_Open := True;
