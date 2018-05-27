@@ -1,0 +1,7 @@
+with "../sxml";
+
+project Exec
+is
+   for Main use ("exec.adb");
+   for Object_Dir use "../obj";
+end Exec;
