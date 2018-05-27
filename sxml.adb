@@ -46,6 +46,43 @@ is
       return String (Name (1 .. Len));
    end To_String;
 
+   ---------------
+   -- To_String --
+   ---------------
+
+   function To_String (Value : Float) return String;
+   -- with
+   --    SPARK_Mode => On;
+
+   function To_String (Value : Float) return String
+   with
+      SPARK_Mode => Off
+   is
+   begin
+      return Value'Img;
+   end To_String;
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   function To_String (Value : Integer) return String;
+   -- with
+   --    SPARK_Mode => Off;
+
+   function To_String (Value : Integer) return String
+   with
+      SPARK_Mode => Off
+   is
+   begin
+      if Value >= 0
+      then
+         return Value'Img (2 .. Value'Img'Last);
+      else
+         return Value'Img;
+      end if;
+   end To_String;
+
    -------
    -- E --
    -------
@@ -125,11 +162,11 @@ is
             when Kind_Element_Close =>
                Result := Result + 3;
             when Kind_Attr_Integer =>
-               Result := Result + E.Integer_Value'Img'Length + 4;
+               Result := Result + To_String (E.Integer_Value)'Length + 4;
             when Kind_Attr_String =>
                Result := Result + To_String (E.String_Value)'Length + 4;
             when Kind_Attr_Float =>
-               Result := Result + E.Float_Value'Img'Length + 4;
+               Result := Result + To_String (E.Float_Value)'Length + 4;
             when Kind_Invalid =>
                return 0;
          end case;
@@ -180,13 +217,12 @@ is
                   end if;
                   Append (Result, "</" & To_String (Tree (I).Name) & ">");
                when Kind_Attr_Integer =>
-                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & Tree (I).Integer_Value'Img & """");
+                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Integer_Value) & """");
                when Kind_Attr_String =>
                   Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).String_Value) & """");
                when Kind_Attr_Float =>
-                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & Tree (I).Float_Value'Img & """");
+                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Float_Value) & """");
                when Kind_Invalid =>
-                  Result := (others => Character'Val (0));
                   return;
             end case;
          end loop;
