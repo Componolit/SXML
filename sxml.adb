@@ -191,6 +191,11 @@ is
 
       procedure Append (Result : in out String;
                         Data   :        String)
+      with
+         Global => (In_Out => Position);
+
+      procedure Append (Result : in out String;
+                        Data   :        String)
       is
       begin
          for C of Data
