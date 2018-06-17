@@ -90,7 +90,7 @@ is
    is
       Index : Natural;
    begin
-      return Result : Subtree_Type (1 .. Children'Length + 2)
+      return Result : Subtree_Type (1 .. Children'Length + 2) := (others => Null_Node)
       do
          Result (Result'First) := (Kind => Kind_Element_Open, Name => To_Name (Name));
          Index := 2;
@@ -214,6 +214,7 @@ is
    begin
       return Result : String (1 .. Text_Len (Tree)) := (others => Character'Val (0))
       do
+         Fill_Result :
          for I in Tree'Range
          loop
             case Tree (I).Kind
@@ -240,9 +241,9 @@ is
                when Kind_Attr_Float =>
                   Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Float_Value) & """");
                when Kind_Invalid =>
-                  return;
+                  exit Fill_Result;
             end case;
-         end loop;
+         end loop Fill_Result;
       end return;
    end To_String;
 
