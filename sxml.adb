@@ -90,7 +90,7 @@ is
    is
       Index : Natural;
    begin
-      return Result : Subtree_Type (1 .. Children'Length + 2)
+      return Result : Subtree_Type (1 .. Children'Length + 2) := (others => Null_Node)
       do
          Result (Result'First) := (Kind => Kind_Element_Open, Name => To_Name (Name));
          Index := 2;
@@ -148,26 +148,40 @@ is
 
    function Text_Len (Tree : Subtree_Type) return Natural
    is
-      Result : Natural := 0;
+      Is_Open : Boolean := False;
+      Result  : Natural := 0;
    begin
       for E of Tree
       loop
-         Result := Result + To_String (E.Name)'Length;
-         case E.Kind
-         is
+         declare
+            Name_Len : constant Natural := To_String (E.Name)'Length;
+         begin
+            Result := Result + Name_Len;
+            case E.Kind
+            is
             when Kind_Element_Open =>
-               Result := Result + 2;
+               Result  := Result + Name_Len + 2;
+               Is_Open := True;
             when Kind_Element_Close =>
-               Result := Result + 3;
+               if Is_Open then
+                  Result := Result + 1;
+               else
+                  Result := Result + Name_Len + 3;
+               end if;
+               Is_Open := False;
             when Kind_Attr_Integer =>
-               Result := Result + To_String (E.Integer_Value)'Length + 4;
+               Result := Result + Name_Len +
+                 To_String (E.Integer_Value)'Length + 4;
             when Kind_Attr_String =>
-               Result := Result + To_String (E.String_Value)'Length + 4;
+               Result := Result + Name_Len + To_String
+                 (E.String_Value)'Length + 4;
             when Kind_Attr_Float =>
-               Result := Result + To_String (E.Float_Value)'Length + 4;
+               Result := Result + Name_Len + To_String
+                 (E.Float_Value)'Length + 4;
             when Kind_Invalid =>
                return 0;
-         end case;
+            end case;
+         end;
       end loop;
       return Result;
    end Text_Len;
@@ -200,6 +214,7 @@ is
    begin
       return Result : String (1 .. Text_Len (Tree)) := (others => Character'Val (0))
       do
+         Fill_Result :
          for I in Tree'Range
          loop
             case Tree (I).Kind
@@ -209,15 +224,16 @@ is
                   then
                      Append (Result, ">");
                   end if;
-                  Is_Open := True;
+                  Is_Open   := True;
                   Append (Result, "<" & To_String (Tree (I).Name));
                when Kind_Element_Close =>
                   if Is_Open
                   then
                      Is_Open := False;
-                     Append (Result, ">");
+                     Append (Result, "/>");
+                  else
+                     Append (Result, "</" & To_String (Tree (I).Name) & ">");
                   end if;
-                  Append (Result, "</" & To_String (Tree (I).Name) & ">");
                when Kind_Attr_Integer =>
                   Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Integer_Value) & """");
                when Kind_Attr_String =>
@@ -225,9 +241,9 @@ is
                when Kind_Attr_Float =>
                   Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Float_Value) & """");
                when Kind_Invalid =>
-                  return;
+                  exit Fill_Result;
             end case;
-         end loop;
+         end loop Fill_Result;
       end return;
    end To_String;
 

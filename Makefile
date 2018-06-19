@@ -1,4 +1,5 @@
-GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=on --output-header
+CODEPEER ?= on
+GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
 GPRBUILD_OPTS = -gnata -p
 
 all:
