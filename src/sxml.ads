@@ -88,8 +88,13 @@ private
           Is_Attr (Left (Left'Last)) or
           Left (Left'Last).Kind = Kind_Element_Open);
 
-   function To_String (Value : Float) return String;
-   function To_String (Value : Integer) return String;
+   function To_String (Value : Float) return String
+   with
+       Post => To_String'Result'Length < 12;
+
+   function To_String (Value : Integer) return String
+   with
+       Post => To_String'Result'Length < 12;
 
 
 end SXML;

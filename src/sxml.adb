@@ -159,6 +159,21 @@ is
    end A;
 
    --------------
+   -- Node_Len --
+   --------------
+
+   function Node_Len (Node : Node_Type;
+                      Open : Boolean) return Natural
+   is
+     (case Node.Kind is
+         when Kind_Invalid       => 0,
+         when Kind_Element_Open  => 2 + To_String (Node.Name)'Length,
+         when Kind_Element_Close => (if Open then 1 else 3 + To_String (Node.Name)'Length),
+         when Kind_Attr_Integer  => 4 + To_String (Node.Name)'Length + To_String (Node.Integer_Value)'Length,
+         when Kind_Attr_Float    => 4 + To_String (Node.Name)'Length + To_String (Node.Float_Value)'Length,
+         when Kind_Attr_String   => 4 + To_String (Node.Name)'Length + To_String (Node.String_Value)'Length);
+
+   --------------
    -- Text_Len --
    --------------
 
@@ -166,71 +181,23 @@ is
    is
       Is_Open : Boolean := False;
       Result  : Natural := 0;
+      Tmp     : Natural;
    begin
       for E of Tree
       loop
-         declare
-            Name_Len : constant Natural := To_String (E.Name)'Length;
-            pragma Assert (Name_Len <= Name_Type'Length);
-         begin
-            case E.Kind
-            is
-            when Kind_Element_Open =>
-               if Result > Natural'Last - Name_Len - 2
-               then
-                  return 0;
-               end if;
-               Result  := Result + Name_Len + 2;
-               Is_Open := True;
-            when Kind_Element_Close =>
-               if Is_Open then
-                  if Result > Natural'Last - 1
-                  then
-                     return 0;
-                  end if;
-                  Result := Result + 1;
-               else
-                  if Result > Natural'Last - Name_Len - 3
-                  then
-                     return 0;
-                  end if;
-                  Result := Result + Name_Len + 3;
-               end if;
-               Is_Open := False;
-            when Kind_Attr_Integer =>
-               declare
-                  Val_Len : constant Natural := To_String (E.Integer_Value)'Length;
-               begin
-                  if Result > Natural'Last - Name_Len - Val_Len - 4
-                  then
-                     return 0;
-                  end if;
-                  Result := Result + Name_Len + Val_Len + 4;
-               end;
-            when Kind_Attr_String =>
-               declare
-                  Val_Len : constant Natural := To_String (E.String_Value)'Length;
-               begin
-                  if Result > Natural'Last - Name_Len - Val_Len - 4
-                  then
-                     return 0;
-                  end if;
-                  Result := Result + Name_Len + Val_Len + 4;
-               end;
-            when Kind_Attr_Float =>
-               declare
-                  Val_Len : constant Natural := To_String (E.Float_Value)'Length;
-               begin
-                  if Result > Natural'Last - Name_Len - Val_Len - 4
-                  then
-                     return 0;
-                  end if;
-                  Result := Result + Name_Len + Val_Len + 4;
-               end;
-            when Kind_Invalid =>
-               return 0;
-            end case;
-         end;
+         Tmp := Node_Len (E, Is_Open);
+         if Tmp > Natural'Last - Result
+         then
+            return 0;
+         end if;
+         Result := Result + Tmp;
+         if E.Kind = Kind_Element_Open
+         then
+            Is_Open := True;
+         elsif not Is_Attr (E)
+         then
+            Is_Open := False;
+         end if;
       end loop;
       return Result;
    end Text_Len;
