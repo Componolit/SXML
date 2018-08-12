@@ -15,13 +15,6 @@ is
          Node.Kind = Kind_Attr_String;
    end Is_Attr;
 
-   -------
-   -- & --
-   -------
-
-   function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   is (Concatenate (Left, Right));
-
    -------------
    -- To_Name --
    -------------

@@ -25,6 +25,7 @@ is
       Pre => Is_Valid (Left, Right);
 
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   is (Concatenate (Left, Right))
    with
       Pre => Is_Valid (Left, Right);
 
@@ -86,8 +87,8 @@ private
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
-     ((Left'Length > 0 and Right'Length > 0) and then
-      Left'Length + Right'Length < Index_Type'Last);
+      (Left'Last <= Index_Type'Last - Right'Length and
+       Left'Length + Right'Length < Index_Type'Last);
 
    function To_String (Value : Float) return String
    with
