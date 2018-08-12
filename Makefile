@@ -6,6 +6,10 @@ all:
 	gprbuild $(GPRBUILD_OPTS) -P sxml
 	gnatprove $(GNATPROVE_OPTS) -P sxml
 
+test: sxml.gpr
+	@gprbuild $(COMMON_OPTS) -P tests/tests.gpr -gnata -p
+	@obj/tests
+
 example:
 	gprbuild $(GPRBUILD_OPTS) -P examples/exec
 	gnatprove $(GNATPROVE_OPTS) -P examples/exec
