@@ -19,8 +19,10 @@ is
    with
       Ghost;
 
-   function Ampersand (Left, Right : Subtree_Type) return Subtree_Type
-      renames "&";
+   function Concatenate (Left, Right : Subtree_Type) return Subtree_Type
+   is (Left & Right)
+   with
+      Pre => Is_Valid (Left, Right);
 
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    with
@@ -84,9 +86,8 @@ private
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
-      (if Is_Attr (Right (Right'First)) then
-          Is_Attr (Left (Left'Last)) or
-          Left (Left'Last).Kind = Kind_Element_Open);
+     ((Left'Length > 0 and Right'Length > 0) and then
+      Left'Length + Right'Length < Index_Type'Last);
 
    function To_String (Value : Float) return String
    with

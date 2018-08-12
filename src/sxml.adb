@@ -20,7 +20,7 @@ is
    -------
 
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   is (Ampersand (Left, Right));
+   is (Concatenate (Left, Right));
 
    -------------
    -- To_Name --
@@ -162,13 +162,12 @@ is
    -- Node_Len --
    --------------
 
-   function Node_Len (Node : Node_Type;
-                      Open : Boolean) return Natural
+   function Node_Len (Node : Node_Type) return Natural
    is
      (case Node.Kind is
          when Kind_Invalid       => 0,
          when Kind_Element_Open  => 2 + To_String (Node.Name)'Length,
-         when Kind_Element_Close => (if Open then 1 else 3 + To_String (Node.Name)'Length),
+         when Kind_Element_Close => 3 + To_String (Node.Name)'Length,
          when Kind_Attr_Integer  => 4 + To_String (Node.Name)'Length + To_String (Node.Integer_Value)'Length,
          when Kind_Attr_Float    => 4 + To_String (Node.Name)'Length + To_String (Node.Float_Value)'Length,
          when Kind_Attr_String   => 4 + To_String (Node.Name)'Length + To_String (Node.String_Value)'Length);
@@ -179,25 +178,18 @@ is
 
    function Text_Len (Tree : Subtree_Type) return Natural
    is
-      Is_Open : Boolean := False;
       Result  : Natural := 0;
       Tmp     : Natural;
    begin
       for E of Tree
       loop
-         Tmp := Node_Len (E, Is_Open);
+         Tmp := Node_Len (E);
          if Tmp > Natural'Last - Result
          then
-            return 0;
+            Result := 0;
+            exit;
          end if;
          Result := Result + Tmp;
-         if E.Kind = Kind_Element_Open
-         then
-            Is_Open := True;
-         elsif not Is_Attr (E)
-         then
-            Is_Open := False;
-         end if;
       end loop;
       return Result;
    end Text_Len;
@@ -248,16 +240,15 @@ is
                   then
                      Append (Result, ">");
                   end if;
-                  Is_Open   := True;
+                  Is_Open := True;
                   Append (Result, "<" & To_String (E.Name));
                when Kind_Element_Close =>
                   if Is_Open
                   then
                      Is_Open := False;
-                     Append (Result, "/>");
-                  else
-                     Append (Result, "</" & To_String (E.Name) & ">");
+                     Append (Result, ">");
                   end if;
+                  Append (Result, "</" & To_String (E.Name) & ">");
                when Kind_Attr_Integer =>
                   Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.Integer_Value) & """");
                when Kind_Attr_String =>

@@ -20,7 +20,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config");
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config/>",
+      Assert (XML = "<config></config>",
          "Unexpected document: " & XML & " len:" & XML'Length'Img);
 	end Test_Generate_Single_Node;
 
@@ -32,7 +32,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", A ("attrib", "Foo"));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config attrib=""Foo""/>",
+      Assert (XML = "<config attrib=""Foo""></config>",
          "Unexpected document: " & XML & " len:" & XML'Length'Img);
 	end Test_Generate_Single_Node_Attrib;
 
@@ -44,7 +44,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", E ("child"));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config><child/></config>",
+      Assert (XML = "<config><child></child></config>",
          "Unexpected document: " & XML & " len:" & XML'Length'Img);
 	end Test_Generate_Nodes;
 
