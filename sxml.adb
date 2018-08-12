@@ -27,6 +27,10 @@ is
    -------------
 
    function To_Name (Name : String) return Name_Type
+   with
+      Pre => Is_Valid (Name);
+
+   function To_Name (Name : String) return Name_Type
    is
       Result : Name_Type := (others => Character'Val (0));
    begin
@@ -42,10 +46,15 @@ is
    ---------------
 
    function To_String (Name : Name_Type) return String
+   with
+      Post => To_String'Result'Length <= Name_Type'Length;
+
+   function To_String (Name : Name_Type) return String
    is
       Len : Natural := 0;
    begin
       loop
+         pragma Loop_Invariant (Len <= Name'Last);
          exit when Len >= Name'Last or else Name (Len + 1) = Character'Val (0);
          Len := Len + 1;
       end loop;
@@ -60,8 +69,15 @@ is
    with
       SPARK_Mode => Off
    is
+      Value_Img : String := Value'Img;
    begin
-      return Value'Img;
+      if Value >= 0.0
+      then
+         -- Remove leading space
+         return Value_Img (2 .. Value_Img'Last);
+      else
+         return Value_Img;
+      end if;
    end To_String;
 
    ---------------
@@ -88,7 +104,7 @@ is
    function E (Name       : String;
                Children   : Subtree_Type := Null_Tree) return Subtree_Type
    is
-      Index : Natural;
+      Index : Index_Type;
    begin
       return Result : Subtree_Type (1 .. Children'Length + 2) := (others => Null_Node)
       do
@@ -155,29 +171,68 @@ is
       loop
          declare
             Name_Len : constant Natural := To_String (E.Name)'Length;
+            pragma Assert (Name_Len <= Name_Type'Length);
          begin
+            if Result > Natural'Last - Name_Len
+            then
+               return 0;
+            end if;
             Result := Result + Name_Len;
+
             case E.Kind
             is
             when Kind_Element_Open =>
+               if Result > Natural'Last - Name_Len - 2
+               then
+                  return 0;
+               end if;
                Result  := Result + Name_Len + 2;
                Is_Open := True;
             when Kind_Element_Close =>
                if Is_Open then
+                  if Result > Natural'Last - 1
+                  then
+                     return 0;
+                  end if;
                   Result := Result + 1;
                else
+                  if Result > Natural'Last - Name_Len - 3
+                  then
+                     return 0;
+                  end if;
                   Result := Result + Name_Len + 3;
                end if;
                Is_Open := False;
             when Kind_Attr_Integer =>
-               Result := Result + Name_Len +
-                 To_String (E.Integer_Value)'Length + 4;
+               declare
+                  Val_Len : constant Natural := To_String (E.Integer_Value)'Length;
+               begin
+                  if Result > Natural'Last - Name_Len - Val_Len - 4
+                  then
+                     return 0;
+                  end if;
+                  Result := Result + Name_Len + Val_Len + 4;
+               end;
             when Kind_Attr_String =>
-               Result := Result + Name_Len + To_String
-                 (E.String_Value)'Length + 4;
+               declare
+                  Val_Len : constant Natural := To_String (E.String_Value)'Length;
+               begin
+                  if Result > Natural'Last - Name_Len - Val_Len - 4
+                  then
+                     return 0;
+                  end if;
+                  Result := Result + Name_Len + Val_Len + 4;
+               end;
             when Kind_Attr_Float =>
-               Result := Result + Name_Len + To_String
-                 (E.Float_Value)'Length + 4;
+               declare
+                  Val_Len : constant Natural := To_String (E.Float_Value)'Length;
+               begin
+                  if Result > Natural'Last - Name_Len - Val_Len - 4
+                  then
+                     return 0;
+                  end if;
+                  Result := Result + Name_Len + Val_Len + 4;
+               end;
             when Kind_Invalid =>
                return 0;
             end case;
@@ -192,23 +247,25 @@ is
 
    function To_String (Tree : Subtree_Type) return String
    is
-      Position : Natural := 1;
+      Position : Natural := 0;
       Is_Open  : Boolean := False;
 
       procedure Append (Result : in out String;
                         Data   :        String)
       with
-         Global => (In_Out => Position);
+         Global => (In_Out => Position),
+         Pre    => Data'Length > 0 and
+                   Position <= Result'Length - Data'Length;
 
       procedure Append (Result : in out String;
                         Data   :        String)
       is
       begin
-         for C of Data
+         for I in 0 .. Data'Length - 1
          loop
-            Result (Position) := C;
-            Position := Position + 1;
+            Result (Result'First + Position + I) := Data (Data'First + I);
          end loop;
+         Position := Position + Data'Length;
       end Append;
 
    begin

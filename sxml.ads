@@ -1,11 +1,21 @@
 package SXML
    with SPARK_Mode
 is
+   -- FIXME: The length should become a generic parameter
+   type Name_Type is new String (1..100);
 
    type Node_Type is private;
-   type Subtree_Type is array (Natural range <>) of Node_Type;
+
+   type Index_Type is new Natural range 1 .. Natural'Last / 2;
+   type Subtree_Type is array (Index_Type range <>) of Node_Type;
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   with
+      Ghost;
+
+   function Is_Valid (Name : String) return Boolean
+   is (Name'Last <= Name_Type'Last and
+       Name'Length <= Name_Type'Length)
    with
       Ghost;
 
@@ -19,16 +29,25 @@ is
    Null_Tree : constant Subtree_Type;
 
    function E (Name     : String;
-               Children : Subtree_Type := Null_Tree) return Subtree_Type;
+               Children : Subtree_Type := Null_Tree) return Subtree_Type
+   with
+      Pre => Children'Length < Index_Type'Last - 2 and
+             Is_Valid (Name);
 
    function A (Name  : String;
-               Value : Integer) return Subtree_Type;
+               Value : Integer) return Subtree_Type
+   with
+      Pre => Is_Valid (Name);
 
    function A (Name  : String;
-               Value : Float) return Subtree_Type;
+               Value : Float) return Subtree_Type
+   with
+      Pre => Is_Valid (Name);
 
    function A (Name  : String;
-               Value : String) return Subtree_Type;
+               Value : String) return Subtree_Type
+   with
+      Pre => Is_Valid (Name) and Is_Valid (Value);
 
    function To_String (Tree : Subtree_Type) return String;
 
@@ -40,8 +59,6 @@ private
                       Kind_Attr_Float,
                       Kind_Attr_String);
 
-   -- FIXME: The length should become a generic parameter
-   type Name_Type is new String (1..100);
    Null_Name : constant Name_Type := (others => Character'Val (0));
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
