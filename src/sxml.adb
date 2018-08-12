@@ -262,13 +262,19 @@ is
          Position := Position + Data'Length;
       end Append;
 
+      TL : constant Natural := Text_Len (Tree);
    begin
-      return Result : String (1 .. Text_Len (Tree)) := (others => Character'Val (0))
+      if TL = 0
+      then
+         return "";
+      end if;
+
+      return Result : String (1 .. TL) := (others => Character'Val (0))
       do
          Fill_Result :
-         for I in Tree'Range
+         for E of Tree
          loop
-            case Tree (I).Kind
+            case E.Kind
             is
                when Kind_Element_Open =>
                   if Is_Open
@@ -276,21 +282,21 @@ is
                      Append (Result, ">");
                   end if;
                   Is_Open   := True;
-                  Append (Result, "<" & To_String (Tree (I).Name));
+                  Append (Result, "<" & To_String (E.Name));
                when Kind_Element_Close =>
                   if Is_Open
                   then
                      Is_Open := False;
                      Append (Result, "/>");
                   else
-                     Append (Result, "</" & To_String (Tree (I).Name) & ">");
+                     Append (Result, "</" & To_String (E.Name) & ">");
                   end if;
                when Kind_Attr_Integer =>
-                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Integer_Value) & """");
+                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.Integer_Value) & """");
                when Kind_Attr_String =>
-                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).String_Value) & """");
+                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.String_Value) & """");
                when Kind_Attr_Float =>
-                  Append (Result, " " & To_String (Tree (I).Name) & "=""" & To_String (Tree (I).Float_Value) & """");
+                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.Float_Value) & """");
                when Kind_Invalid =>
                   exit Fill_Result;
             end case;
