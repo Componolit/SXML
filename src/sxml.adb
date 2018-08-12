@@ -173,12 +173,6 @@ is
             Name_Len : constant Natural := To_String (E.Name)'Length;
             pragma Assert (Name_Len <= Name_Type'Length);
          begin
-            if Result > Natural'Last - Name_Len
-            then
-               return 0;
-            end if;
-            Result := Result + Name_Len;
-
             case E.Kind
             is
             when Kind_Element_Open =>
