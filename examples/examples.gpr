@@ -1,0 +1,7 @@
+with "../SXML";
+
+project Examples
+is
+   for Main use ("exec.adb", "simple.adb");
+   for Exec_Dir use "../out";
+end Examples;

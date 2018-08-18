@@ -6,15 +6,16 @@ with
    SPARK_Mode
 is
    type Argument_Type is new String (1..100);
-   type Arguments_Type is array (Natural range <>) of Argument_Type;
+   type Arguments_Type is array (Index_Type range <>) of Argument_Type;
 
    function To_Subtree (Arguments : Arguments_Type) return Subtree_Type
    is
       Result : Subtree_Type (1 .. 3 * Arguments'Length);
    begin
-      for I in 0 .. Arguments'Length - 1
+      for I in 0 .. Index_Type'(Arguments'Length) - 1
       loop
-         Result (Result'First + 3*I .. Result'First + 3*I+2) := E ("arg", A ("value", String (Arguments (Arguments'First + I))));
+         Result (Result'First + 3 * I .. Result'First + 3 * I + 2) :=
+            E ("arg", A ("value", String (Arguments (Arguments'First + I))));
       end loop;
       return Result;
    end To_Subtree;

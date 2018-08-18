@@ -7,23 +7,15 @@ all:
 	gnatprove $(GNATPROVE_OPTS) -P SXML
 
 test: SXML.gpr
-	@gprbuild $(COMMON_OPTS) -P tests/execute/tests.gpr -gnata -p
+	@gprbuild $(COMMON_OPTS) -P tests/execute/tests -gnata -p
 	@obj/tests
 
-example:
-	gprbuild $(GPRBUILD_OPTS) -P examples/exec
-	gnatprove $(GNATPROVE_OPTS) -P examples/exec
-
-simple:
-	gprbuild $(GPRBUILD_OPTS) -P examples/simple
-	gnatprove $(GNATPROVE_OPTS) -P examples/simple
-	./out/simple
+examples::
+	gprbuild $(GPRBUILD_OPTS) -P examples/examples
 
 clean:
 	gnatclean -P SXML
 	gnatprove -P SXML --clean
 	gnatclean -P tests/execute/tests.gpr
-	gnatclean -P examples/exec
-	gnatclean -P examples/simple
-	gnatprove -P examples/exec --clean
-	gnatprove -P examples/simple --clean
+	gnatclean -P examples/examples
+	gnatprove -P examples/examples --clean
