@@ -208,7 +208,7 @@ is
       is
         (Buffer'First <= Natural'Last - Position and then
          Buffer'First + Position <= Natural'Last - Length and then
-         Buffer'First + Position + Length <= Buffer'Last);
+         Buffer'First + Position + Length - 1 <= Buffer'Last);
 
       procedure Append (Result : in out String;
                         Data   :        String)
