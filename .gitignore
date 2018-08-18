@@ -3,3 +3,7 @@ obj
 out
 adalib
 *.ali
+*.stdout
+*.stderr
+b__*.ad?
+*.bexch
