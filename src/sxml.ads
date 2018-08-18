@@ -92,11 +92,13 @@ private
 
    function To_String (Value : Float) return String
    with
-       Post => To_String'Result'Length < 12;
+      Post     => To_String'Result'Length < 12,
+      Annotate => (GNATprove, Terminating);
 
    function To_String (Value : Integer) return String
    with
-       Post => To_String'Result'Length < 12;
+      Post     => To_String'Result'Length < 12,
+      Annotate => (GNATprove, Terminating);
 
 
 end SXML;

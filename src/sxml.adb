@@ -40,7 +40,8 @@ is
 
    function To_String (Name : Name_Type) return String
    with
-      Post => To_String'Result'Length <= Name_Type'Length;
+      Post     => To_String'Result'Length <= Name_Type'Length,
+      Annotate => (GNATprove, Terminating);
 
    function To_String (Name : Name_Type) return String
    is
@@ -48,6 +49,7 @@ is
    begin
       loop
          pragma Loop_Invariant (Len <= Name'Last);
+         pragma Loop_Variant (Decreases => (Name'Last - Len));
          exit when Len >= Name'Last or else Name (Len + 1) = Character'Val (0);
          Len := Len + 1;
       end loop;
@@ -196,6 +198,16 @@ is
       Position : Natural := 0;
       Is_Open  : Boolean := False;
 
+      function In_Range (Buffer : String;
+                         Length : Natural) return Boolean;
+
+      function In_Range (Buffer : String;
+                         Length : Natural) return Boolean
+      is
+         (Buffer'First <= Natural'Last - Position and then
+          Buffer'First + Position <= Natural'Last - Length and then
+          Buffer'First + Position + Length <= Buffer'Last);
+
       procedure Append (Result : in out String;
                         Data   :        String)
       with
@@ -215,44 +227,93 @@ is
       end Append;
 
       TL : constant Natural := Text_Len (Tree);
+      Invalid : constant String := "";
    begin
       if TL = 0
       then
-         return "";
+         return Invalid;
       end if;
 
-      return Result : String (1 .. TL) := (others => Character'Val (0))
-      do
+      declare
+         Result : String (1 .. TL) := (others => Character'Val (0));
+      begin
          Fill_Result :
          for E of Tree
          loop
+            declare
+               Name : constant String := To_String (E.Name);
+            begin
             case E.Kind
             is
                when Kind_Element_Open =>
                   if Is_Open
                   then
+                     if not In_Range (Result, 1)
+                     then
+                        return Invalid;
+                     end if;
                      Append (Result, ">");
                   end if;
                   Is_Open := True;
-                  Append (Result, "<" & To_String (E.Name));
+                  begin
+                     if not In_Range (Result, 1 + Name'Length)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, "<" & Name);
+                  end;
                when Kind_Element_Close =>
                   if Is_Open
                   then
                      Is_Open := False;
+                     if not In_Range (Result, 1)
+                     then
+                        return Invalid;
+                     end if;
                      Append (Result, ">");
                   end if;
-                  Append (Result, "</" & To_String (E.Name) & ">");
+                  if not In_Range (Result, 3 + Name'Length)
+                  then
+                     return Invalid;
+                  end if;
+                  Append (Result, "</" & Name & ">");
                when Kind_Attr_Integer =>
-                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.Integer_Value) & """");
+                  declare
+                     Val : constant String := To_String (E.Integer_Value);
+                  begin
+                     if not In_Range (Result, 4 + Name'Length + Val'Length)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, " " & Name & "=""" & Val & """");
+                  end;
                when Kind_Attr_String =>
-                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.String_Value) & """");
+                  declare
+                     Val : constant String := To_String (E.String_Value);
+                  begin
+                     if not In_Range (Result, 4 + Name'Length + Val'Length)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, " " & Name & "=""" & Val & """");
+                  end;
                when Kind_Attr_Float =>
-                  Append (Result, " " & To_String (E.Name) & "=""" & To_String (E.Float_Value) & """");
+                  declare
+                     Val : constant String := To_String (E.Float_Value);
+                  begin
+                     if not In_Range (Result, 4 + Name'Length + Val'Length)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, " " & Name & "=""" & Val & """");
+                  end;
                when Kind_Invalid =>
                   exit Fill_Result;
             end case;
+            end;
          end loop Fill_Result;
-      end return;
+         return Result;
+      end;
    end To_String;
 
 end SXML;
