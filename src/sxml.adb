@@ -212,10 +212,10 @@ is
 
       procedure Append (Result : in out String;
                         Data   :        String)
-        with
-          Global => (In_Out => Position),
-        Pre    => Data'Length > 0 and
-        Position <= Result'Length - Data'Length;
+      with
+         Global => (In_Out => Position),
+         Pre    => Data'Length > 0 and
+                   Position <= Result'Length - Data'Length;
 
       procedure Append (Result : in out String;
                         Data   :        String)
