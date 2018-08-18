@@ -7,8 +7,8 @@ is
    for Object_Dir use "obj";
 
    for Library_Name use "sxml";
-   for Library_Dir use "adalib";
    for Library_Kind use "dynamic";
+   for Library_Dir use "obj/adalib";
 
    package Builder is
       for Global_Configuration_Pragmas use "spark.adc";

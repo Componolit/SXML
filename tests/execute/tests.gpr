@@ -4,4 +4,5 @@ with "../../SXML";
 project Tests is
    for Source_Dirs use (".");
    for Main use ("tests.adb");
+   for Exec_Dir use "../../obj";
 end Tests;
