@@ -3,10 +3,10 @@ GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-he
 GPRBUILD_OPTS = -gnata -p
 
 all:
-	gprbuild $(GPRBUILD_OPTS) -P sxml
-	gnatprove $(GNATPROVE_OPTS) -P sxml
+	gprbuild $(GPRBUILD_OPTS) -P SXML
+	gnatprove $(GNATPROVE_OPTS) -P SXML
 
-test: sxml.gpr
+test: SXML.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/tests.gpr -gnata -p
 	@obj/tests
 
@@ -20,8 +20,8 @@ simple:
 	./out/simple
 
 clean:
-	gnatclean -P sxml
-	gnatprove -P sxml --clean
+	gnatclean -P SXML
+	gnatprove -P SXML --clean
 	gnatclean -P examples/exec
 	gnatclean -P examples/simple
 	gnatprove -P examples/exec --clean

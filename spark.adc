@@ -1,2 +1,2 @@
 pragma SPARK_Mode (On);
-pragma Assertion_Policy (Check);
+pragma Assertion_Policy (Pre => Check, Post => Check);

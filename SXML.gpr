@@ -1,3 +1,5 @@
+with "switches";
+
 project SXML
 is
 
@@ -11,5 +13,9 @@ is
    package Builder is
       for Global_Configuration_Pragmas use "spark.adc";
    end Builder;
+
+   package Compiler is
+      for Default_Switches ("Ada") use Switches.Compiler_Switches;
+   end Compiler;
 
 end SXML;

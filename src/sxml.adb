@@ -64,11 +64,11 @@ is
    with
       SPARK_Mode => Off
    is
-      Value_Img : String := Value'Img;
+      Value_Img : constant String := Value'Img;
    begin
       if Value >= 0.0
       then
-         -- Remove leading space
+         --  Remove leading space
          return Value_Img (2 .. Value_Img'Last);
       else
          return Value_Img;
@@ -171,6 +171,8 @@ is
    -- Text_Len --
    --------------
 
+   function Text_Len (Tree : Subtree_Type) return Natural;
+
    function Text_Len (Tree : Subtree_Type) return Natural
    is
       Result  : Natural := 0;
@@ -204,16 +206,16 @@ is
       function In_Range (Buffer : String;
                          Length : Natural) return Boolean
       is
-         (Buffer'First <= Natural'Last - Position and then
-          Buffer'First + Position <= Natural'Last - Length and then
-          Buffer'First + Position + Length <= Buffer'Last);
+        (Buffer'First <= Natural'Last - Position and then
+         Buffer'First + Position <= Natural'Last - Length and then
+         Buffer'First + Position + Length <= Buffer'Last);
 
       procedure Append (Result : in out String;
                         Data   :        String)
-      with
-         Global => (In_Out => Position),
-         Pre    => Data'Length > 0 and
-                   Position <= Result'Length - Data'Length;
+        with
+          Global => (In_Out => Position),
+        Pre    => Data'Length > 0 and
+        Position <= Result'Length - Data'Length;
 
       procedure Append (Result : in out String;
                         Data   :        String)
@@ -243,8 +245,8 @@ is
             declare
                Name : constant String := To_String (E.Name);
             begin
-            case E.Kind
-            is
+               case E.Kind
+               is
                when Kind_Element_Open =>
                   if Is_Open
                   then
@@ -309,7 +311,7 @@ is
                   end;
                when Kind_Invalid =>
                   exit Fill_Result;
-            end case;
+               end case;
             end;
          end loop Fill_Result;
          return Result;

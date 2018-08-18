@@ -1,8 +1,8 @@
 package SXML
    with SPARK_Mode
 is
-   -- FIXME: The length should become a generic parameter
-   type Name_Type is new String (1..100);
+   --  FIXME: The length should become a generic parameter
+   type Name_Type is new String (1 .. 100);
 
    type Node_Type is private;
 
@@ -24,6 +24,7 @@ is
    with
       Pre => Is_Valid (Left, Right);
 
+   overriding
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    is (Concatenate (Left, Right))
    with
@@ -81,7 +82,7 @@ private
    end record;
 
    Null_Node : constant Node_Type := (Kind => Kind_Invalid, Name => Null_Name);
-   Null_Tree : constant Subtree_Type (1..0) := (others => Null_Node);
+   Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
    function Is_Attr (Node : Node_Type) return Boolean;
 
@@ -99,6 +100,5 @@ private
    with
       Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);
-
 
 end SXML;

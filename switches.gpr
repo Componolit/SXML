@@ -1,0 +1,55 @@
+abstract project Switches
+is
+   Compiler_Switches :=
+   (
+      "-gnatA"	 -- Avoid processing gnat.adc, if present file will be ignored
+     ,"-gnata"  -- Enable pragma Assert/Debug
+
+     ,"-gnatA"  -- Aliasing checks on subprogram parameters
+     ,"-gnatef" -- Full source path in brief error messages
+     ,"-gnateV" -- Validity checks on subprogram parameters
+     ,"-gnatf"  -- Full errors. Verbose details, all undefined references
+     ,"-gnatU"  -- Enable unique tag for error messages
+
+     -- Validity checks
+     ,"-gnatVa" -- turn on all validity checking options
+
+     -- Warnings
+     ,"-gnatwa" -- turn on all info/warnings marked with + in gnatmake help
+     ,"-gnatwe" -- treat all warnings (but not info) as errors
+     ,"-gnatwd" -- turn on warnings for implicit dereference
+     ,"-gnatwh" -- turn on warnings for hiding declarations
+     ,"-gnatwk" -- turn on warnings for standard redefinition
+     ,"-gnatwt" -- turn on warnings for tracking deleted code
+     ,"-gnatwu" -- turn on warnings for unordered enumeration
+
+     -- Style checks
+     ,"-gnaty3"    -- Check indentation (3 spaces)
+     ,"-gnatya"    -- check attribute casing
+     ,"-gnatyA"    -- check array attribute indexes
+     ,"-gnatyb"    -- check no blanks at end of lines
+     ,"-gnatyc"    -- check comment format (two spaces)
+     ,"-gnatyd"    -- check no DOS line terminators
+     ,"-gnatye"    -- check end/exit labels present
+     ,"-gnatyf"    -- check no form feeds/vertical tabs in source
+     ,"-gnatyh"    -- check no horizontal tabs in source
+     ,"-gnatyi"    -- check if-then layout
+     ,"-gnatyI"    -- check mode in
+     ,"-gnatyk"    -- check casing rules for keywords
+     ,"-gnatyl"    -- check reference manual layout
+     ,"-gnatyL8"   -- check max nest level < nn
+     ,"-gnatyM120" -- check line length <= nn characters
+     ,"-gnatyn"    -- check casing of package Standard identifiers
+     ,"-gnatyO"    -- check overriding indicators
+     ,"-gnatyp"    -- check pragma casing
+     ,"-gnatyr"    -- check casing for identifier references
+     ,"-gnatys"    -- check separate subprogram specs present
+     ,"-gnatyS"    -- check separate lines after THEN or ELSE
+     ,"-gnatyt"    -- check token separation rules
+     ,"-gnatyu"    -- check no unnecessary blank lines
+     ,"-gnatyx"    -- check extra parentheses around conditionals
+
+     ,"-fstack-check"          -- dynamic stack checking
+   );
+
+end Switches;
