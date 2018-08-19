@@ -11,13 +11,24 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML;
+with SXML.Parser;
 
 package body SXML_Parser_Tests is
 
    procedure Test_Parser_Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
+      package Parser is new SXML.Parser ("<valid></valid>");
+      use SXML;
+      use Parser;
+      Result : Match_Type;
    begin
-      Assert (False, "Not implemented");
+      Parser.Parse (Match => Result);
+      Assert (Result = Match_OK, "Invalid result: " & Result'Img);
+      declare
+         Doc : constant String := To_String (Parser.Document);
+      begin
+         Assert (Doc = "<valid></valid>", "Invalid result: " & Doc);
+      end;
 	end Test_Parser_Single_Node;
 
    ---------------------------------------------------------------------------

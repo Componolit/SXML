@@ -36,6 +36,10 @@ is
 
    Null_Tree : constant Subtree_Type;
 
+   -------
+   -- E --
+   -------
+
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    with
@@ -43,11 +47,19 @@ is
               Is_Valid (Name),
       Post => E'Result'First = 1 and E'Result'Length = Children'Length + 2;
 
+   -------
+   -- A --
+   -------
+
    function A (Name  : String;
                Value : Integer) return Subtree_Type
    with
       Pre  => Is_Valid (Name),
       Post => A'Result'First = 1 and A'Result'Length = 1;
+
+   -------
+   -- A --
+   -------
 
    function A (Name  : String;
                Value : Float) return Subtree_Type
@@ -55,11 +67,27 @@ is
       Pre  => Is_Valid (Name),
       Post => A'Result'First = 1 and A'Result'Length = 1;
 
+   -------
+   -- A --
+   -------
+
    function A (Name  : String;
                Value : String) return Subtree_Type
    with
       Pre  => Is_Valid (Name) and Is_Valid (Value),
       Post => A'Result'First = 1 and A'Result'Length = 1;
+
+   -------------
+   -- To_Name --
+   -------------
+
+   function To_Name (Name : String) return Name_Type
+   with
+      Pre => Is_Valid (Name);
+
+   ---------------
+   -- To_String --
+   ---------------
 
    function To_String (Tree : Subtree_Type) return String;
 

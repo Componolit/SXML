@@ -7,6 +7,7 @@ package SXML.Parser is
                        Match_None,
                        Match_Invalid,
                        Match_Out_Of_Memory,
+                       Match_None_Wellformed,
                        Match_Depth_Limit);
    --  Result of a parsing operation
    --

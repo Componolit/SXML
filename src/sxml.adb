@@ -20,16 +20,12 @@ is
    -------------
 
    function To_Name (Name : String) return Name_Type
-   with
-      Pre => Is_Valid (Name);
-
-   function To_Name (Name : String) return Name_Type
    is
       Result : Name_Type := (others => Character'Val (0));
    begin
-      for I in Name'Range
+      for I in 0 .. Name'Length - 1
       loop
-         Result (I) := Name (I);
+         Result (Result'First + I) := Name (Name'First + I);
       end loop;
       return Result;
    end To_Name;
