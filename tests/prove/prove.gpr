@@ -1,0 +1,7 @@
+with "../../SXML";
+
+project Prove is
+   for Source_Dirs use (".");
+   for Main use ("exec.adb");
+   for Exec_Dir use "../../obj";
+end Prove;

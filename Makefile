@@ -8,6 +8,7 @@ all:
 
 test: SXML.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/execute/tests -gnata -p
+	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
 examples::
