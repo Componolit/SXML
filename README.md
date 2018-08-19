@@ -1,6 +1,6 @@
-# SXML: A proof-of-concept XML generator in SPARK.
+# SXML: XML generator in SPARK.
 
-SXML is a PoC for generating XML in pure [SPARK 2014](http://spark-2014.org). The goal is to allow for a concise definition of XML documents directly inside the code, comparable to [Genodes XML generator](https://github.com/genodelabs/genode/tree/master/repos/os/src/test/xml_generator).
+SXML is a library for generating XML in pure [SPARK 2014](http://spark-2014.org). The goal is to allow for a concise definition of XML documents directly inside the code, comparable to [Genodes XML generator](https://github.com/genodelabs/genode/tree/master/repos/os/src/test/xml_generator). Dynamic generation of (parts of) the XML document is supported. Absence of runtime errors was proven for the library.
 
 ## Example
 
@@ -8,30 +8,29 @@ XML document to be generated:
 
 ```XML
 <config>
-  <report delay_ms=" 500"></report>
+  <report delay_ms="500"/>
   <parent-provides>
-    <service name="CAP"></service>
-    <service name="CPU"></service>
+    <service name="CAP"/>
+    <service name="CPU"/>
   </parent-provides>
-  <start name="myprog" caps=" 500">
-    <binary name="myprog"></binary>
-    <resource name="RAM" quantum="16MB"></resource>
+  <start name="myprog" caps="500">
+    <binary name="myprog"/>
+    <resource name="RAM" quantum="16MB"/>
     <config>
-      <argv progname="myprog"></argv>
+      <argv progname="myprog"/>
       <vfs>
         <dir name="dev">
-          <log></log>
-          <rtc></rtc>
-          <null></null>
+          <log/>
+          <rtc/>
+          <null/>
         </dir>
-        <fs></fs>
+        <fs/>
       </vfs>
-      <libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc">
-      </libc>
+      <libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc"/>
     </config>
-    <route>
+    <route foo="5.41234E+01">
       <any-service>
-        <parent></parent>
+        <parent/>
       </any-service>
     </route>
   </start>
@@ -68,7 +67,7 @@ is
            E ("libc", A ("stdout", "/dev/log") & A ("stderr", "/dev/log") & A ("rtc", "/dev/rtc")
            )
         ) &
-        E ("route",
+        E ("route", A ("foo", 54.1234) &
            E ("any-service",
               E ("parent")
            )
@@ -79,7 +78,6 @@ is
 begin
    Put_Line (To_String (Doc));
 end Simple;
-
 ```
 
 # Authors and License
