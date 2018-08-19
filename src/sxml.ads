@@ -5,11 +5,14 @@ is
    type Name_Type is new String (1 .. 100);
 
    type Node_Type is private;
+   Null_Node : constant Node_Type;
 
    type Index_Type is new Natural range 1 .. Natural'Last / 2;
    type Subtree_Type is array (Index_Type range <>) of Node_Type;
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   is
+      (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length)
    with
       Ghost;
 
@@ -28,30 +31,35 @@ is
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    is (Concatenate (Left, Right))
    with
-      Pre => Is_Valid (Left, Right);
+      Pre  => Is_Valid (Left, Right),
+      Post => "&"'Result'Length = Left'Length + Right'Length;
 
    Null_Tree : constant Subtree_Type;
 
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    with
-      Pre => Children'Length < Index_Type'Last - 2 and
-             Is_Valid (Name);
+      Pre  => Children'Length < Index_Type'Last - 2 and
+              Is_Valid (Name),
+      Post => E'Result'First = 1 and E'Result'Length = Children'Length + 2;
 
    function A (Name  : String;
                Value : Integer) return Subtree_Type
    with
-      Pre => Is_Valid (Name);
+      Pre  => Is_Valid (Name),
+      Post => A'Result'First = 1 and A'Result'Length = 1;
 
    function A (Name  : String;
                Value : Float) return Subtree_Type
    with
-      Pre => Is_Valid (Name);
+      Pre  => Is_Valid (Name),
+      Post => A'Result'First = 1 and A'Result'Length = 1;
 
    function A (Name  : String;
                Value : String) return Subtree_Type
    with
-      Pre => Is_Valid (Name) and Is_Valid (Value);
+      Pre  => Is_Valid (Name) and Is_Valid (Value),
+      Post => A'Result'First = 1 and A'Result'Length = 1;
 
    function To_String (Tree : Subtree_Type) return String;
 
@@ -85,11 +93,6 @@ private
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
    function Is_Attr (Node : Node_Type) return Boolean;
-
-   function Is_Valid (Left, Right : Subtree_Type) return Boolean
-   is
-      (Left'Last <= Index_Type'Last - Right'Length and
-       Left'Length + Right'Length < Index_Type'Last);
 
    function To_String (Value : Float) return String
    with
