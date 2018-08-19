@@ -1,10 +1,10 @@
-CODEPEER ?= on
+CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
 GPRBUILD_OPTS = -gnata -p
 
 all:
-	gprbuild $(GPRBUILD_OPTS) -P SXML
-	gnatprove $(GNATPROVE_OPTS) -P SXML
+	@gprbuild $(GPRBUILD_OPTS) -P SXML
+	@gnatprove $(GNATPROVE_OPTS) -P SXML
 
 test: SXML.gpr
 	@gprbuild $(COMMON_OPTS) -P tests/execute/tests -gnata -p
