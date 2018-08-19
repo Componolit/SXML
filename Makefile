@@ -11,6 +11,10 @@ test: SXML.gpr
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
+testonly: SXML.gpr
+	@gprbuild $(COMMON_OPTS) -P tests/execute/tests -gnata -p
+	@obj/tests
+
 examples::
 	gprbuild $(GPRBUILD_OPTS) -P examples/examples
 

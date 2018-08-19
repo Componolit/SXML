@@ -1,5 +1,7 @@
 # SXML: XML generator in SPARK.
 
+[![Build Status](https://travis-ci.org/Componolit/SXML.svg?branch=master)](https://travis-ci.org/Componolit/SXML)
+
 SXML is a library for generating XML in pure [SPARK 2014](http://spark-2014.org). The goal is to allow for a concise definition of XML documents directly inside the code, comparable to [Genodes XML generator](https://github.com/genodelabs/genode/tree/master/repos/os/src/test/xml_generator). Dynamic generation of (parts of) the XML document is supported. Absence of runtime errors was proven for the library.
 
 ## Example
