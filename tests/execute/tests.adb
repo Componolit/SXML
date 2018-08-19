@@ -5,7 +5,7 @@
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
+-- This file is part of SXML, which is distributed under the terms of the
 -- GNU Affero General Public License version 3.
 --
 

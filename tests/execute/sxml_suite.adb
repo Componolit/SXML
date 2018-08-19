@@ -5,12 +5,13 @@
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
--- This file is part of JWX, which is distributed under the terms of the
+-- This file is part of SXML, which is distributed under the terms of the
 -- GNU Affero General Public License version 3.
 --
 
 -- Import tests and sub-suites to run
 with SXML_Generator_Tests;
+with SXML_Parser_Tests;
 
 package body SXML_Suite is
 
@@ -21,10 +22,12 @@ package body SXML_Suite is
 
    --  Statically allocate test cases:
    Generator_Tests : aliased SXML_Generator_Tests.Test_Case;
+   Parser_Tests    : aliased SXML_Parser_Tests.Test_Case;
 
    function Suite return Access_Test_Suite is
    begin
       Add_Test (Result'Access, Generator_Tests'Access);
+      Add_Test (Result'Access, Parser_Tests'Access);
       return Result'Access;
    end Suite;
 

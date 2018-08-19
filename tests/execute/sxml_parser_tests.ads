@@ -1,6 +1,6 @@
 --
 -- @author Alexander Senier
--- @date   2018-05-12
+-- @date   2018-08-19
 --
 -- Copyright (C) 2018 Componolit GmbH
 --
@@ -11,8 +11,8 @@
 with AUnit; use AUnit;
 with AUnit.Test_Cases; use AUnit.Test_Cases;
 
--- @summary Tests for XML generator
-package SXML_Generator_Tests is
+-- @summary Tests for SXML Parser
+package SXML_Parser_Tests is
 
    type Test_Case is new Test_Cases.Test_Case with null record;
 
@@ -22,4 +22,4 @@ package SXML_Generator_Tests is
    function Name (T : Test_Case) return Message_String;
    -- Provide name identifying the test case
 
-end SXML_Generator_Tests;
+end SXML_Parser_Tests;
