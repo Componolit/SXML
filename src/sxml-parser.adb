@@ -280,17 +280,15 @@ package body SXML.Parser is
          Context (Context_Index) :=
            (Kind => Kind_Element_Close,
             Name => To_Name (Data (Name.First .. Name.Last)));
+         Context_Index := Context_Index + 1;
          Match := Match_OK;
          return;
       end if;
 
-      Parse_Internal (Match);
-      if Match /= Match_OK and Match /= Match_None
-      then
-         Match  := Match_Invalid;
-         Offset := Old_Offset;
-         return;
-      end if;
+      loop
+         Parse_Internal (Match);
+         exit when Match = Match_None;
+      end loop;
 
       --  FIXME: Match closing tag with opening tag
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);

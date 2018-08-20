@@ -52,11 +52,21 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Multiple_Children (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent><child1/><child2/></parent>",
+                      "<parent><child1></child1><child2></child2></parent>");
+   end Multiple_Children;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
       Register_Routine (T, Single_Node'Access, "Parse single node");
       Register_Routine (T, Single_Short_Node'Access, "Parse single short node");
+      Register_Routine (T, Multiple_Children'Access, "Parse multiple children");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
