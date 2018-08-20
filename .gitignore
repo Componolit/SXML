@@ -8,3 +8,5 @@ adalib
 b__*.ad?
 *.bexch
 gnatprove
+gnatinspect.db
+tests-loc.xml

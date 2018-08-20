@@ -15,9 +15,10 @@ with SXML.Parser;
 
 package body SXML_Parser_Tests is
 
-   procedure Test_Parser_Single_Node (T : in out Test_Cases.Test_Case'Class)
+   procedure Check_Document (Input  : String;
+                             Output : String := "INPUT")
    is
-      package Parser is new SXML.Parser ("<valid></valid>");
+      package Parser is new SXML.Parser (Input);
       use SXML;
       use Parser;
       Result : Match_Type;
@@ -27,16 +28,35 @@ package body SXML_Parser_Tests is
       declare
          Doc : constant String := To_String (Parser.Document);
       begin
-         Assert (Doc = "<valid></valid>", "Invalid result: " & Doc);
+         --  FIXME: Remove whitespace
+         Assert (Doc = (if Output = "INPUT" then Input else Output),
+            "Invalid result: " & Doc);
       end;
-	end Test_Parser_Single_Node;
+   end Check_Document;
+
+   -----------------------------------------------------------------------------
+
+   procedure Single_Node (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<valid></valid>");
+   end Single_Node;
+
+   ---------------------------------------------------------------------------
+
+   procedure Single_Short_Node (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<valid/>", "<valid></valid>");
+   end Single_Short_Node;
 
    ---------------------------------------------------------------------------
 
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
-      Register_Routine (T, Test_Parser_Single_Node'Access, "Parse single node");
+      Register_Routine (T, Single_Node'Access, "Parse single node");
+      Register_Routine (T, Single_Short_Node'Access, "Parse single short node");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

@@ -47,6 +47,40 @@ package body SXML.Parser is
       (Data'First > Integer'Last - Offset or
        Offset > Data'Length - 1);
 
+   ------------------
+   -- Match_String --
+   ------------------
+
+   procedure Match_String (Text  : String;
+                           Match : out Match_Type);
+
+   procedure Match_String (Text  : String;
+                           Match : out Match_Type)
+   is
+      Old_Offset : constant Natural := Offset;
+   begin
+      for I in 1 .. Text'Length
+      loop
+         if Data_Overflow
+         then
+            Match  := Match_Invalid;
+            Offset := Old_Offset;
+            return;
+         end if;
+
+         if Data (Data'First + Offset) /= Text (I)
+         then
+            Match  := Match_None;
+            Offset := Old_Offset;
+            return;
+         end if;
+
+         Offset := Offset + 1;
+      end loop;
+
+      Match := Match_OK;
+   end Match_String;
+
    ----------------------
    -- Context_Overflow --
    ----------------------
@@ -121,7 +155,7 @@ package body SXML.Parser is
       end if;
 
       --  Match tag name
-      Match_Until (" >", Name);
+      Match_Until (">/", Name);
       if Name = Null_Range
       then
          Offset := Old_Offset;
@@ -135,18 +169,19 @@ package body SXML.Parser is
          return;
       end if;
 
-      --  Match closing '>'
-      if not Match_Set (">")
+      --  Short form node?
+      Match_String ("/>", Match);
+      if Match = Match_OK
       then
-         Offset := Old_Offset;
-         return;
-      end if;
-
-      Offset := Offset + 1;
-      if Data_Overflow
-      then
-         Offset := Old_Offset;
-         return;
+         Done := True;
+      else
+         --  Match closing '>'
+         if not Match_Set (">")
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
+         Offset := Offset + 1;
       end if;
 
       --  FIXME: Add range type for string to avoid copying
@@ -167,8 +202,7 @@ package body SXML.Parser is
    procedure Parse_Closing_Tag (Name  : String;
                                 Match : out Match_Type)
    is
-      Old_Offset : constant Natural := Offset;
-      P : constant Natural := Data'First + Offset;
+      Old_Offset   : constant Natural := Offset;
       Closing_Name : Range_Type;
    begin
       Match := Match_Invalid;
@@ -179,17 +213,11 @@ package body SXML.Parser is
          return;
       end if;
 
-      --  Enough space to hold </Name>?
-      if P > Data'Last - Name'Length - 2
+      Match_String ("</", Match);
+      if Match /= Match_OK
       then
          return;
       end if;
-
-      if Data (P .. P + 1) /= "</"
-      then
-         return;
-      end if;
-      Offset := Offset + 2;
 
       Match_Until (">", Closing_Name);
       if Closing_Name = Null_Range or Data_Overflow
@@ -234,10 +262,25 @@ package body SXML.Parser is
    begin
 
       Parse_Opening_Tag (Match, Name, Done);
-      if Match /= Match_OK or else Done
+      if Match /= Match_OK
       then
          Offset := Old_Offset;
          Match  := Match_None;
+         return;
+      end if;
+
+      if Context_Overflow
+      then
+         Match := Match_Out_Of_Memory;
+         return;
+      end if;
+
+      if Done
+      then
+         Context (Context_Index) :=
+           (Kind => Kind_Element_Close,
+            Name => To_Name (Data (Name.First .. Name.Last)));
+         Match := Match_OK;
          return;
       end if;
 
