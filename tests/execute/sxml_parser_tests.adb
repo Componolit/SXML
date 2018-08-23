@@ -36,6 +36,19 @@ package body SXML_Parser_Tests is
 
    -----------------------------------------------------------------------------
 
+   procedure Check_Invalid (Input : String)
+   is
+      package Parser is new SXML.Parser (Input);
+      use SXML;
+      use Parser;
+      Result : Match_Type;
+   begin
+      Parser.Parse (Match => Result);
+      Assert (Result /= Match_OK, "Error expected");
+   end Check_Invalid;
+
+   -----------------------------------------------------------------------------
+
    procedure Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
    begin
@@ -59,6 +72,25 @@ package body SXML_Parser_Tests is
                       "<parent><child1></child1><child2></child2></parent>");
    end Multiple_Children;
 
+   -----------------------------------------------------------------------------
+
+   procedure Invalid_Whitespace (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Invalid ("<   valid></valid>");
+   end Invalid_Whitespace;
+
+   -----------------------------------------------------------------------------
+
+   procedure Valid_Whitespace (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<valid     ></valid>", "<valid></valid>");
+      Check_Document ("<valid" & Character'Val(16#D#) & "></valid>", "<valid></valid>");
+      Check_Document ("<valid></valid  " & Character'Val(16#9#) & ">", "<valid></valid>");
+      Check_Document ("<valid></valid  " & Character'Val(16#A#) & ">", "<valid></valid>");
+   end Valid_Whitespace;
+
    ---------------------------------------------------------------------------
 
    procedure Register_Tests (T: in out Test_Case) is
@@ -67,6 +99,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Single_Node'Access, "Parse single node");
       Register_Routine (T, Single_Short_Node'Access, "Parse single short node");
       Register_Routine (T, Multiple_Children'Access, "Parse multiple children");
+      Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
+      Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

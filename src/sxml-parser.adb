@@ -12,6 +12,12 @@ package body SXML.Parser is
    end record;
    Null_Range : constant Range_Type := (Natural'Last, 0);
 
+   Whitespace : constant String :=
+      Character'Val (16#20#) &
+      Character'Val (16#9#)  &
+      Character'Val (16#D#)  &
+      Character'Val (16#A#);
+
    function Document_Valid return Boolean is (Context_Valid);
 
    ---------------
@@ -118,6 +124,26 @@ package body SXML.Parser is
 
    end Match_Until;
 
+   ----------
+   -- Skip --
+   ----------
+
+   procedure Skip (Skip_Set : String);
+
+   procedure Skip (Skip_Set : String)
+   is
+   begin
+      loop
+         if Data_Overflow
+         then
+            return;
+         end if;
+
+         exit when not Match_Set (Skip_Set);
+         Offset := Offset + 1;
+      end loop;
+   end Skip;
+
    -----------------------
    -- Parse_Opening_Tag --
    -----------------------
@@ -155,14 +181,14 @@ package body SXML.Parser is
       end if;
 
       --  Match tag name
-      Match_Until (">/", Name);
+      Match_Until (Whitespace & ">/", Name);
       if Name = Null_Range
       then
          Offset := Old_Offset;
          return;
       end if;
 
-      --  FIXME: Skip whitespace
+      Skip (Whitespace);
 
       if Data_Overflow
       then
@@ -219,12 +245,14 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until (">", Closing_Name);
+      Match_Until (Whitespace & ">", Closing_Name);
       if Closing_Name = Null_Range or Data_Overflow
       then
          Offset := Old_Offset;
          return;
       end if;
+
+      Skip (Whitespace);
 
       --  Match closing tag
       if not Match_Set (">")
