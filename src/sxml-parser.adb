@@ -227,7 +227,14 @@ package body SXML.Parser is
          Offset := Old_Offset;
          return;
       end if;
-      Offset := Offset + 1;
+
+      Skip (Whitespace);
+      Match_Set ("=", Match_Tmp);
+      if Match_Tmp /= Match_OK
+      then
+         Offset := Old_Offset;
+         return;
+      end if;
 
       Skip (Whitespace);
       Match_Set ("""", Match_Tmp);
