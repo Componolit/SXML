@@ -3,17 +3,6 @@ package body SXML
 is
 
    -------------
-   -- Is_Attr --
-   -------------
-
-   function Is_Attr (Node : Node_Type) return Boolean
-   is
-   begin
-      return
-         Node.Kind = Kind_Attr;
-   end Is_Attr;
-
-   -------------
    -- To_Name --
    -------------
 

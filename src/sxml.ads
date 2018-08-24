@@ -114,8 +114,6 @@ private
    Null_Node : constant Node_Type := (Kind => Kind_Invalid, Name => Null_Name);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
-   function Is_Attr (Node : Node_Type) return Boolean;
-
    function To_String (Value : Float) return String
    with
       Post     => To_String'Result'Length < 12 and
