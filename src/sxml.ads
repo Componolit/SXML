@@ -95,9 +95,7 @@ private
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
                       Kind_Element_Close,
-                      Kind_Attr_Integer,
-                      Kind_Attr_Float,
-                      Kind_Attr_String);
+                      Kind_Attr);
 
    Null_Name : constant Name_Type := (others => Character'Val (0));
 
@@ -108,12 +106,8 @@ private
          when Kind_Invalid
             | Kind_Element_Open
             | Kind_Element_Close => null;
-         when Kind_Attr_Integer =>
-            Integer_Value : Integer;
-         when Kind_Attr_Float =>
-            Float_Value : Float;
-         when Kind_Attr_String =>
-            String_Value : Name_Type;
+         when Kind_Attr =>
+            Value : Name_Type;
       end case;
    end record;
 
@@ -124,12 +118,14 @@ private
 
    function To_String (Value : Float) return String
    with
-      Post     => To_String'Result'Length < 12,
+      Post     => To_String'Result'Length < 12 and
+                  Is_Valid (To_String'Result),
       Annotate => (GNATprove, Terminating);
 
    function To_String (Value : Integer) return String
    with
-      Post     => To_String'Result'Length < 12,
+      Post     => To_String'Result'Length < 12 and
+                  Is_Valid (To_String'Result),
       Annotate => (GNATprove, Terminating);
 
 end SXML;

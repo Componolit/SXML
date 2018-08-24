@@ -10,9 +10,7 @@ is
    is
    begin
       return
-         Node.Kind = Kind_Attr_Integer or
-         Node.Kind = Kind_Attr_Float or
-         Node.Kind = Kind_Attr_String;
+         Node.Kind = Kind_Attr;
    end Is_Attr;
 
    -------------
@@ -118,9 +116,9 @@ is
                Value : Integer) return Subtree_Type
    is
    begin
-      return (1 => (Kind          => Kind_Attr_Integer,
-                    Name          => To_Name (Name),
-                    Integer_Value => Value));
+      return (1 => (Kind  => Kind_Attr,
+                    Name  => To_Name (Name),
+                    Value => To_Name (To_String (Value))));
    end A;
 
    -------
@@ -131,9 +129,9 @@ is
                Value : Float) return Subtree_Type
    is
    begin
-      return (1 => (Kind        => Kind_Attr_Float,
-                    Name        => To_Name (Name),
-                    Float_Value => Value));
+      return (1 => (Kind  => Kind_Attr,
+                    Name  => To_Name (Name),
+                    Value => To_Name (To_String (Value))));
    end A;
 
    -------
@@ -144,9 +142,9 @@ is
                Value : String) return Subtree_Type
    is
    begin
-      return (1 => (Kind         => Kind_Attr_String,
-                    Name         => To_Name (Name),
-                    String_Value => To_Name (Value)));
+      return (1 => (Kind  => Kind_Attr,
+                    Name  => To_Name (Name),
+                    Value => To_Name (Value)));
    end A;
 
    --------------
@@ -159,9 +157,7 @@ is
          when Kind_Invalid       => 0,
          when Kind_Element_Open  => 2 + To_String (Node.Name)'Length,
          when Kind_Element_Close => 3 + To_String (Node.Name)'Length,
-         when Kind_Attr_Integer  => 4 + To_String (Node.Name)'Length + To_String (Node.Integer_Value)'Length,
-         when Kind_Attr_Float    => 4 + To_String (Node.Name)'Length + To_String (Node.Float_Value)'Length,
-         when Kind_Attr_String   => 4 + To_String (Node.Name)'Length + To_String (Node.String_Value)'Length);
+         when Kind_Attr          => 4 + To_String (Node.Name)'Length + To_String (Node.Value)'Length);
 
    --------------
    -- Text_Len --
@@ -275,29 +271,9 @@ is
                      return Invalid;
                   end if;
                   Append (Result, "</" & Name & ">");
-               when Kind_Attr_Integer =>
+               when Kind_Attr =>
                   declare
-                     Val : constant String := To_String (E.Integer_Value);
-                  begin
-                     if not In_Range (Result, 4 + Name'Length + Val'Length)
-                     then
-                        return Invalid;
-                     end if;
-                     Append (Result, " " & Name & "=""" & Val & """");
-                  end;
-               when Kind_Attr_String =>
-                  declare
-                     Val : constant String := To_String (E.String_Value);
-                  begin
-                     if not In_Range (Result, 4 + Name'Length + Val'Length)
-                     then
-                        return Invalid;
-                     end if;
-                     Append (Result, " " & Name & "=""" & Val & """");
-                  end;
-               when Kind_Attr_Float =>
-                  declare
-                     Val : constant String := To_String (E.Float_Value);
+                     Val : constant String := To_String (E.Value);
                   begin
                      if not In_Range (Result, 4 + Name'Length + Val'Length)
                      then
