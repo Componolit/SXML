@@ -2,6 +2,8 @@ with "switches";
 
 project SXML
 is
+   type Mode_Type is ("strict", "sloppy");
+   Mode : Mode_Type := external ("Mode", "strict");
 
    for Source_Dirs use ("src", "src/proof");
    for Object_Dir use "obj";
@@ -15,7 +17,12 @@ is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("Ada") use Switches.Compiler_Switches;
+      case Mode is
+         when "strict" =>
+            for Default_Switches ("Ada") use Switches.Compiler_Switches;
+         when others =>
+            null;
+      end case;
    end Compiler;
 
 end SXML;
