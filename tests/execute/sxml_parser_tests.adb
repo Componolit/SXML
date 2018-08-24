@@ -93,6 +93,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Simple_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr=""test""></parent>");
+   end Simple_Attribute;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -101,6 +109,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Multiple_Children'Access, "Parse multiple children");
       Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
+      Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
