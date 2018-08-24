@@ -1,3 +1,5 @@
+with Ada.Text_IO;
+
 package body SXML.Parser is
 
    Context       : Subtree_Type (1 .. Context_Size) := (others => Null_Node);
@@ -34,15 +36,6 @@ package body SXML.Parser is
    function Is_Valid_Name (R : Range_Type) return Boolean
    is (R.First >= Name_Type'First and R.Last <= Name_Type'Last);
 
-   ------------
-   -- Length --
-   ------------
-
-   function Length (R : Range_Type) return Natural
-   is (R.Last - R.First + 1)
-   with
-      Pre => In_Range (R);
-
    ---------------
    -- Match_Set --
    ---------------
@@ -50,22 +43,25 @@ package body SXML.Parser is
    procedure Match_Set (S      : String;
                         Result : out Match_Type)
    with
-      Pre    => Data_Valid,
+      Pre    => Data_Valid and
+                Offset < Natural'Last,
       Post   => (if Result = Match_OK then
                     (for some E of S => E = Data (Data'First + Offset - 1)));
 
    procedure Match_Set (S      : String;
                         Result : out Match_Type)
    is
-      Matched : Boolean;
    begin
       Result := Match_Invalid;
 
       for Value of S
       loop
-         Matched := Offset < Data'Length and then
-                    Data (Data'First + Offset) = Value;
-         if Matched
+         if Offset > Data'Length
+         then
+            return;
+         end if;
+
+         if Data (Data'First + Offset) = Value
          then
             Offset := Offset + 1;
             Result := Match_OK;
@@ -218,30 +214,20 @@ package body SXML.Parser is
       if Context_Overflow
       then
          Match  := Match_Out_Of_Memory;
-         Offset := Old_Offset;
          return;
       end if;
-
 
       Match := Match_Invalid;
 
       Skip (Whitespace);
-      Match_Until (End_Set => Whitespace & "=",
-                   Text    => Attr_Name);
+      Match_Until (Whitespace & "=", Attr_Name);
       if Attr_Name = Null_Range or else
          not Is_Valid_Name (Attr_Name)
       then
          Offset := Old_Offset;
          return;
       end if;
-
-      Skip (Whitespace);
-      Match_Set ("=", Match_Tmp);
-      if Match_Tmp /= Match_OK
-      then
-         Offset := Old_Offset;
-         return;
-      end if;
+      Offset := Offset + 1;
 
       Skip (Whitespace);
       Match_Set ("""", Match_Tmp);
@@ -258,6 +244,7 @@ package body SXML.Parser is
          Offset := Old_Offset;
          return;
       end if;
+      Offset := Offset + 1;
 
       --  FIXME: Add range type for string to avoid copying
       Context (Context_Index) :=
@@ -319,13 +306,12 @@ package body SXML.Parser is
 
       --  Parse_Attribute may add attributes to the context. Leave space for
       --  the opening tag we add below.
---      Context_Index := Context_Index + 1;
+      Context_Index := Context_Index + 1;
 
---        loop
---           Parse_Attribute (Match_Attr);
---           Ada.Text_IO.Put_Line ("Parse_Attribute: " & Match_Attr'Img);
---           exit when Match_Attr /= Match_OK;
---        end loop;
+      loop
+         Parse_Attribute (Match_Attr);
+         exit when Match_Attr /= Match_OK;
+      end loop;
 
       --  Short form node?
       Skip (Whitespace);
@@ -338,7 +324,7 @@ package body SXML.Parser is
          Match_Set (">", Match_Tmp);
          if Match_Tmp /= Match_OK
          then
-            --  Context_Index := Old_Index;
+            Context_Index := Old_Index;
             Offset := Old_Offset;
             return;
          end if;
@@ -348,8 +334,8 @@ package body SXML.Parser is
       Context (Old_Index) :=
         (Kind => Kind_Element_Open,
          Name => To_Name (Data (Name.First .. Name.Last)));
-      Context_Index := Context_Index + 1;
       Match := Match_OK;
+
    end Parse_Opening_Tag;
 
    -----------------------
