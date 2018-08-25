@@ -161,6 +161,7 @@ is
    begin
       for E of Tree
       loop
+         exit when E = Null_Node;
          Tmp := Node_Len (E);
          if Tmp > Natural'Last - Result
          then
@@ -223,6 +224,7 @@ is
          Fill_Result :
          for E of Tree
          loop
+            exit Fill_Result when E = Null_Node;
             declare
                Name : constant String := To_String (E.Name);
             begin

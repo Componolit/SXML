@@ -468,19 +468,19 @@ package body SXML.Parser is
    procedure Parse (Match : out Match_Type)
    is
    begin
-      Context := (others => Null_Node);
       Context_Valid := False;
       Parse_Internal (Match);
       if Match = Match_OK
       then
          Context_Valid := True;
       end if;
+      Context (Context_Index) := Null_Node;
    end Parse;
 
    --------------
    -- Document --
    --------------
 
-   function Document return Subtree_Type is (Context);
+   function Document return Subtree_Type is (Context (Context'First .. Context_Index));
 
 end SXML.Parser;
