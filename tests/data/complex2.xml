@@ -1,0 +1,8 @@
+<config>
+   <report delay_ms="500"/>
+	<parent-provides>
+		<service/>
+		<service/>
+		<service/>
+   </parent-provides>
+</config>

@@ -12,10 +12,31 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML;
 with SXML.Parser;
+with Ada.Direct_IO;
+with Ada.Directories;
 
 package body SXML_Parser_Tests is
 
    Context : SXML.Subtree_Type (1 .. 1000000);
+
+   ---------------
+   -- Read_File --
+   ---------------
+
+   function Read_File (File_Name : String) return String
+   is
+      File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
+      subtype File_String is String (1 .. File_Size);
+      package File_String_IO is new Ada.Direct_IO (File_String);
+
+      File     : File_String_IO.File_Type;
+      Contents : File_String;
+   begin
+      File_String_IO.Open (File, File_String_IO.In_File, File_Name);
+      File_String_IO.Read (File, Contents);
+      File_String_IO.Close (File);
+      return Contents;
+   end Read_File;
 
    procedure Check_Document (Input  : String;
                              Output : String := "INPUT")
@@ -111,6 +132,31 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Multiple_Attributes (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr1=""data1"" attr2=""data2"" attr3=""data3""></parent>");
+   end Multiple_Attributes;
+
+   ---------------------------------------------------------------------------
+
+   procedure Whitespace_Between_Nodes (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr=""test"">     </parent>", "<parent attr=""test""></parent>");
+   end Whitespace_Between_Nodes;
+
+   ---------------------------------------------------------------------------
+
+   procedure Complex_File (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : constant String := Read_File ("tests/data/complex.xml");
+   begin
+      Check_Document (Data);
+   end Complex_File;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -121,6 +167,9 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
       Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
       Register_Routine (T, Whitespace_Attribute'Access, "Whitespace attribute");
+      Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
+      Register_Routine (T, Whitespace_Between_Nodes'Access, "Whitespace between nodes");
+      Register_Routine (T, Complex_File'Access, "Complex_File");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
