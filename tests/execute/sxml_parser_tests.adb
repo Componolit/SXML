@@ -15,10 +15,12 @@ with SXML.Parser;
 
 package body SXML_Parser_Tests is
 
+   Context : SXML.Subtree_Type (1 .. 1000000);
+
    procedure Check_Document (Input  : String;
                              Output : String := "INPUT")
    is
-      package Parser is new SXML.Parser (Input);
+      package Parser is new SXML.Parser (Input, Context);
       use SXML;
       use Parser;
       Result : Match_Type;
@@ -38,7 +40,7 @@ package body SXML_Parser_Tests is
 
    procedure Check_Invalid (Input : String)
    is
-      package Parser is new SXML.Parser (Input);
+      package Parser is new SXML.Parser (Input, Context);
       use SXML;
       use Parser;
       Result : Match_Type;

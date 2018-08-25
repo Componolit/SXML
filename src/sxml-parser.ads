@@ -1,6 +1,6 @@
 generic
-   Data         : String;
-   Context_Size : Index_Type := Data'Length / 3 + 1;
+   Data    : String;
+   Context : in out Subtree_Type;
 package SXML.Parser is
 
    type Match_Type is (Match_OK,

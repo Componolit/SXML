@@ -1,8 +1,7 @@
-with SXML;
-
 package Prove_Parser is
 
-   function Parse (XML : String) return SXML.Subtree_Type
+   procedure Parse (XML    : String;
+                    Result : out Boolean)
    with
       Pre => XML'First >= 0 and
              XML'Last < Natural'Last and

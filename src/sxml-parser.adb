@@ -2,7 +2,6 @@ with Ada.Text_IO;
 
 package body SXML.Parser is
 
-   Context       : Subtree_Type (1 .. Context_Size) := (others => Null_Node);
    Context_Index : Index_Type := Context'First;
    Context_Valid : Boolean    := False;
    Offset        : Natural    := 0;
@@ -463,6 +462,7 @@ package body SXML.Parser is
    procedure Parse (Match : out Match_Type)
    is
    begin
+      Context := (others => Null_Node);
       Context_Valid := False;
       Parse_Internal (Match);
       if Match = Match_OK
