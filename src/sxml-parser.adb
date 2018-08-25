@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 package body SXML.Parser is
 
    Context_Index : Index_Type := Context'First;
@@ -35,6 +33,14 @@ package body SXML.Parser is
    function Is_Valid_Name (R : Range_Type) return Boolean
    is (R.First >= Name_Type'First and R.Last <= Name_Type'Last);
 
+   -------------------
+   -- Data_Overflow --
+   -------------------
+
+   function Data_Overflow return Boolean is
+      (Data'First > Integer'Last - Offset or
+       Offset > Data'Length - 1);
+
    ---------------
    -- Match_Set --
    ---------------
@@ -44,8 +50,9 @@ package body SXML.Parser is
    with
       Pre    => Data_Valid and
                 Offset < Natural'Last,
-      Post   => (if Result = Match_OK then
-                    (for some E of S => E = Data (Data'First + Offset - 1)));
+       Post   => (if Result = Match_OK then
+                    (for some E of S => E = Data (Data'First + Offset - 1)) and
+                    Offset > Offset'Old);
 
    procedure Match_Set (S      : String;
                         Result : out Match_Type)
@@ -55,7 +62,8 @@ package body SXML.Parser is
 
       for Value of S
       loop
-         if Offset > Data'Length
+         pragma Loop_Invariant (Result = Match_Invalid and Offset = Offset'Loop_Entry);
+         if Data_Overflow
          then
             return;
          end if;
@@ -69,14 +77,6 @@ package body SXML.Parser is
       end loop;
       Offset := Offset + 1;
    end Match_Set;
-
-   -------------------
-   -- Data_Overflow --
-   -------------------
-
-   function Data_Overflow return Boolean is
-      (Data'First > Integer'Last - Offset or
-       Offset > Data'Length - 1);
 
    ------------------
    -- Match_String --
@@ -145,7 +145,8 @@ package body SXML.Parser is
       Text := Null_Range;
 
       loop
-         if Data_Overflow
+         if Data_Overflow or
+            Len >= Natural'Last
          then
             Offset := Old_Offset;
             return;
@@ -294,6 +295,8 @@ package body SXML.Parser is
          return;
       end if;
 
+      Skip (Whitespace);
+
       --  Match opening '<'
       Match_Set ("<", Match_Tmp);
       if Match_Tmp /= Match_OK
@@ -367,6 +370,8 @@ package body SXML.Parser is
          return;
       end if;
 
+      Skip (Whitespace);
+
       Match_String ("</", Match);
       if Match /= Match_OK
       then
@@ -415,9 +420,10 @@ package body SXML.Parser is
 
    procedure Parse_Internal (Match : out Match_Type)
    is
-      Done       : Boolean;
       Old_Offset : constant Natural := Offset;
+      Done       : Boolean;
       Name       : Range_Type;
+      Sub_Match  : Match_Type;
    begin
 
       Parse_Opening_Tag (Match, Name, Done);
@@ -446,8 +452,8 @@ package body SXML.Parser is
       end if;
 
       loop
-         Parse_Internal (Match);
-         exit when Match /= Match_OK;
+         Parse_Internal (Sub_Match);
+         exit when Sub_Match /= Match_OK;
       end loop;
 
       --  FIXME: Match closing tag with opening tag
