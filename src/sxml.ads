@@ -17,8 +17,7 @@ is
       Ghost;
 
    function Is_Valid (Name : String) return Boolean
-   is (Name'Last <= Name_Type'Last and
-       Name'Length <= Name_Type'Length)
+   is (Name'Length <= Name_Type'Length)
    with
       Ghost;
 

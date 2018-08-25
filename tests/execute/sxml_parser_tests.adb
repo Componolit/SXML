@@ -46,6 +46,7 @@ package body SXML_Parser_Tests is
       use Parser;
       Result : Match_Type;
    begin
+      Context := (others => Null_Node);
       Parser.Parse (Match => Result);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img);
       declare
@@ -53,7 +54,7 @@ package body SXML_Parser_Tests is
       begin
          --  FIXME: Remove whitespace
          Assert (Doc = (if Output = "INPUT" then Input else Output),
-            "Invalid result: " & Doc);
+            "Invalid result: (" & Doc & "), expected: (" & Output & ")");
       end;
    end Check_Document;
 
@@ -148,9 +149,19 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Complex_File_Without_Attributes (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data     : constant String := Read_File ("tests/data/complex1.xml");
+      Expected : constant String := Read_File ("tests/data/complex1_expect.xml");
+   begin
+      Check_Document (Data, Expected (Expected'First .. Expected'Last - 1));
+   end Complex_File_Without_Attributes;
+
+   ---------------------------------------------------------------------------
+
    procedure Complex_File (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/complex.xml");
+      Data : constant String := Read_File ("tests/data/complex2.xml");
    begin
       Check_Document (Data);
    end Complex_File;
@@ -169,7 +180,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Whitespace_Attribute'Access, "Whitespace attribute");
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
       Register_Routine (T, Whitespace_Between_Nodes'Access, "Whitespace between nodes");
-      Register_Routine (T, Complex_File'Access, "Complex_File");
+      Register_Routine (T, Complex_File_Without_Attributes'Access, "Complex file without attributes");
+      Register_Routine (T, Complex_File'Access, "Complex file");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
