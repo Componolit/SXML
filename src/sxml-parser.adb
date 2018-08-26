@@ -421,11 +421,13 @@ package body SXML.Parser is
    -- Parse_Internal --
    --------------------
 
-   procedure Parse_Internal (Match : out Match_Type)
+   procedure Parse_Internal (Match : out Match_Type;
+                             Level : Natural := 0)
    with
       Post => (if Match /= Match_OK then Offset = Offset'Old);
 
-   procedure Parse_Internal (Match : out Match_Type)
+   procedure Parse_Internal (Match : out Match_Type;
+                             Level : Natural := 0)
    is
       Old_Offset : constant Natural := Offset;
       Done       : Boolean;
@@ -459,11 +461,10 @@ package body SXML.Parser is
       end if;
 
       loop
-         Parse_Internal (Sub_Match);
+         Parse_Internal (Sub_Match, Level + 1);
          exit when Sub_Match /= Match_OK;
       end loop;
 
-      --  FIXME: Match closing tag with opening tag
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
 
    end Parse_Internal;
