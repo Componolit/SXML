@@ -38,6 +38,18 @@ package body SXML_Parser_Tests is
       return Contents;
    end Read_File;
 
+   function Parse_Document (File : String) return Boolean
+   is
+      Input : constant String := Read_File (File);
+      package Parser is new SXML.Parser (Input, Context);
+      use SXML;
+      use Parser;
+      Result : Match_Type;
+   begin
+      Parser.Parse (Match => Result);
+      return Result = Match_OK;
+   end Parse_Document;
+
    procedure Check_Document (Input  : String;
                              Output : String := "INPUT")
    is
@@ -178,6 +190,15 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure CCDA_1 (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Assert (Parse_Document ("tests/data/Vitera_CCDA_SMART_Sample.xml"),
+              "Document not accepted");
+   end CCDA_1;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -193,6 +214,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Ignore_Node_Content'Access, "Ignore node content");
       Register_Routine (T, Complex_File_Without_Attributes'Access, "Complex file without attributes");
       Register_Routine (T, Complex_File'Access, "Complex file");
+      Register_Routine (T, CCDA_1'Access, "CCDA sample file");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
