@@ -1,3 +1,9 @@
 CCDA samples form https://github.com/chb/sample_ccdas:
 
 * Vitera_CCDA_SMART_Sample.xml
+
+MusicXML samples from http://www2.cpdl.org/wiki/index.php/Main_Page
+License: CPDL - http://www2.cpdl.org/wiki/index.php/ChoralWiki:CPDL
+
+* Bach-himmel.xml
+* Ws-bach243b.xml

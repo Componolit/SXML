@@ -217,6 +217,24 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure MXML_1 (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Assert (Parse_Document ("tests/data/Ws-bach243b.xml"),
+              "Document not accepted");
+   end MXML_1;
+
+   ---------------------------------------------------------------------------
+
+   procedure MXML_2 (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Assert (Parse_Document ("tests/data/Bach-himmel.xml"),
+              "Document not accepted");
+   end MXML_2;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -235,6 +253,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Complex_File_Without_Attributes'Access, "Complex file without attributes");
       Register_Routine (T, Complex_File'Access, "Complex file");
       Register_Routine (T, CCDA_1'Access, "CCDA sample file");
+      Register_Routine (T, MXML_1'Access, "MusicXML sample file #1");
+      Register_Routine (T, MXML_2'Access, "MusicXML sample file #2");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
