@@ -480,21 +480,26 @@ package body SXML.Parser is
 
    procedure Parse_Comment
    is
-      Old_Offset   : constant Natural := Offset;
+      Old_Offset   : Natural;
       Result       : Match_Type;
       Comment_Text : Range_Type;
    begin
-      Skip (Whitespace);
-      Match_String ("<!--", Result);
-      if Result = Match_OK
-      then
+      loop
+         Skip (Whitespace);
+         Old_Offset := Offset;
+         Match_String ("<!--", Result);
+         if Result /= Match_OK
+         then
+            return;
+         end if;
+
          Match_Until_String ("-->", Comment_Text);
          if Comment_Text = Null_Range
          then
             Offset := Old_Offset;
             return;
          end if;
-      end if;
+      end loop;
    end Parse_Comment;
 
    ----------------------------------
