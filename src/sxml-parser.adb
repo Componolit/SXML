@@ -497,6 +497,36 @@ package body SXML.Parser is
       end if;
    end Parse_Comment;
 
+   ----------------------------------
+   -- Parse_Processing_Information --
+   ----------------------------------
+
+   procedure Parse_Processing_Information;
+
+   procedure Parse_Processing_Information
+   is
+      Old_Offset : Natural;
+      Result     : Match_Type;
+      PI_Text    : Range_Type;
+   begin
+      loop
+         Skip (Whitespace);
+         Old_Offset := Offset;
+         Match_String ("<?", Result);
+         if Result /= Match_OK
+         then
+            return;
+         end if;
+
+         Match_Until_String ("?>", PI_Text);
+         if PI_Text = Null_Range
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
+      end loop;
+   end Parse_Processing_Information;
+
    --------------------
    -- Parse_Internal --
    --------------------
@@ -516,6 +546,7 @@ package body SXML.Parser is
    begin
 
       Parse_Comment;
+      Parse_Processing_Information;
 
       Parse_Opening_Tag (Match, Name, Done);
       if Match /= Match_OK
@@ -535,6 +566,7 @@ package body SXML.Parser is
       if Done
       then
          Parse_Comment;
+         Parse_Processing_Information;
          Context (Context_Index) :=
            (Kind => Kind_Element_Close,
             Name => To_Name (Data (Name.First .. Name.Last)));
@@ -551,6 +583,7 @@ package body SXML.Parser is
 
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
       Parse_Comment;
+      Parse_Processing_Information;
 
    end Parse_Internal;
 
