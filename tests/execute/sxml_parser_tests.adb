@@ -190,6 +190,15 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Ignore_Comments (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : constant String := Read_File ("tests/data/comments.xml");
+   begin
+      Check_Document (Data, "<parent><child></child></parent>");
+   end Ignore_Comments;
+
+   ---------------------------------------------------------------------------
+
    procedure CCDA_1 (T : in out Test_Cases.Test_Case'Class)
    is
    begin
@@ -212,6 +221,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
       Register_Routine (T, Whitespace_Between_Nodes'Access, "Whitespace between nodes");
       Register_Routine (T, Ignore_Node_Content'Access, "Ignore node content");
+      Register_Routine (T, Ignore_Comments'Access, "Ignore comments");
       Register_Routine (T, Complex_File_Without_Attributes'Access, "Complex file without attributes");
       Register_Routine (T, Complex_File'Access, "Complex file");
       Register_Routine (T, CCDA_1'Access, "CCDA sample file");

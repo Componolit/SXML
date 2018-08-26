@@ -128,12 +128,53 @@ package body SXML.Parser is
    function Context_Overflow return Boolean is
       (Context_Index >= Context'Last);
 
-   -----------------
-   -- Match_Until --
-   -----------------
+   ----------------------
+   -- Match_Until_Text --
+   ----------------------
 
-   procedure Match_Until (End_Set : String;
-                          Text    : out Range_Type)
+   procedure Match_Until_String (End_String : String;
+                                 Text       : out Range_Type);
+
+   procedure Match_Until_String (End_String : String;
+                                 Text       : out Range_Type)
+   is
+      Old_Offset : constant Natural := Offset;
+      First      : constant Natural := Data'First + Offset;
+      Result     : Match_Type;
+      Len        : Natural := 0;
+   begin
+      Text := Null_Range;
+
+      loop
+         if Data_Overflow or
+            Len >= Natural'Last
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
+
+         Match_String (End_String, Result);
+         exit when Result = Match_OK;
+         Offset := Offset + 1;
+         Len := Len + 1;
+      end loop;
+
+      if Len = 0
+      then
+         Offset := Old_Offset;
+         return;
+      end if;
+
+      Text := (First, Data'First + Offset - End_String'Length - 1);
+
+   end Match_Until_String;
+
+   ---------------------
+   -- Match_Until_Set --
+   ---------------------
+
+   procedure Match_Until_Set (End_Set : String;
+                              Text    : out Range_Type)
    with
       Pre  => Data_Valid and then
               Data'First <= Data'Last - Offset,
@@ -141,8 +182,8 @@ package body SXML.Parser is
                then Offset = Offset'Old
                else In_Range (Text));
 
-   procedure Match_Until (End_Set : String;
-                          Text    : out Range_Type)
+   procedure Match_Until_Set (End_Set : String;
+                              Text    : out Range_Type)
    is
       Old_Offset : constant Natural := Offset;
       First      : constant Natural := Data'First + Offset;
@@ -173,7 +214,7 @@ package body SXML.Parser is
       Offset := Offset - 1;
       Text := (First, Data'First + Offset - 1);
 
-   end Match_Until;
+   end Match_Until_Set;
 
    ----------
    -- Skip --
@@ -227,7 +268,7 @@ package body SXML.Parser is
       Match := Match_Invalid;
 
       Skip (Whitespace);
-      Match_Until (Whitespace & "=", Attr_Name);
+      Match_Until_Set (Whitespace & "=", Attr_Name);
       if Attr_Name = Null_Range or else
          not Is_Valid_Name (Attr_Name)
       then
@@ -251,7 +292,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until ("""", Attr_Value);
+      Match_Until_Set ("""", Attr_Value);
       if Attr_Value = Null_Range or else
          not Is_Valid_Name (Attr_Value)
       then
@@ -313,7 +354,7 @@ package body SXML.Parser is
       end if;
 
       --  Match tag name
-      Match_Until (Whitespace & ">/", Name);
+      Match_Until_Set (Whitespace & ">/", Name);
       if Name = Null_Range
       then
          Offset := Old_Offset;
@@ -386,7 +427,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until (Whitespace & ">", Closing_Name);
+      Match_Until_Set (Whitespace & ">", Closing_Name);
       if Closing_Name = Null_Range
       then
          Offset := Old_Offset;
@@ -427,9 +468,34 @@ package body SXML.Parser is
    is
       Content : Range_Type;
    begin
-      Match_Until ("<", Content);
+      Match_Until_Set ("<", Content);
       pragma Unreferenced (Content);
    end Parse_Content;
+
+   -------------------
+   -- Parse_Comment --
+   -------------------
+
+   procedure Parse_Comment;
+
+   procedure Parse_Comment
+   is
+      Old_Offset   : constant Natural := Offset;
+      Result       : Match_Type;
+      Comment_Text : Range_Type;
+   begin
+      Skip (Whitespace);
+      Match_String ("<!--", Result);
+      if Result = Match_OK
+      then
+         Match_Until_String ("-->", Comment_Text);
+         if Comment_Text = Null_Range
+         then
+            Offset := Old_Offset;
+            return;
+         end if;
+      end if;
+   end Parse_Comment;
 
    --------------------
    -- Parse_Internal --
@@ -449,6 +515,8 @@ package body SXML.Parser is
       Sub_Match  : Match_Type;
    begin
 
+      Parse_Comment;
+
       Parse_Opening_Tag (Match, Name, Done);
       if Match /= Match_OK
       then
@@ -466,6 +534,7 @@ package body SXML.Parser is
 
       if Done
       then
+         Parse_Comment;
          Context (Context_Index) :=
            (Kind => Kind_Element_Close,
             Name => To_Name (Data (Name.First .. Name.Last)));
@@ -481,6 +550,7 @@ package body SXML.Parser is
       end loop;
 
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
+      Parse_Comment;
 
    end Parse_Internal;
 
