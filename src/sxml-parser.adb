@@ -549,6 +549,36 @@ package body SXML.Parser is
       end loop;
    end Parse_Processing_Information;
 
+   -------------------
+   -- Parse_Doctype --
+   -------------------
+
+   procedure Parse_Doctype;
+
+   procedure Parse_Doctype
+   is
+      Old_Offset   : Natural;
+      Result       : Match_Type;
+      Doctype_Text : Range_Type;
+   begin
+      loop
+         Skip (Whitespace);
+         Old_Offset := Offset;
+         Match_String ("<!DOCTYPE", Result);
+         if Result /= Match_OK
+         then
+            return;
+         end if;
+
+         Match_Until_String (">", Doctype_Text);
+         if Doctype_Text = Null_Range
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+      end loop;
+   end Parse_Doctype;
+
    --------------------
    -- Parse_Internal --
    --------------------
@@ -569,6 +599,7 @@ package body SXML.Parser is
 
       Parse_Comment;
       Parse_Processing_Information;
+      Parse_Doctype;
 
       Parse_Opening_Tag (Match, Name, Done);
       if Match /= Match_OK
@@ -589,6 +620,7 @@ package body SXML.Parser is
       then
          Parse_Comment;
          Parse_Processing_Information;
+         Parse_Doctype;
          Context (Context_Index) :=
            (Kind => Kind_Element_Close,
             Name => To_Name (Data (Name.First .. Name.Last)));
@@ -606,6 +638,7 @@ package body SXML.Parser is
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
       Parse_Comment;
       Parse_Processing_Information;
+      Parse_Doctype;
 
    end Parse_Internal;
 
