@@ -161,9 +161,10 @@ package body SXML_Parser_Tests is
 
    procedure Complex_File (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/complex2.xml");
+      Data     : constant String := Read_File ("tests/data/complex2.xml");
+      Expected : constant String := Read_File ("tests/data/complex2_expect.xml");
    begin
-      Check_Document (Data);
+      Check_Document (Data, Expected (Expected'First .. Expected'Last - 1));
    end Complex_File;
 
    ---------------------------------------------------------------------------
