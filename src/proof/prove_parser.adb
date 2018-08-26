@@ -10,8 +10,11 @@ package body Prove_Parser is
       package Parser is new SXML.Parser (XML, Context);
       use Parser;
       Match : Match_Type;
+      Position : Natural;
    begin
-      Parser.Parse (Match => Match);
+      Parser.Parse (Match    => Match,
+                    Position => Position);
+      pragma Unreferenced (Position);
       Result := Match = Match_OK;
    end Parse;
 

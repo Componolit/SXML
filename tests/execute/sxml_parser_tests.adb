@@ -38,35 +38,41 @@ package body SXML_Parser_Tests is
       return Contents;
    end Read_File;
 
-   function Parse_Document (File : String) return Boolean
+   procedure Parse_Document (File : String)
    is
       Input : constant String := Read_File (File);
       package Parser is new SXML.Parser (Input, Context);
       use SXML;
       use Parser;
-      Result : Match_Type;
+      Result   : Match_Type;
+      Position : Natural;
    begin
-      Parser.Parse (Match => Result);
-      return Result = Match_OK;
+      Parser.Parse (Match    => Result,
+                    Position => Position);
+      Assert (Result = Match_OK,
+              File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result");
    end Parse_Document;
 
-   procedure Check_Document (Input  : String;
-                             Output : String := "INPUT")
+   procedure Check_Document (Input    : String;
+                             Output   : String := "INPUT")
    is
       package Parser is new SXML.Parser (Input, Context);
       use SXML;
       use Parser;
-      Result : Match_Type;
+      Result   : Match_Type;
+      Position : Natural;
    begin
       Context := (others => Null_Node);
-      Parser.Parse (Match => Result);
+      Parser.Parse (Match    => Result,
+                    Position => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img);
       declare
          Doc : constant String := To_String (Parser.Document);
       begin
          --  FIXME: Remove whitespace
          Assert (Doc = (if Output = "INPUT" then Input else Output),
-            "Invalid result: (" & Doc & "), expected: (" & Output & ")");
+            "Invalid result at" & Position'Img &
+            ": (" & Doc & "), expected: (" & Output & ")");
       end;
    end Check_Document;
 
@@ -77,9 +83,12 @@ package body SXML_Parser_Tests is
       package Parser is new SXML.Parser (Input, Context);
       use SXML;
       use Parser;
-      Result : Match_Type;
+      Result   : Match_Type;
+      Position : Natural;
    begin
-      Parser.Parse (Match => Result);
+      Parser.Parse (Match    => Result,
+                    Position => Position);
+      pragma Unreferenced (Position);
       Assert (Result /= Match_OK, "Error expected");
    end Check_Invalid;
 
@@ -211,8 +220,7 @@ package body SXML_Parser_Tests is
    procedure CCDA_1 (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Assert (Parse_Document ("tests/data/Vitera_CCDA_SMART_Sample.xml"),
-              "Document not accepted");
+      Parse_Document ("tests/data/Vitera_CCDA_SMART_Sample.xml");
    end CCDA_1;
 
    ---------------------------------------------------------------------------
@@ -220,8 +228,7 @@ package body SXML_Parser_Tests is
    procedure MXML_1 (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Assert (Parse_Document ("tests/data/Ws-bach243b.xml"),
-              "Document not accepted");
+      Parse_Document ("tests/data/Ws-bach243b.xml");
    end MXML_1;
 
    ---------------------------------------------------------------------------
@@ -229,8 +236,7 @@ package body SXML_Parser_Tests is
    procedure MXML_2 (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Assert (Parse_Document ("tests/data/Bach-himmel.xml"),
-              "Document not accepted");
+      Parse_Document ("tests/data/Bach-himmel.xml");
    end MXML_2;
 
    ---------------------------------------------------------------------------

@@ -35,7 +35,8 @@ package SXML.Parser is
    -- Parse --
    -----------
 
-   procedure Parse (Match : out Match_Type)
+   procedure Parse (Match    : out Match_Type;
+                    Position : out Natural)
    with
       Pre  => Data_Valid,
       Post => (if Match = Match_OK then Document_Valid);

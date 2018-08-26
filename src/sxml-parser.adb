@@ -3,6 +3,7 @@ package body SXML.Parser is
    Context_Index : Index_Type := Context'First;
    Context_Valid : Boolean    := False;
    Offset        : Natural    := 0;
+   Error_Index   : Natural    := 0;
 
    type Range_Type is
    record
@@ -18,6 +19,22 @@ package body SXML.Parser is
       Character'Val (16#A#);
 
    function Document_Valid return Boolean is (Context_Valid);
+
+   --------------------
+   -- Restore_Offset --
+   --------------------
+
+   procedure Restore_Offset (Old_Offset : Natural);
+
+   procedure Restore_Offset (Old_Offset : Natural)
+   is
+   begin
+      if Offset > Error_Index
+      then
+         Error_Index := Offset;
+      end if;
+      Offset := Old_Offset;
+   end Restore_Offset;
 
    --------------
    -- In_Range --
@@ -104,14 +121,14 @@ package body SXML.Parser is
          if Data_Overflow
          then
             Match  := Match_Invalid;
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
 
          if Data (Data'First + Offset) /= C
          then
             Match  := Match_None;
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
 
@@ -149,7 +166,7 @@ package body SXML.Parser is
          if Data_Overflow or
             Len >= Natural'Last
          then
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
 
@@ -161,7 +178,7 @@ package body SXML.Parser is
 
       if Len = 0
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -196,7 +213,7 @@ package body SXML.Parser is
          if Data_Overflow or
             Len >= Natural'Last
          then
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
 
@@ -207,7 +224,7 @@ package body SXML.Parser is
 
       if Len = 0
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -272,7 +289,7 @@ package body SXML.Parser is
       if Attr_Name = Null_Range or else
          not Is_Valid_Name (Attr_Name)
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -280,7 +297,7 @@ package body SXML.Parser is
       Match_Set ("=", Match_Tmp);
       if Match_Tmp /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -288,7 +305,7 @@ package body SXML.Parser is
       Match_Set ("""", Match_Tmp);
       if Match_Tmp /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -296,7 +313,7 @@ package body SXML.Parser is
       if Attr_Value = Null_Range or else
          not Is_Valid_Name (Attr_Value)
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
       Offset := Offset + 1;
@@ -349,7 +366,7 @@ package body SXML.Parser is
       Match_Set ("<", Match_Tmp);
       if Match_Tmp /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -357,7 +374,7 @@ package body SXML.Parser is
       Match_Until_Set (Whitespace & ">/", Name);
       if Name = Null_Range
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -382,7 +399,7 @@ package body SXML.Parser is
          if Match_Tmp /= Match_OK
          then
             Context_Index := Old_Index;
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
       end if;
@@ -413,7 +430,7 @@ package body SXML.Parser is
    begin
       if Context_Overflow
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          Match := Match_Out_Of_Memory;
          return;
       end if;
@@ -423,14 +440,14 @@ package body SXML.Parser is
       Match_String ("</", Match);
       if Match /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
       Match_Until_Set (Whitespace & ">", Closing_Name);
       if Closing_Name = Null_Range
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -439,13 +456,13 @@ package body SXML.Parser is
       Match_Set (">", Match_Tmp);
       if Match_Tmp /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          return;
       end if;
 
       if Data (Closing_Name.First .. Closing_Name.Last) /= Name
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          Match := Match_None_Wellformed;
          return;
       end if;
@@ -496,7 +513,7 @@ package body SXML.Parser is
          Match_Until_String ("-->", Comment_Text);
          if Comment_Text = Null_Range
          then
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
       end loop;
@@ -526,7 +543,7 @@ package body SXML.Parser is
          Match_Until_String ("?>", PI_Text);
          if PI_Text = Null_Range
          then
-            Offset := Old_Offset;
+            Restore_Offset (Old_Offset);
             return;
          end if;
       end loop;
@@ -556,14 +573,14 @@ package body SXML.Parser is
       Parse_Opening_Tag (Match, Name, Done);
       if Match /= Match_OK
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          Match  := Match_None;
          return;
       end if;
 
       if Context_Overflow
       then
-         Offset := Old_Offset;
+         Restore_Offset (Old_Offset);
          Match := Match_Out_Of_Memory;
          return;
       end if;
@@ -596,7 +613,8 @@ package body SXML.Parser is
    -- Parse --
    -----------
 
-   procedure Parse (Match : out Match_Type)
+   procedure Parse (Match    : out Match_Type;
+                    Position : out Natural)
    is
    begin
       Context_Valid := False;
@@ -604,6 +622,8 @@ package body SXML.Parser is
       if Match = Match_OK
       then
          Context_Valid := True;
+      else
+         Position := Error_Index;
       end if;
       Context (Context_Index) := Null_Node;
    end Parse;
