@@ -417,6 +417,20 @@ package body SXML.Parser is
 
    end Parse_Closing_Tag;
 
+   -------------------
+   -- Parse_Content --
+   -------------------
+
+   procedure Parse_Content;
+
+   procedure Parse_Content
+   is
+      Content : Range_Type;
+   begin
+      Match_Until ("<", Content);
+      pragma Unreferenced (Content);
+   end Parse_Content;
+
    --------------------
    -- Parse_Internal --
    --------------------
@@ -461,6 +475,7 @@ package body SXML.Parser is
       end if;
 
       loop
+         Parse_Content;
          Parse_Internal (Sub_Match, Level + 1);
          exit when Sub_Match /= Match_OK;
       end loop;
