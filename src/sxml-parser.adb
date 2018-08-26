@@ -26,12 +26,19 @@ package body SXML.Parser is
    function In_Range (R : Range_Type) return Boolean
    is (R.First >= Data'First and R.Last <= Data'Last and R.First <= R.Last);
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length (R : Range_Type) return Natural
+   is (if R.Last > R.First then R.Last - R.First - 1 else 0);
+
    -------------------
    -- Is_Valid_Name --
    -------------------
 
    function Is_Valid_Name (R : Range_Type) return Boolean
-   is (R.First >= Name_Type'First and R.Last <= Name_Type'Last);
+   is (Length (R) <= Name_Type'Length);
 
    -------------------
    -- Data_Overflow --
