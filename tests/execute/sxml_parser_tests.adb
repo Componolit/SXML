@@ -72,7 +72,7 @@ package body SXML_Parser_Tests is
          --  FIXME: Remove whitespace
          Assert (Doc = (if Output = "INPUT" then Input else Output),
             "Invalid result at" & Position'Img &
-            ": (" & Doc & "), expected: (" & Output & ")");
+            ": (" & Doc & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
       end;
    end Check_Document;
 
