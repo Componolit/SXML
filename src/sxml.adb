@@ -1,44 +1,6 @@
 package body SXML
    with SPARK_Mode
 is
-
-   -------------
-   -- To_Name --
-   -------------
-
-   function To_Name (Name : String) return Name_Type
-   is
-      Result : Name_Type := (others => Character'Val (0));
-   begin
-      for I in 0 .. Name'Length - 1
-      loop
-         Result (Result'First + I) := Name (Name'First + I);
-      end loop;
-      return Result;
-   end To_Name;
-
-   ---------------
-   -- To_String --
-   ---------------
-
-   function To_String (Name : Name_Type) return String
-   with
-      Post     => To_String'Result'Length <= Name_Type'Length,
-      Annotate => (GNATprove, Terminating);
-
-   function To_String (Name : Name_Type) return String
-   is
-      Len : Natural := 0;
-   begin
-      loop
-         pragma Loop_Invariant (Len <= Name'Last);
-         pragma Loop_Variant (Decreases => (Name'Last - Len));
-         exit when Len >= Name'Last or else Name (Len + 1) = Character'Val (0);
-         Len := Len + 1;
-      end loop;
-      return String (Name (1 .. Len));
-   end To_String;
-
    ---------------
    -- To_String --
    ---------------
@@ -75,6 +37,42 @@ is
       end if;
    end To_String;
 
+   ----------
+   -- Open --
+   ----------
+
+   --  FIXME: Implement!
+
+   function Open (Name : String) return Subtree_Type
+   is
+      Result : Subtree_Type (1 .. 1);
+   begin
+      pragma Unreferenced (Name);
+      --  FIXME: Implement, move to sxml.ads
+      Result (1) := Node_Type'(Kind   => Kind_Element_Open,
+                               Length => 0,
+                               Data   => Null_Data);
+      return Result;
+   end Open;
+
+   -----------
+   -- Close --
+   -----------
+
+   --  FIXME: Implement!
+
+   function Close (Name : String) return Subtree_Type
+   is
+      Result : Subtree_Type (1 .. 1);
+   begin
+      pragma Unreferenced (Name);
+      --  FIXME: Implement, move to sxml.ads
+      Result (1) := Node_Type'(Kind   => Kind_Element_Close,
+                               Length => 0,
+                               Data   => Null_Data);
+      return Result;
+   end Close;
+
    -------
    -- E --
    -------
@@ -82,18 +80,30 @@ is
    function E (Name       : String;
                Children   : Subtree_Type := Null_Tree) return Subtree_Type
    is
-      Index : Index_Type;
+      O : constant Subtree_Type := Open (Name);
+      C : constant Subtree_Type := Close (Name);
+      Index : Index_Type := 1;
    begin
-      return Result : Subtree_Type (1 .. Children'Length + 2) := (others => Null_Node)
+      return Result : Subtree_Type (1 .. Children'Length + O'Length + C'Length) :=
+        (others => Null_Node)
       do
-         Result (Result'First) := (Kind => Kind_Element_Open, Name => To_Name (Name));
-         Index := 2;
-         for Child of Children
+         for N of O
          loop
-            Result (Index) := Child;
+            Result (Index) := N;
             Index := Index + 1;
          end loop;
-         Result (Result'Last) := (Kind => Kind_Element_Close, Name => To_Name (Name));
+
+         for N of Children
+         loop
+            Result (Index) := N;
+            Index := Index + 1;
+         end loop;
+
+         for N of C
+         loop
+            Result (Index) := N;
+            Index := Index + 1;
+         end loop;
       end return;
    end E;
 
@@ -105,9 +115,7 @@ is
                Value : Integer) return Subtree_Type
    is
    begin
-      return (1 => (Kind  => Kind_Attr,
-                    Name  => To_Name (Name),
-                    Value => To_Name (To_String (Value))));
+      return A (Name, To_String (Value));
    end A;
 
    -------
@@ -118,9 +126,7 @@ is
                Value : Float) return Subtree_Type
    is
    begin
-      return (1 => (Kind  => Kind_Attr,
-                    Name  => To_Name (Name),
-                    Value => To_Name (To_String (Value))));
+      return A (Name, To_String (Value));
    end A;
 
    -------
@@ -131,10 +137,17 @@ is
                Value : String) return Subtree_Type
    is
    begin
-      return (1 => (Kind  => Kind_Attr,
-                    Name  => To_Name (Name),
-                    Value => To_Name (Value)));
+      --  FIXME: Implement!
+      pragma Unreferenced (Name, Value);
+      return (1 => Null_Node);
    end A;
+
+   --------------
+   -- Data_Len --
+   --------------
+
+   function Data_Len (Node : Node_Type) return Natural is
+     (if Node.Length = 0 then Node.Data'Length else Natural (Node.Length));
 
    --------------
    -- Node_Len --
@@ -144,9 +157,11 @@ is
    is
      (case Node.Kind is
          when Kind_Invalid       => 0,
-         when Kind_Element_Open  => 2 + To_String (Node.Name)'Length,
-         when Kind_Element_Close => 3 + To_String (Node.Name)'Length,
-         when Kind_Attr          => 4 + To_String (Node.Name)'Length + To_String (Node.Value)'Length);
+         when Kind_Element_Open  => 2 + Data_Len (Node),
+         when Kind_Element_Close => 3 + Data_Len (Node),
+         when Kind_Attr_Name     => 1 + Data_Len (Node),
+         when Kind_Attr_Data     => 2 + Data_Len (Node),
+         when Kind_Data          => Data_Len (Node));
 
    --------------
    -- Text_Len --
@@ -225,11 +240,8 @@ is
          for E of Tree
          loop
             exit Fill_Result when E = Null_Node;
-            declare
-               Name : constant String := To_String (E.Name);
-            begin
-               case E.Kind
-               is
+            case E.Kind
+            is
                when Kind_Element_Open =>
                   if Is_Open
                   then
@@ -241,11 +253,11 @@ is
                   end if;
                   Is_Open := True;
                   begin
-                     if not In_Range (Result, 1 + Name'Length)
+                     if not In_Range (Result, 1 + E.Data'Length)
                      then
                         return Invalid;
                      end if;
-                     Append (Result, "<" & Name);
+                     Append (Result, "<" & E.Data);
                   end;
                when Kind_Element_Close =>
                   if Is_Open
@@ -257,25 +269,20 @@ is
                      end if;
                      Append (Result, ">");
                   end if;
-                  if not In_Range (Result, 3 + Name'Length)
+                  if not In_Range (Result, 3 + E.Data'Length)
                   then
                      return Invalid;
                   end if;
-                  Append (Result, "</" & Name & ">");
-               when Kind_Attr =>
-                  declare
-                     Val : constant String := To_String (E.Value);
-                  begin
-                     if not In_Range (Result, 4 + Name'Length + Val'Length)
-                     then
-                        return Invalid;
-                     end if;
-                     Append (Result, " " & Name & "=""" & Val & """");
-                  end;
+                  Append (Result, "</" & E.Data & ">");
+               when Kind_Attr_Name =>
+                  Append (Result, " " & E.Data & "=");
+               when Kind_Attr_Data =>
+                  Append (Result, """" & E.Data & """");
+               when Kind_Data =>
+                  Append (Result, E.Data);
                when Kind_Invalid =>
                   exit Fill_Result;
-               end case;
-            end;
+            end case;
          end loop Fill_Result;
          return Result;
       end;

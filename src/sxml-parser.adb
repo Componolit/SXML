@@ -49,15 +49,9 @@ package body SXML.Parser is
    -- Length --
    ------------
 
-   function Length (R : Range_Type) return Natural
-   is (if R.Last > R.First then R.Last - R.First - 1 else 0);
-
-   -------------------
-   -- Is_Valid_Name --
-   -------------------
-
-   function Is_Valid_Name (R : Range_Type) return Boolean
-   is (Length (R) <= Name_Type'Length);
+   --  FIXME: Remove
+   --  function Length (R : Range_Type) return Natural
+   --  is (if R.Last > R.First then R.Last - R.First - 1 else 0);
 
    -------------------
    -- Data_Overflow --
@@ -145,7 +139,32 @@ package body SXML.Parser is
    ----------------------
 
    function Context_Overflow return Boolean is
-      (Context_Index >= Context'Last);
+     (Context_Index >= Context'Last);
+
+   -----------------
+   -- Context_Put --
+   -----------------
+
+   procedure Context_Put (Value  : Subtree_Type;
+                          Result : out Boolean);
+
+   procedure Context_Put (Value  : Subtree_Type;
+                          Result : out Boolean)
+   is
+   begin
+      Result := False;
+      if Context_Index > Context'Last - Value'Length
+      then
+         return;
+      end if;
+
+      for I in 0 .. Value'Length
+      loop
+         Context (Context_Index + Index_Type (I)) :=
+           Value (Value'First + Index_Type (I));
+      end loop;
+      Result := True;
+   end Context_Put;
 
    ----------------------
    -- Match_Until_Text --
@@ -281,10 +300,11 @@ package body SXML.Parser is
 
    procedure Parse_Attribute (Match : out Match_Type)
    is
-      Old_Offset : constant Natural := Offset;
-      Attr_Name  : Range_Type;
-      Attr_Value : Range_Type;
-      Match_Tmp  : Match_Type;
+      Old_Offset    : constant Natural := Offset;
+      Attr_Name     : Range_Type;
+      Attr_Value    : Range_Type;
+      Match_Tmp     : Match_Type;
+      Valid         : Boolean;
    begin
 
       if Context_Overflow
@@ -303,8 +323,7 @@ package body SXML.Parser is
       end if;
 
       Match_Until_Set (Whitespace & "=", Attr_Name);
-      if Attr_Name = Null_Range or else
-         not Is_Valid_Name (Attr_Name)
+      if Attr_Name = Null_Range
       then
          Restore_Offset (Old_Offset);
          return;
@@ -340,21 +359,23 @@ package body SXML.Parser is
       end if;
 
       Match_Until_Set ("""", Attr_Value);
-      if (Attr_Value = Null_Range or else
-          not Is_Valid_Name (Attr_Value)) or
-          Data_Overflow
+      if Attr_Value = Null_Range or
+         Data_Overflow
       then
          Restore_Offset (Old_Offset);
          return;
       end if;
       Offset := Offset + 1;
 
-      --  FIXME: Add range type for string to avoid copying
-      Context (Context_Index) :=
-        (Kind  => Kind_Attr,
-         Name  => To_Name (Data (Attr_Name.First .. Attr_Name.Last)),
-         Value => To_Name (Data (Attr_Value.First .. Attr_Value.Last)));
-      Context_Index := Context_Index + 1;
+      Context_Put (Value  => A (Name  => Data (Attr_Name.First .. Attr_Name.Last),
+                                Value =>  Data (Attr_Value.First .. Attr_Value.Last)),
+                   Result => Valid);
+      if not Valid
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
+
       Match := Match_OK;
 
    end Parse_Attribute;
@@ -380,6 +401,7 @@ package body SXML.Parser is
       Old_Offset  : constant Natural := Offset;
       Match_Attr  : Match_Type;
       Match_Tmp   : Match_Type;
+      Valid       : Boolean;
    begin
       Name  := Null_Range;
       Match := Match_Invalid;
@@ -447,10 +469,14 @@ package body SXML.Parser is
          end if;
       end if;
 
-      --  FIXME: Add range type for string to avoid copying
-      Context (Old_Index) :=
-        (Kind => Kind_Element_Open,
-         Name => To_Name (Data (Name.First .. Name.Last)));
+      Context_Put (Value  => Open (Data (Name.First .. Name.Last)),
+                   Result => Valid);
+      if not Valid
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
+
       Match := Match_OK;
 
    end Parse_Opening_Tag;
@@ -471,6 +497,7 @@ package body SXML.Parser is
       Old_Offset   : constant Natural := Offset;
       Closing_Name : Range_Type;
       Match_Tmp    : Match_Type;
+      Valid        : Boolean;
    begin
       Match := Match_Invalid;
 
@@ -528,10 +555,14 @@ package body SXML.Parser is
          return;
       end if;
 
-      Context (Context_Index) :=
-        (Kind => Kind_Element_Close,
-         Name => To_Name (Name));
-      Context_Index := Context_Index + 1;
+      Context_Put (Value  => Close (Name => Name),
+                   Result => Valid);
+      if not Valid
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
+
       Match := Match_OK;
 
    end Parse_Closing_Tag;
@@ -688,6 +719,7 @@ package body SXML.Parser is
       Done       : Boolean;
       Name       : Range_Type;
       Sub_Match  : Match_Type;
+      Valid      : Boolean;
    begin
 
       Match := Match_Invalid;
@@ -722,12 +754,15 @@ package body SXML.Parser is
          Parse_Comment;
          Parse_Processing_Information;
          Parse_Doctype;
-         Context (Context_Index) :=
-           (Kind => Kind_Element_Close,
-            Name => To_Name (Data (Name.First .. Name.Last)));
-         Context_Index := Context_Index + 1;
+         Context_Put (Value  =>  E (Data (Name.First .. Name.Last)),
+                      Result => Valid);
+         if not Valid
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+
          Match := Match_OK;
-         return;
       end if;
 
       loop

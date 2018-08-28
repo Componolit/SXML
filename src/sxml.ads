@@ -1,9 +1,6 @@
 package SXML
    with SPARK_Mode
 is
-   --  FIXME: The length should become a generic parameter
-   type Name_Type is new String (1 .. 100);
-
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
@@ -13,11 +10,6 @@ is
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length)
-   with
-      Ghost;
-
-   function Is_Valid (Name : String) return Boolean
-   is (Name'Length <= Name_Type'Length)
    with
       Ghost;
 
@@ -35,6 +27,18 @@ is
 
    Null_Tree : constant Subtree_Type;
 
+   ----------
+   -- Open --
+   ----------
+
+   function Open (Name : String) return Subtree_Type;
+
+   -----------
+   -- Close --
+   -----------
+
+   function Close (Name : String) return Subtree_Type;
+
    -------
    -- E --
    -------
@@ -42,8 +46,7 @@ is
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    with
-      Pre  => Children'Length < Index_Type'Last - 2 and
-              Is_Valid (Name),
+      Pre  => Children'Length < Index_Type'Last - 2,
       Post => E'Result'First = 1 and E'Result'Length = Children'Length + 2;
 
    -------
@@ -53,7 +56,6 @@ is
    function A (Name  : String;
                Value : Integer) return Subtree_Type
    with
-      Pre  => Is_Valid (Name),
       Post => A'Result'First = 1 and A'Result'Length = 1;
 
    -------
@@ -63,7 +65,6 @@ is
    function A (Name  : String;
                Value : Float) return Subtree_Type
    with
-      Pre  => Is_Valid (Name),
       Post => A'Result'First = 1 and A'Result'Length = 1;
 
    -------
@@ -73,16 +74,7 @@ is
    function A (Name  : String;
                Value : String) return Subtree_Type
    with
-      Pre  => Is_Valid (Name) and Is_Valid (Value),
-      Post => A'Result'First = 1 and A'Result'Length = 1;
-
-   -------------
-   -- To_Name --
-   -------------
-
-   function To_Name (Name : String) return Name_Type
-   with
-      Pre => Is_Valid (Name);
+       Post => A'Result'First = 1 and A'Result'Length = 1;
 
    ---------------
    -- To_String --
@@ -91,38 +83,37 @@ is
    function To_String (Tree : Subtree_Type) return String;
 
 private
+   subtype Data_Type is String (1 .. 10);
+   Null_Data : constant Data_Type := (others => Character'Val (0));
+
+   type Data_Index_Type is new Natural range Data_Type'First - 1 .. Data_Type'Last - 1;
+
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
                       Kind_Element_Close,
-                      Kind_Attr);
-
-   Null_Name : constant Name_Type := (others => Character'Val (0));
+                      Kind_Attr_Name,
+                      Kind_Attr_Data,
+                      Kind_Data);
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
-      Name : Name_Type;
-      case Kind is
-         when Kind_Invalid
-            | Kind_Element_Open
-            | Kind_Element_Close => null;
-         when Kind_Attr =>
-            Value : Name_Type;
-      end case;
+      Length : Data_Index_Type;
+      Data   : Data_Type;
    end record;
 
-   Null_Node : constant Node_Type := (Kind => Kind_Invalid, Name => Null_Name);
+   Null_Node : constant Node_Type := (Kind   => Kind_Invalid,
+                                      Length => Data_Index_Type'First,
+                                      Data   => Null_Data);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
    function To_String (Value : Float) return String
    with
-      Post     => To_String'Result'Length < 12 and
-                  Is_Valid (To_String'Result),
-      Annotate => (GNATprove, Terminating);
+       Post     => To_String'Result'Length < 12,
+       Annotate => (GNATprove, Terminating);
 
    function To_String (Value : Integer) return String
    with
-      Post     => To_String'Result'Length < 12 and
-                  Is_Valid (To_String'Result),
+      Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);
 
 end SXML;
