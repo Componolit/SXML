@@ -38,6 +38,20 @@ package body SXML.Parser is
       Offset := Old_Offset;
    end Restore_Offset;
 
+   ---------------------
+   -- Restore_Context --
+   ---------------------
+
+   procedure Restore_Context (Old_Context : Index_Type)
+   with
+      Post => Context_Index = Old_Context;
+
+   procedure Restore_Context (Old_Context : Index_Type)
+   is
+   begin
+      Context_Index := Old_Context;
+   end Restore_Context;
+
    --------------
    -- In_Range --
    --------------
@@ -158,10 +172,10 @@ package body SXML.Parser is
          return;
       end if;
 
-      for I in 0 .. Value'Length
+      for V of Value
       loop
-         Context (Context_Index + Index_Type (I)) :=
-           Value (Value'First + Index_Type (I));
+         Context (Context_Index) := V;
+         Context_Index := Context_Index + 1;
       end loop;
       Result := True;
    end Context_Put;
@@ -437,9 +451,13 @@ package body SXML.Parser is
          return;
       end if;
 
-      --  Parse_Attribute may add attributes to the context. Leave space for
-      --  the opening tag we add below.
-      Context_Index := Context_Index + 1;
+      Context_Put (Value  => Open (Data (Name.First .. Name.Last)),
+                   Result => Valid);
+      if not Valid
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
 
       loop
          Parse_Attribute (Match_Attr);
@@ -456,6 +474,7 @@ package body SXML.Parser is
          if Data_Overflow
          then
             Restore_Offset (Old_Offset);
+            Restore_Context (Old_Index);
             return;
          end if;
 
@@ -463,18 +482,10 @@ package body SXML.Parser is
          Match_Set (">", Match_Tmp);
          if Match_Tmp /= Match_OK
          then
-            Context_Index := Old_Index;
             Restore_Offset (Old_Offset);
+            Restore_Context (Old_Index);
             return;
          end if;
-      end if;
-
-      Context_Put (Value  => Open (Data (Name.First .. Name.Last)),
-                   Result => Valid);
-      if not Valid
-      then
-         Restore_Offset (Old_Offset);
-         return;
       end if;
 
       Match := Match_OK;
@@ -754,7 +765,7 @@ package body SXML.Parser is
          Parse_Comment;
          Parse_Processing_Information;
          Parse_Doctype;
-         Context_Put (Value  =>  E (Data (Name.First .. Name.Last)),
+         Context_Put (Value  => Close (Data (Name.First .. Name.Last)),
                       Result => Valid);
          if not Valid
          then
@@ -763,6 +774,7 @@ package body SXML.Parser is
          end if;
 
          Match := Match_OK;
+         return;
       end if;
 
       loop

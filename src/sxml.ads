@@ -77,7 +77,7 @@ is
    function To_String (Tree : Subtree_Type) return String;
 
 private
-   subtype Data_Type is String (1 .. 12);
+   subtype Data_Type is String (1 .. 50);
    Null_Data : constant Data_Type := (others => Character'Val (0));
 
    type Kind_Type is (Kind_Invalid,

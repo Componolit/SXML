@@ -65,7 +65,7 @@ package body SXML_Parser_Tests is
       Context := (others => Null_Node);
       Parser.Parse (Match    => Result,
                     Position => Position);
-      Assert (Result = Match_OK, "Invalid result: " & Result'Img);
+      Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
       declare
          Doc : constant String := To_String (Parser.Document);
       begin
