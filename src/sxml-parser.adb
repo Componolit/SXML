@@ -59,14 +59,6 @@ package body SXML.Parser is
    function In_Range (R : Range_Type) return Boolean
    is (R.First >= Data'First and R.Last <= Data'Last and R.First <= R.Last);
 
-   ------------
-   -- Length --
-   ------------
-
-   --  FIXME: Remove
-   --  function Length (R : Range_Type) return Natural
-   --  is (if R.Last > R.First then R.Last - R.First - 1 else 0);
-
    -------------------
    -- Data_Overflow --
    -------------------
