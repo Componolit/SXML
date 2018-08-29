@@ -37,40 +37,60 @@ is
       end if;
    end To_String;
 
+   --------------
+   -- Set_Data --
+   --------------
+
+   function Set_Data (Name : String;
+                      Kind : Kind_Type) return Subtree_Type;
+
+   function Set_Data (Name : String;
+                      Kind : Kind_Type) return Subtree_Type
+   is
+      Result_Len : constant Index_Type := (Name'Length - 1) / Data_Type'Length + 1;
+      Index      : Natural := Name'First;
+   begin
+      return Result : Subtree_Type (1 .. Result_Len) := (others => Null_Node)
+      do
+         for I in Result'Range
+         loop
+            declare
+               Offset : constant Natural :=
+                 (if Name'Last - Index > Data_Type'Length then
+                     Data_Type'Length - 1
+                  else
+                     Name'Last - Index);
+               D  : Data_Type := (others => Character'Val (0));
+            begin
+               D (Data_Type'First .. Data_Type'First + Offset) :=
+                 Name (Index .. Index + Offset);
+               Result (I) := Node_Type'(Kind   => Kind,
+                                        Length => Offset + 1,
+                                        Data   => D);
+            end;
+            Index := Index + Data_Type'Length;
+         end loop;
+      end return;
+   end Set_Data;
+
    ----------
    -- Open --
    ----------
 
-   --  FIXME: Implement!
-
    function Open (Name : String) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. 1);
    begin
-      pragma Unreferenced (Name);
-      --  FIXME: Implement, move to sxml.ads
-      Result (1) := Node_Type'(Kind   => Kind_Element_Open,
-                               Length => 0,
-                               Data   => Null_Data);
-      return Result;
+      return Set_Data (Name, Kind_Element_Open);
    end Open;
 
    -----------
    -- Close --
    -----------
 
-   --  FIXME: Implement!
-
    function Close (Name : String) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. 1);
    begin
-      pragma Unreferenced (Name);
-      --  FIXME: Implement, move to sxml.ads
-      Result (1) := Node_Type'(Kind   => Kind_Element_Close,
-                               Length => 0,
-                               Data   => Null_Data);
-      return Result;
+      return Set_Data (Name, Kind_Element_Close);
    end Close;
 
    -------
@@ -137,9 +157,8 @@ is
                Value : String) return Subtree_Type
    is
    begin
-      --  FIXME: Implement!
-      pragma Unreferenced (Name, Value);
-      return (1 => Null_Node);
+      return Set_Data (Name,  Kind_Attr_Name) &
+             Set_Data (Value, Kind_Attr_Data);
    end A;
 
    --------------
@@ -147,7 +166,7 @@ is
    --------------
 
    function Data_Len (Node : Node_Type) return Natural is
-     (if Node.Length = 0 then Node.Data'Length else Natural (Node.Length));
+     (if Node.Length = 0 then Node.Data'Length else Node.Length);
 
    --------------
    -- Node_Len --
@@ -159,7 +178,7 @@ is
          when Kind_Invalid       => 0,
          when Kind_Element_Open  => 2 + Data_Len (Node),
          when Kind_Element_Close => 3 + Data_Len (Node),
-         when Kind_Attr_Name     => 1 + Data_Len (Node),
+         when Kind_Attr_Name     => 2 + Data_Len (Node),
          when Kind_Attr_Data     => 2 + Data_Len (Node),
          when Kind_Data          => Data_Len (Node));
 
@@ -253,11 +272,11 @@ is
                   end if;
                   Is_Open := True;
                   begin
-                     if not In_Range (Result, 1 + E.Data'Length)
+                     if not In_Range (Result, 1 + E.Length)
                      then
                         return Invalid;
                      end if;
-                     Append (Result, "<" & E.Data);
+                     Append (Result, "<" & E.Data (1 .. E.Length));
                   end;
                when Kind_Element_Close =>
                   if Is_Open
@@ -269,17 +288,17 @@ is
                      end if;
                      Append (Result, ">");
                   end if;
-                  if not In_Range (Result, 3 + E.Data'Length)
+                  if not In_Range (Result, 3 + E.Length)
                   then
                      return Invalid;
                   end if;
-                  Append (Result, "</" & E.Data & ">");
+                  Append (Result, "</" & E.Data (1 .. E.Length) & ">");
                when Kind_Attr_Name =>
-                  Append (Result, " " & E.Data & "=");
+                  Append (Result, " " & E.Data (1 .. E.Length) & "=");
                when Kind_Attr_Data =>
-                  Append (Result, """" & E.Data & """");
+                  Append (Result, """" & E.Data (1 .. E.Length) & """");
                when Kind_Data =>
-                  Append (Result, E.Data);
+                  Append (Result, E.Data (1 .. E.Length));
                when Kind_Invalid =>
                   exit Fill_Result;
             end case;

@@ -54,27 +54,21 @@ is
    -------
 
    function A (Name  : String;
-               Value : Integer) return Subtree_Type
-   with
-      Post => A'Result'First = 1 and A'Result'Length = 1;
+               Value : Integer) return Subtree_Type;
 
    -------
    -- A --
    -------
 
    function A (Name  : String;
-               Value : Float) return Subtree_Type
-   with
-      Post => A'Result'First = 1 and A'Result'Length = 1;
+               Value : Float) return Subtree_Type;
 
    -------
    -- A --
    -------
 
    function A (Name  : String;
-               Value : String) return Subtree_Type
-   with
-       Post => A'Result'First = 1 and A'Result'Length = 1;
+               Value : String) return Subtree_Type;
 
    ---------------
    -- To_String --
@@ -83,10 +77,8 @@ is
    function To_String (Tree : Subtree_Type) return String;
 
 private
-   subtype Data_Type is String (1 .. 10);
+   subtype Data_Type is String (1 .. 12);
    Null_Data : constant Data_Type := (others => Character'Val (0));
-
-   type Data_Index_Type is new Natural range Data_Type'First - 1 .. Data_Type'Last - 1;
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
@@ -97,12 +89,12 @@ private
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
-      Length : Data_Index_Type;
+      Length : Natural;
       Data   : Data_Type;
    end record;
 
    Null_Node : constant Node_Type := (Kind   => Kind_Invalid,
-                                      Length => Data_Index_Type'First,
+                                      Length => 0,
                                       Data   => Null_Data);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
