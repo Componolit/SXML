@@ -324,9 +324,9 @@ is
                      Append (Result, """");
                      Is_Open_Quote := False;
                   end if;
-                  Append (Result, " " & E.Data (1 .. E.Length) & "=");
+                  Append (Result, " " & E.Data (1 .. E.Length));
                when Kind_Attr_Data =>
-                  Append (Result, """" & E.Data (1 .. E.Length));
+                  Append (Result, "=""" & E.Data (1 .. E.Length));
                   Is_Open_Quote := True;
                when Kind_Data =>
                   Append (Result, E.Data (1 .. E.Length));
