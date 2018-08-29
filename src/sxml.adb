@@ -171,7 +171,7 @@ is
    --------------
 
    function Data_Len (Node : Node_Type) return Natural is
-     (if Node.Length = 0 then Node.Data'Length else Node.Length);
+     (Node.Length);
 
    --------------
    -- Node_Len --
