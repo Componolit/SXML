@@ -96,7 +96,7 @@ package body SXML.Parser is
 
       for Value of S
       loop
-         pragma Loop_Invariant (Result = Match_Invalid and Offset = Offset'Loop_Entry);
+         pragma Loop_Invariant (Result = Match_Invalid);
          if Data_Overflow
          then
             return;
