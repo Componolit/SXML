@@ -77,7 +77,8 @@ is
    function To_String (Tree : Subtree_Type) return String;
 
 private
-   subtype Data_Type is String (1 .. 50);
+   subtype Length_Type is Natural range 0 .. 8;
+   subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
 
    type Kind_Type is (Kind_Invalid,
@@ -89,7 +90,7 @@ private
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
-      Length : Natural;
+      Length : Length_Type;
       Data   : Data_Type;
    end record;
 

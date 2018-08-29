@@ -47,30 +47,33 @@ is
    function Set_Data (Data : String;
                       Kind : Kind_Type) return Subtree_Type
    is
-      Result_Len : constant Index_Type := (Data'Length - 1) / Data_Type'Length + 1;
-      Index      : Natural := Data'First;
-      Chunk_Kind : Kind_Type := Kind;
+      Num_Chunks : constant Index_Type :=
+        (Data'Length - 1) / Data_Type'Length + 1;
+
+      Data_Offset : Natural := 0;
+      Chunk_Kind  : Kind_Type := Kind;
    begin
-      return Result : Subtree_Type (1 .. Result_Len) := (others => Null_Node)
+      return Result : Subtree_Type (1 .. Num_Chunks) := (others => Null_Node)
       do
-         for I in Result'Range
+         for Chunk of Result
          loop
             declare
-               Offset : constant Natural :=
-                 (if Data'Last - Index > Data_Type'Length then
-                     Data_Type'Length - 1
-                  else
-                     Data'Last - Index);
-               D  : Data_Type := (others => Character'Val (0));
+               Chunk_Len : constant Natural :=
+                 (if Data'Length - Data_Offset < Data_Type'Length
+                  then Data'Length - Data_Offset
+                  else Data_Type'Length);
+
+               Elem          : Data_Type := (others => Character'Val (0));
+               Data_Position : constant Natural := Data'First + Data_Offset;
             begin
-               D (Data_Type'First .. Data_Type'First + Offset) :=
-                 Data (Index .. Index + Offset);
-               Result (I) := Node_Type'(Kind   => Chunk_Kind,
-                                        Length => Offset + 1,
-                                        Data   => D);
+               Elem (Data_Type'First .. Data_Type'First + Chunk_Len - 1) :=
+                     Data (Data_Position .. Data_Position + Chunk_Len - 1);
+               Chunk := Node_Type'(Kind   => Chunk_Kind,
+                                   Length => Chunk_Len,
+                                   Data   => Elem);
+               Chunk_Kind := Kind_Data;
+               Data_Offset := Data_Offset + Chunk_Len;
             end;
-            Chunk_Kind := Kind_Data;
-            Index := Index + Data_Type'Length;
          end loop;
       end return;
    end Set_Data;
@@ -215,8 +218,9 @@ is
 
    function To_String (Tree : Subtree_Type) return String
    is
-      Position : Natural := 0;
-      Is_Open  : Boolean := False;
+      Position      : Natural := 0;
+      Is_Open_Tag   : Boolean := False;
+      Is_Open_Quote : Boolean := False;
 
       function In_Range (Buffer : String;
                          Length : Natural) return Boolean;
@@ -232,8 +236,8 @@ is
                         Data   :        String)
         with
           Global => (In_Out => Position),
-        Pre    => Data'Length > 0 and
-        Position <= Result'Length - Data'Length;
+          Pre    => Data'Length > 0 and
+                    Position <= Result'Length - Data'Length;
 
       procedure Append (Result : in out String;
                         Data   :        String)
@@ -264,7 +268,16 @@ is
             case E.Kind
             is
                when Kind_Element_Open =>
-                  if Is_Open
+                  if Is_Open_Quote
+                  then
+                     if not In_Range (Result, 1)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, """");
+                     Is_Open_Quote := False;
+                  end if;
+                  if Is_Open_Tag
                   then
                      if not In_Range (Result, 1)
                      then
@@ -272,7 +285,7 @@ is
                      end if;
                      Append (Result, ">");
                   end if;
-                  Is_Open := True;
+                  Is_Open_Tag := True;
                   begin
                      if not In_Range (Result, 1 + E.Length)
                      then
@@ -281,9 +294,18 @@ is
                      Append (Result, "<" & E.Data (1 .. E.Length));
                   end;
                when Kind_Element_Close =>
-                  if Is_Open
+                  if Is_Open_Quote
                   then
-                     Is_Open := False;
+                     if not In_Range (Result, 1)
+                     then
+                        return Invalid;
+                     end if;
+                     Append (Result, """");
+                     Is_Open_Quote := False;
+                  end if;
+                  if Is_Open_Tag
+                  then
+                     Is_Open_Tag := False;
                      if not In_Range (Result, 1)
                      then
                         return Invalid;
@@ -295,11 +317,17 @@ is
                      return Invalid;
                   end if;
                   Append (Result, "</" & E.Data (1 .. E.Length));
-                  Is_Open := True;
+                  Is_Open_Tag := True;
                when Kind_Attr_Name =>
+                  if Is_Open_Quote
+                  then
+                     Append (Result, """");
+                     Is_Open_Quote := False;
+                  end if;
                   Append (Result, " " & E.Data (1 .. E.Length) & "=");
                when Kind_Attr_Data =>
-                  Append (Result, """" & E.Data (1 .. E.Length) & """");
+                  Append (Result, """" & E.Data (1 .. E.Length));
+                  Is_Open_Quote := True;
                when Kind_Data =>
                   Append (Result, E.Data (1 .. E.Length));
                when Kind_Invalid =>
@@ -307,9 +335,19 @@ is
             end case;
          end loop Fill_Result;
 
-         if Is_Open
+         if Is_Open_Quote
          then
-            Is_Open := False;
+            Is_Open_Quote := False;
+            if not In_Range (Result, 1)
+            then
+               return Invalid;
+            end if;
+            Append (Result, """");
+         end if;
+
+         if Is_Open_Tag
+         then
+            Is_Open_Tag := False;
             if not In_Range (Result, 1)
             then
                return Invalid;

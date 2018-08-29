@@ -109,6 +109,21 @@ package body SXML_Parser_Tests is
       Check_Document ("<" & Tag & "></" & Tag & ">");
    end Long_Node;
 
+   -----------------------------------------------------------------------------
+
+   procedure Multiple_Of_Chunk_Tag (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      for I in 1 .. 100
+      loop
+         declare
+            Tag : constant String (1 .. I) := (others => 'Y');
+         begin
+            Check_Document ("<" & Tag & "></" & Tag & ">");
+         end;
+      end loop;
+   end Multiple_Of_Chunk_Tag;
+
    ---------------------------------------------------------------------------
 
    procedure Single_Short_Node (T : in out Test_Cases.Test_Case'Class)
@@ -152,6 +167,40 @@ package body SXML_Parser_Tests is
    begin
       Check_Document ("<parent attr=""test""></parent>");
    end Simple_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Long_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+      Attr : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+   begin
+      Check_Document ("<parent attr=""" & Attr & """></parent>");
+   end Long_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Multiple_Of_Chunk_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      --  We cannot determine data length programatically, as Data_Type is
+      --  private in SXML.
+      for I in 1 .. 100
+      loop
+         declare
+            Attr : constant String (1 .. I) := (others => 'X');
+         begin
+            Check_Document ("<parent attr=""" & Attr & """></parent>");
+         end;
+      end loop;
+   end Multiple_Of_Chunk_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Slash_In_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr=""/foo/bar/baz""></parent>");
+   end Slash_In_Attribute;
 
    ---------------------------------------------------------------------------
 
@@ -255,11 +304,15 @@ package body SXML_Parser_Tests is
    begin
       Register_Routine (T, Single_Node'Access, "Parse single node");
       Register_Routine (T, Long_Node'Access, "Node with long tag name");
+      Register_Routine (T, Multiple_Of_Chunk_Tag'Access, "Tag that is multiple of chunk length");
       Register_Routine (T, Single_Short_Node'Access, "Parse single short node");
       Register_Routine (T, Multiple_Children'Access, "Parse multiple children");
       Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
       Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
+      Register_Routine (T, Long_Attribute'Access, "Long attribute");
+      Register_Routine (T, Multiple_Of_Chunk_Attribute'Access, "Attribute that is multple of chunk length");
+      Register_Routine (T, Slash_In_Attribute'Access, "Slash character in attribute");
       Register_Routine (T, Whitespace_Attribute'Access, "Whitespace attribute");
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
       Register_Routine (T, Whitespace_Between_Nodes'Access, "Whitespace between nodes");
