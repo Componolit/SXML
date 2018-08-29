@@ -69,7 +69,7 @@ is
                Elem (Data_Type'First .. Data_Type'First + Chunk_Len - 1) :=
                      Data (Data_Position .. Data_Position + Chunk_Len - 1);
                Chunk := Node_Type'(Kind   => Chunk_Kind,
-                                   Length => Chunk_Len,
+                                   Length => Length_Type (Chunk_Len),
                                    Data   => Elem);
                Chunk_Kind := Kind_Data;
                Data_Offset := Data_Offset + Chunk_Len;
@@ -171,7 +171,7 @@ is
    --------------
 
    function Data_Len (Node : Node_Type) return Natural is
-     (Node.Length);
+     (Natural (Node.Length));
 
    --------------
    -- Node_Len --
@@ -287,11 +287,11 @@ is
                   end if;
                   Is_Open_Tag := True;
                   begin
-                     if not In_Range (Result, 1 + E.Length)
+                     if not In_Range (Result, 1 + Natural (E.Length))
                      then
                         return Invalid;
                      end if;
-                     Append (Result, "<" & E.Data (1 .. E.Length));
+                     Append (Result, "<" & E.Data (1 .. Natural (E.Length)));
                   end;
                when Kind_Element_Close =>
                   if Is_Open_Quote
@@ -312,11 +312,11 @@ is
                      end if;
                      Append (Result, ">");
                   end if;
-                  if not In_Range (Result, 3 + E.Length)
+                  if not In_Range (Result, 3 + Natural (E.Length))
                   then
                      return Invalid;
                   end if;
-                  Append (Result, "</" & E.Data (1 .. E.Length));
+                  Append (Result, "</" & E.Data (1 .. Natural (E.Length)));
                   Is_Open_Tag := True;
                when Kind_Attr_Name =>
                   if Is_Open_Quote
@@ -324,12 +324,12 @@ is
                      Append (Result, """");
                      Is_Open_Quote := False;
                   end if;
-                  Append (Result, " " & E.Data (1 .. E.Length));
+                  Append (Result, " " & E.Data (1 .. Natural (E.Length)));
                when Kind_Attr_Data =>
-                  Append (Result, "=""" & E.Data (1 .. E.Length));
+                  Append (Result, "=""" & E.Data (1 .. Natural (E.Length)));
                   Is_Open_Quote := True;
                when Kind_Data =>
-                  Append (Result, E.Data (1 .. E.Length));
+                  Append (Result, E.Data (1 .. Natural (E.Length)));
                when Kind_Invalid =>
                   exit Fill_Result;
             end case;

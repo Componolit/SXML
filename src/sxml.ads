@@ -76,7 +76,7 @@ is
    function To_String (Tree : Subtree_Type) return String;
 
 private
-   subtype Length_Type is Natural range 0 .. 8;
+   type Length_Type is range 0 .. 8 with Size => 8;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
 
