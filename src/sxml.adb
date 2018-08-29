@@ -41,14 +41,15 @@ is
    -- Set_Data --
    --------------
 
-   function Set_Data (Name : String;
+   function Set_Data (Data : String;
                       Kind : Kind_Type) return Subtree_Type;
 
-   function Set_Data (Name : String;
+   function Set_Data (Data : String;
                       Kind : Kind_Type) return Subtree_Type
    is
-      Result_Len : constant Index_Type := (Name'Length - 1) / Data_Type'Length + 1;
-      Index      : Natural := Name'First;
+      Result_Len : constant Index_Type := (Data'Length - 1) / Data_Type'Length + 1;
+      Index      : Natural := Data'First;
+      Chunk_Kind : Kind_Type := Kind;
    begin
       return Result : Subtree_Type (1 .. Result_Len) := (others => Null_Node)
       do
@@ -56,18 +57,19 @@ is
          loop
             declare
                Offset : constant Natural :=
-                 (if Name'Last - Index > Data_Type'Length then
+                 (if Data'Last - Index > Data_Type'Length then
                      Data_Type'Length - 1
                   else
-                     Name'Last - Index);
+                     Data'Last - Index);
                D  : Data_Type := (others => Character'Val (0));
             begin
                D (Data_Type'First .. Data_Type'First + Offset) :=
-                 Name (Index .. Index + Offset);
-               Result (I) := Node_Type'(Kind   => Kind,
+                 Data (Index .. Index + Offset);
+               Result (I) := Node_Type'(Kind   => Chunk_Kind,
                                         Length => Offset + 1,
                                         Data   => D);
             end;
+            Chunk_Kind := Kind_Data;
             Index := Index + Data_Type'Length;
          end loop;
       end return;
@@ -228,10 +230,10 @@ is
 
       procedure Append (Result : in out String;
                         Data   :        String)
-      with
-         Global => (In_Out => Position),
-         Pre    => Data'Length > 0 and
-                   Position <= Result'Length - Data'Length;
+        with
+          Global => (In_Out => Position),
+        Pre    => Data'Length > 0 and
+        Position <= Result'Length - Data'Length;
 
       procedure Append (Result : in out String;
                         Data   :        String)
@@ -292,7 +294,8 @@ is
                   then
                      return Invalid;
                   end if;
-                  Append (Result, "</" & E.Data (1 .. E.Length) & ">");
+                  Append (Result, "</" & E.Data (1 .. E.Length));
+                  Is_Open := True;
                when Kind_Attr_Name =>
                   Append (Result, " " & E.Data (1 .. E.Length) & "=");
                when Kind_Attr_Data =>
@@ -303,6 +306,16 @@ is
                   exit Fill_Result;
             end case;
          end loop Fill_Result;
+
+         if Is_Open
+         then
+            Is_Open := False;
+            if not In_Range (Result, 1)
+            then
+               return Invalid;
+            end if;
+            Append (Result, ">");
+         end if;
          return Result;
       end;
    end To_String;

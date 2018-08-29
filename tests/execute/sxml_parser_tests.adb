@@ -100,6 +100,15 @@ package body SXML_Parser_Tests is
       Check_Document ("<valid></valid>");
    end Single_Node;
 
+   -----------------------------------------------------------------------------
+
+   procedure Long_Node (T : in out Test_Cases.Test_Case'Class)
+   is
+      Tag : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+   begin
+      Check_Document ("<" & Tag & "></" & Tag & ">");
+   end Long_Node;
+
    ---------------------------------------------------------------------------
 
    procedure Single_Short_Node (T : in out Test_Cases.Test_Case'Class)
@@ -245,6 +254,7 @@ package body SXML_Parser_Tests is
       use AUnit.Test_Cases.Registration;
    begin
       Register_Routine (T, Single_Node'Access, "Parse single node");
+      Register_Routine (T, Long_Node'Access, "Node with long tag name");
       Register_Routine (T, Single_Short_Node'Access, "Parse single short node");
       Register_Routine (T, Multiple_Children'Access, "Parse multiple children");
       Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
