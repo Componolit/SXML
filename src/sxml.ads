@@ -46,8 +46,7 @@ is
    function E (Name     : String;
                Children : Subtree_Type := Null_Tree) return Subtree_Type
    with
-      Pre  => Children'Length < Index_Type'Last - 2,
-      Post => E'Result'First = 1 and E'Result'Length = Children'Length + 2;
+      Pre  => Children'Length < Index_Type'Last - 2;
 
    -------
    -- A --
