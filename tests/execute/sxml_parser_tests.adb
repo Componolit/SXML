@@ -179,7 +179,24 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure Multiple_Of_Chunk_Attribute (T : in out Test_Cases.Test_Case'Class)
+   procedure Multiple_Of_Chunk_Attribute_Name (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      --  We cannot determine data length programatically, as Data_Type is
+      --  private in SXML.
+      for I in 1 .. 100
+      loop
+         declare
+            Name : constant String (1 .. I) := (others => 'X');
+         begin
+            Check_Document ("<parent " & Name & "=""value""></parent>");
+         end;
+      end loop;
+   end Multiple_Of_Chunk_Attribute_Name;
+
+   ---------------------------------------------------------------------------
+
+   procedure Multiple_Of_Chunk_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
    is
    begin
       --  We cannot determine data length programatically, as Data_Type is
@@ -192,7 +209,7 @@ package body SXML_Parser_Tests is
             Check_Document ("<parent attr=""" & Attr & """></parent>");
          end;
       end loop;
-   end Multiple_Of_Chunk_Attribute;
+   end Multiple_Of_Chunk_Attribute_Value;
 
    ---------------------------------------------------------------------------
 
@@ -311,7 +328,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
       Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
       Register_Routine (T, Long_Attribute'Access, "Long attribute");
-      Register_Routine (T, Multiple_Of_Chunk_Attribute'Access, "Attribute that is multple of chunk length");
+      Register_Routine (T, Multiple_Of_Chunk_Attribute_Name'Access, "Attribute name that is multple of chunk length");
+      Register_Routine (T, Multiple_Of_Chunk_Attribute_Value'Access, "Attribute value that is multple of chunk length");
       Register_Routine (T, Slash_In_Attribute'Access, "Slash character in attribute");
       Register_Routine (T, Whitespace_Attribute'Access, "Whitespace attribute");
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
