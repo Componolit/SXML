@@ -92,6 +92,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Empty_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr=""""></parent>");
+   end Empty_Attribute;
+
+   ---------------------------------------------------------------------------
+
    procedure Single_Quote_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
    begin
@@ -266,6 +274,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
       Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
+      Register_Routine (T, Empty_Attribute'Access, "Empty attribute");
       Register_Routine (T, Single_Quote_Attribute'Access, "Single quote attribute");
       Register_Routine (T, Invalid_Mixed_Quote_Attribute'Access, "Invalid mixed quote attribute");
       Register_Routine (T, Long_Attribute'Access, "Long attribute");
