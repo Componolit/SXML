@@ -264,6 +264,7 @@ package body SXML.Parser is
    is
       Old_Offset : constant Natural := Offset;
       First      : constant Natural := Data'First + Offset;
+      Last       : Natural;
       Tmp_Match  : Match_Type;
       Len        : Natural := 0;
    begin
@@ -290,8 +291,9 @@ package body SXML.Parser is
       end if;
 
       Offset := Offset - 1;
-      Result := (First, Data'First + Offset - 1);
-      Match  := Match_OK;
+      Last   := Data'First + Offset - 1;
+      Result := (First, Last);
+      Match  := (if Len > 0 then Match_OK else Match_None);
 
    end Match_Until_Set;
 
@@ -394,7 +396,7 @@ package body SXML.Parser is
       end if;
 
       Match_Until_Set ("" & Separator, Match_Tmp, Attr_Value);
-      if Match_Tmp /= Match_OK or
+      if (Match_Tmp /= Match_OK and Match_Tmp /= Match_None) or
          Data_Overflow
       then
          Restore_Offset (Old_Offset);
@@ -600,26 +602,50 @@ package body SXML.Parser is
    end Parse_Closing_Tag;
 
    -------------------
-   -- Parse_Content --
+   -- Parse_Section --
    -------------------
 
-   procedure Parse_Content
+   procedure Parse_Sections (Start_Tag : String;
+                             End_Tag   : String;
+                             Result    : out Match_Type)
    with
       Pre => Data_Valid;
 
-   procedure Parse_Content
+   procedure Parse_Sections (Start_Tag : String;
+                             End_Tag   : String;
+                             Result    : out Match_Type)
    is
-      Content   : Range_Type;
-      Match_Tmp : Match_Type;
+      Old_Offset   : Natural;
+      Tmp_Result   : Match_Type;
+      Comment_Text : Range_Type;
    begin
-      if Data_Overflow
-      then
-         return;
-      end if;
+      Result := Match_Invalid;
+      loop
+         Old_Offset := Offset;
+         if Data_Overflow
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
 
-      Match_Until_Set ("<", Match_Tmp, Content);
-      pragma Unreferenced (Content, Match_Tmp);
-   end Parse_Content;
+         Skip (Whitespace);
+         Match_String (Start_Tag, Tmp_Result);
+         if Tmp_Result /= Match_OK or
+            Data_Overflow
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+
+         Match_Until_String (End_Tag, Comment_Text);
+         if Comment_Text = Null_Range
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+         Result := Match_OK;
+      end loop;
+   end Parse_Sections;
 
    -------------------
    -- Parse_Comment --
@@ -631,32 +657,10 @@ package body SXML.Parser is
 
    procedure Parse_Comment
    is
-      Old_Offset   : Natural;
-      Result       : Match_Type;
-      Comment_Text : Range_Type;
+      Unused : Match_Type;
    begin
-      loop
-         if Data_Overflow
-         then
-            return;
-         end if;
-
-         Skip (Whitespace);
-         Old_Offset := Offset;
-         Match_String ("<!--", Result);
-         if Result /= Match_OK or
-            Data_Overflow
-         then
-            return;
-         end if;
-
-         Match_Until_String ("-->", Comment_Text);
-         if Comment_Text = Null_Range
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-      end loop;
+      Parse_Sections ("<!--", "-->", Unused);
+      pragma Unreferenced (Unused);
    end Parse_Comment;
 
    ----------------------------------
@@ -669,32 +673,10 @@ package body SXML.Parser is
 
    procedure Parse_Processing_Information
    is
-      Old_Offset : Natural;
-      Result     : Match_Type;
-      PI_Text    : Range_Type;
+      Unused : Match_Type;
    begin
-      loop
-         if Data_Overflow
-         then
-            return;
-         end if;
-
-         Skip (Whitespace);
-         Old_Offset := Offset;
-         Match_String ("<?", Result);
-         if Result /= Match_OK or
-            Data_Overflow
-         then
-            return;
-         end if;
-
-         Match_Until_String ("?>", PI_Text);
-         if PI_Text = Null_Range
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-      end loop;
+      Parse_Sections ("<?", "?>", Unused);
+      pragma Unreferenced (Unused);
    end Parse_Processing_Information;
 
    -------------------
@@ -707,33 +689,53 @@ package body SXML.Parser is
 
    procedure Parse_Doctype
    is
-      Old_Offset   : Natural;
-      Result       : Match_Type;
-      Doctype_Text : Range_Type;
+      Unused : Match_Type;
    begin
-      loop
-         if Data_Overflow
-         then
-            return;
-         end if;
-
-         Skip (Whitespace);
-         Old_Offset := Offset;
-         Match_String ("<!DOCTYPE", Result);
-         if Result /= Match_OK or
-            Data_Overflow
-         then
-            return;
-         end if;
-
-         Match_Until_String (">", Doctype_Text);
-         if Doctype_Text = Null_Range
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-      end loop;
+      Parse_Sections ("<!DOCTYPE", ">", Unused);
+      pragma Unreferenced (Unused);
    end Parse_Doctype;
+
+   -----------------
+   -- Parse_CDATA --
+   -----------------
+
+   procedure Parse_CDATA (Result : out Match_Type)
+   with
+      Pre => Data_Valid;
+
+   procedure Parse_CDATA (Result : out Match_Type)
+   is
+   begin
+      Parse_Sections ("<![CDATA[", "]]>", Result);
+   end Parse_CDATA;
+
+   -------------------
+   -- Parse_Content --
+   -------------------
+
+   procedure Parse_Content
+   with
+      Pre => Data_Valid;
+
+   procedure Parse_Content
+   is
+      Content       : Range_Type;
+      Match_Content : Match_Type;
+      Match_CDATA   : Match_Type;
+   begin
+      if Data_Overflow
+      then
+         return;
+      end if;
+
+      loop
+         Match_Until_Set ("<", Match_Content, Content);
+         Parse_CDATA (Match_CDATA);
+         exit when Match_Content /= Match_OK and Match_CDATA /= Match_OK;
+      end loop;
+
+      pragma Unreferenced (Content);
+   end Parse_Content;
 
    --------------------
    -- Parse_Internal --

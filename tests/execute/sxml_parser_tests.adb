@@ -263,6 +263,27 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Ignore_CDATA (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document (
+         "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>",
+         "<parent></parent>");
+   end Ignore_CDATA;
+
+   ---------------------------------------------------------------------------
+
+   procedure Ignore_Multiple_CDATA (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document (
+         "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
+         "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>",
+         "<parent></parent>");
+   end Ignore_Multiple_CDATA;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -292,6 +313,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, CCDA_1'Access, "CCDA sample file");
       Register_Routine (T, MXML_1'Access, "MusicXML sample file #1");
       Register_Routine (T, MXML_2'Access, "MusicXML sample file #2");
+      Register_Routine (T, Ignore_CDATA'Access, "Ignore CDATA");
+      Register_Routine (T, Ignore_Multiple_CDATA'Access, "Ignore multiple CDATA");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
