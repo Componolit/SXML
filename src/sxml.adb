@@ -305,7 +305,6 @@ is
                   end if;
                   if Is_Open_Tag
                   then
-                     Is_Open_Tag := False;
                      if not In_Range (Result, 1)
                      then
                         return Invalid;
@@ -337,7 +336,6 @@ is
 
          if Is_Open_Quote
          then
-            Is_Open_Quote := False;
             if not In_Range (Result, 1)
             then
                return Invalid;
@@ -347,7 +345,6 @@ is
 
          if Is_Open_Tag
          then
-            Is_Open_Tag := False;
             if not In_Range (Result, 1)
             then
                return Invalid;
