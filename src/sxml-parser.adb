@@ -651,49 +651,67 @@ package body SXML.Parser is
    -- Parse_Comment --
    -------------------
 
-   procedure Parse_Comment
+   procedure Parse_Comment (Result : out Match_Type)
    with
       Pre => Data_Valid;
 
-   procedure Parse_Comment
+   procedure Parse_Comment (Result : out Match_Type)
    is
-      Unused : Match_Type;
    begin
-      Parse_Sections ("<!--", "-->", Unused);
-      pragma Unreferenced (Unused);
+      Parse_Sections ("<!--", "-->", Result);
    end Parse_Comment;
 
    ----------------------------------
    -- Parse_Processing_Information --
    ----------------------------------
 
-   procedure Parse_Processing_Information
+   procedure Parse_Processing_Information (Result : out Match_Type)
    with
       Pre => Data_Valid;
 
-   procedure Parse_Processing_Information
+   procedure Parse_Processing_Information (Result : out Match_Type)
    is
-      Unused : Match_Type;
    begin
-      Parse_Sections ("<?", "?>", Unused);
-      pragma Unreferenced (Unused);
+      Parse_Sections ("<?", "?>", Result);
    end Parse_Processing_Information;
 
    -------------------
    -- Parse_Doctype --
    -------------------
 
-   procedure Parse_Doctype
+   procedure Parse_Doctype (Result : out Match_Type)
    with
       Pre => Data_Valid;
 
-   procedure Parse_Doctype
+   procedure Parse_Doctype (Result : out Match_Type)
    is
       Unused : Match_Type;
    begin
-      Parse_Sections ("<!DOCTYPE", ">", Unused);
-      pragma Unreferenced (Unused);
+      Parse_Sections ("<!DOCTYPE", ">", Result);
    end Parse_Doctype;
+
+   -------------------
+   -- Parse_Section --
+   -------------------
+
+   procedure Parse_Sections
+   with
+      Pre => Data_Valid;
+
+   procedure Parse_Sections
+   is
+      Match_Doctype, Match_Comment, Match_PI : Match_Type;
+   begin
+      loop
+         Parse_Doctype (Match_Doctype);
+         Parse_Comment (Match_Comment);
+         Parse_Processing_Information (Match_PI);
+         exit when Match_Doctype /= Match_OK and
+                   Match_Comment /= Match_OK and
+                   Match_PI /= Match_OK;
+      end loop;
+
+   end Parse_Sections;
 
    -----------------
    -- Parse_CDATA --
@@ -759,9 +777,7 @@ package body SXML.Parser is
 
       Match := Match_Invalid;
 
-      Parse_Comment;
-      Parse_Processing_Information;
-      Parse_Doctype;
+      Parse_Sections;
 
       if Data_Overflow
       then
@@ -786,9 +802,7 @@ package body SXML.Parser is
 
       if Done
       then
-         Parse_Comment;
-         Parse_Processing_Information;
-         Parse_Doctype;
+         Parse_Sections;
          Context_Put (Value  => Close (Data (Name.First .. Name.Last)),
                       Result => Valid);
          if not Valid
@@ -821,9 +835,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Parse_Comment;
-      Parse_Processing_Information;
-      Parse_Doctype;
+      Parse_Sections;
 
    end Parse_Internal;
 

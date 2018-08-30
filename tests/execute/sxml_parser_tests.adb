@@ -230,6 +230,15 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure PI_And_Comment (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : constant String := Read_File ("tests/data/pi_and_comment.xml");
+   begin
+      Check_Document (Data, "<bar></bar>");
+   end PI_And_Comment;
+
+   ---------------------------------------------------------------------------
+
    procedure Ignore_Processing_Information (T : in out Test_Cases.Test_Case'Class)
    is
       Data : constant String := Read_File ("tests/data/pi.xml");
@@ -307,6 +316,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Whitespace_Between_Nodes'Access, "Whitespace between nodes");
       Register_Routine (T, Ignore_Node_Content'Access, "Ignore node content");
       Register_Routine (T, Ignore_Comments'Access, "Ignore comments");
+      Register_Routine (T, PI_And_Comment'Access, "PI and comment");
       Register_Routine (T, Ignore_Processing_Information'Access, "Ignore PI");
       Register_Routine (T, Complex_File_Without_Attributes'Access, "Complex file without attributes");
       Register_Routine (T, Complex_File'Access, "Complex file");
