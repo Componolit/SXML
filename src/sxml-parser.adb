@@ -72,21 +72,26 @@ package body SXML.Parser is
    ---------------
 
    procedure Match_Set (S      : String;
-                        Result : out Match_Type)
+                        Result : out Match_Type;
+                        Value  : out Character)
    with
       Pre    => Data_Valid and
                 Offset < Natural'Last,
-       Post   => (if Result = Match_OK then
-                    (for some E of S => E = Data (Data'First + Offset - 1)) and
-                    Offset > Offset'Old);
+      Post   => (if Result = Match_OK then
+                    (for some E of S =>
+                        E = Data (Data'First + Offset - 1) and
+                        E = Value) and
+                     Offset > Offset'Old);
 
    procedure Match_Set (S      : String;
-                        Result : out Match_Type)
+                        Result : out Match_Type;
+                        Value  : out Character)
    is
    begin
       Result := Match_Invalid;
+      Value := Character'Val (0);
 
-      for Value of S
+      for V of S
       loop
          pragma Loop_Invariant (Result = Match_Invalid);
          if Data_Overflow
@@ -94,14 +99,33 @@ package body SXML.Parser is
             return;
          end if;
 
-         if Data (Data'First + Offset) = Value
+         if Data (Data'First + Offset) = V
          then
             Offset := Offset + 1;
             Result := Match_OK;
+            Value  := V;
             return;
          end if;
       end loop;
       Offset := Offset + 1;
+   end Match_Set;
+
+   procedure Match_Set (S      : String;
+                        Result : out Match_Type)
+   with
+      Pre    => Data_Valid and
+                Offset < Natural'Last,
+      Post   => (if Result = Match_OK then
+                    (for some E of S => E = Data (Data'First + Offset - 1)) and
+                     Offset > Offset'Old);
+
+   procedure Match_Set (S      : String;
+                        Result : out Match_Type)
+   is
+      Unused : Character;
+   begin
+      Match_Set (S, Result, Unused);
+      pragma Unused (Unused);
    end Match_Set;
 
    ------------------
@@ -281,6 +305,8 @@ package body SXML.Parser is
    is
       Last_None_Whitespace : Natural;
       Result : Match_Type;
+      Unused : Character;
+      pragma Unreferenced (Unused);
    begin
       loop
          if Data_Overflow
@@ -289,7 +315,7 @@ package body SXML.Parser is
          end if;
 
          Last_None_Whitespace := Offset;
-         Match_Set (Skip_Set, Result);
+         Match_Set (Skip_Set, Result, Unused);
          exit when Result /= Match_OK;
       end loop;
       Offset := Last_None_Whitespace;
@@ -311,6 +337,7 @@ package body SXML.Parser is
       Attr_Value    : Range_Type;
       Match_Tmp     : Match_Type;
       Valid         : Boolean;
+      Separator     : Character;
    begin
 
       if Context_Overflow
@@ -356,7 +383,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Set ("""", Match_Tmp);
+      Match_Set ("""'", Match_Tmp, Separator);
       if Match_Tmp /= Match_OK or
          Data_Overflow
       then
@@ -364,7 +391,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until_Set ("""", Attr_Value);
+      Match_Until_Set ("" & Separator, Attr_Value);
       if Attr_Value = Null_Range or
          Data_Overflow
       then

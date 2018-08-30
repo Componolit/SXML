@@ -92,6 +92,23 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Single_Quote_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<parent attr='test'></parent>", "<parent attr=""test""></parent>");
+   end Single_Quote_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Invalid_Mixed_Quote_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Invalid ("<parent attr='test""></parent>");
+      Check_Invalid ("<parent attr=""test'></parent>");
+   end Invalid_Mixed_Quote_Attribute;
+
+   ---------------------------------------------------------------------------
+
    procedure Long_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       Attr : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
@@ -249,6 +266,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Invalid_Whitespace'Access, "Invalid whitespace");
       Register_Routine (T, Valid_Whitespace'Access, "Valid whitespace");
       Register_Routine (T, Simple_Attribute'Access, "Simple attribute");
+      Register_Routine (T, Single_Quote_Attribute'Access, "Single quote attribute");
+      Register_Routine (T, Invalid_Mixed_Quote_Attribute'Access, "Invalid mixed quote attribute");
       Register_Routine (T, Long_Attribute'Access, "Long attribute");
       Register_Routine (T, Multiple_Of_Chunk_Attribute_Name'Access, "Attribute name that is multple of chunk length");
       Register_Routine (T, Multiple_Of_Chunk_Attribute_Value'Access, "Attribute value that is multple of chunk length");
