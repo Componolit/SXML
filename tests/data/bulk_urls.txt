@@ -1,2 +1,51 @@
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Enterprise EHR/b2 Adam Everyman ToC.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Internal Test with MU 2 data/170.314B1_Amb_SummaryOfCare.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Internal Test with MU 2 data/170.314(b)(1)InPt_Discharge Summary CED Type.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Internal Test with MU 2 data/170.314B2_Amb_CCD.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Internal Test with MU 2 data/170.314B2_Amb_SummaryOfCare.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Professional EHR/dataport_Ambulatory.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Professional EHR/Encounter Based C-CDA CCD - 08-06-2012 [Jones, Isabella - 170314E2].xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Sunrise Clinical Manager/C-CDA_101646_20130617114506_Everyman_Adam.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Sunrise Clinical Manager/C-CDA_101693_20130617091427_Kidd_Kari CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Sunrise Clinical Manager/C-CDA_101693_20130617120344_Kidd_Kari CCDA_TOCAMB.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Sunrise Clinical Manager/C-CDA_101693_20130617120425_Kidd_Kari CCDA_TOCINPT.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Allscripts Samples/Sunrise Clinical Manager/C-CDA_101822_20130617114349_Williams_John.xml
+https://github.com/jmandel/sample_ccdas/raw/master/CDA.xsl
+https://github.com/jmandel/sample_ccdas/raw/master/Cerner Samples/problems-and-medications.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Cerner Samples/Transition_of_Care_Referral_Summary.xml
+https://github.com/jmandel/sample_ccdas/raw/master/EMERGE/Patient-121.xml
+https://github.com/jmandel/sample_ccdas/raw/master/EMERGE/Patient-65.xml
+https://github.com/jmandel/sample_ccdas/raw/master/EMERGE/Patient-485.xml
+https://github.com/jmandel/sample_ccdas/raw/master/EMERGE/Patient-349.xml
+https://github.com/jmandel/sample_ccdas/raw/master/EMERGE/Patient-2.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Greenway Samples/26933_ExportSummary_CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Greenway Samples/26562_ExportSummary_CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Greenway Samples/26840_ExportSummary_CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Greenway Samples/26789_ClinicalVisitSummary_CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Greenway Samples/26775_ExportSummary_CCDA.xml
+https://github.com/jmandel/sample_ccdas/raw/master/HL7 Samples/OpNote.sample.xml
+https://github.com/jmandel/sample_ccdas/raw/master/HL7 Samples/UD.sample.xml
+https://github.com/jmandel/sample_ccdas/raw/master/HL7 Samples/Procedure_Note.sample.xml
+https://github.com/jmandel/sample_ccdas/raw/master/HL7 Samples/HandP.sample.xml
+https://github.com/jmandel/sample_ccdas/raw/master/HL7 Samples/DIR.sample.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Kareo Samples/Kareo_SummaryOfCare_export_Joey_Miller.xml
 https://github.com/jmandel/sample_ccdas/raw/master/Kinsights Samples/kinsights-sample-timmy.xml
+https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/Content/xsl/cda.xsl
+https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/hernia.xml
+https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/knee.xml
+https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/colonoscopy.xml
+https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/breast surgery.xml
+https://github.com/jmandel/sample_ccdas/raw/master/NIST Samples/CCDA_CCD_b1_Ambulatory_v2.xml
+https://github.com/jmandel/sample_ccdas/raw/master/NIST Samples/CCDA_CCD_b1_InPatient_v2.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/LMR1TEST.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/LMR2TEST.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/LMR3TEST.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/LMR4TEST.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/LMR5TEST.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Partners HealthCare/partners.ccda.xml
+https://github.com/jmandel/sample_ccdas/raw/master/PracticeFusion Samples/AdamEveryman-ReferralSummary.xml
+https://github.com/jmandel/sample_ccdas/raw/master/PracticeFusion Samples/IsabellaJones-ReferralSummary.xml
+https://github.com/jmandel/sample_ccdas/raw/master/PracticeFusion Samples/MaryGrant-ClinicalSummary.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Transitions of Care Samples/ToC_CCDA_CCD_CompGuideSample_FullXML.xml
+https://github.com/jmandel/sample_ccdas/raw/master/Vitera/Vitera_CCDA_SMART_Sample.xml
 https://openclipart.org/download/305822/1535586869.svg

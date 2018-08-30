@@ -29,6 +29,7 @@ package body SXML_Bulk_Tests is
                                4 => new String'(URL));
       Result : Integer;
    begin
+      Ada.Text_IO.Put_Line ("Fetching " & Url);
       Result := Spawn (Locate_Exec_On_Path ("wget").all, Args);
       Assert (Result = 0, "Error downloading " & URL & ":" & Result'Img);
       Parse_Document ("obj/document/" & URL (9..URL'Last));
@@ -41,7 +42,15 @@ package body SXML_Bulk_Tests is
       use AUnit.Test_Cases.Registration;
       use Ada.Text_IO;
       File : File_Type;
+      use GNAT.OS_Lib;
+      Run_Bulk_Tests : access String := null;
    begin
+      Run_Bulk_Tests := Getenv ("SXML_BULK_TESTS");
+      if Run_Bulk_Tests = null or else
+         Run_Bulk_Tests.all = ""
+      then
+         return;
+      end if;
       Open (File, In_File, "tests/data/bulk_urls.txt");
       while not End_Of_File (File)
       loop
