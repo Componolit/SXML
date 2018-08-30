@@ -293,6 +293,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Single_Quote_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<test>='</test><test>'</test>");
+   end Single_Quote_Content;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -325,6 +333,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, MXML_2'Access, "MusicXML sample file #2");
       Register_Routine (T, Ignore_CDATA'Access, "Ignore CDATA");
       Register_Routine (T, Ignore_Multiple_CDATA'Access, "Ignore multiple CDATA");
+      Register_Routine (T, Single_Quote_Content'Access, "Single quote content");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
