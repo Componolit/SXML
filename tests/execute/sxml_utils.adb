@@ -68,7 +68,7 @@ is
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK,
-              File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result");
+              File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
    end Parse_Document;
 
    --------------------
