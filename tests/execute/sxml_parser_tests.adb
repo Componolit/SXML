@@ -12,87 +12,9 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML;
 with SXML.Parser;
-with Ada.Direct_IO;
-with Ada.Directories;
+with SXML_Utils; use SXML_Utils;
 
 package body SXML_Parser_Tests is
-
-   Context : SXML.Subtree_Type (1 .. 1000000);
-
-   ---------------
-   -- Read_File --
-   ---------------
-
-   function Read_File (File_Name : String) return String
-   is
-      File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
-      subtype File_String is String (1 .. File_Size);
-      package File_String_IO is new Ada.Direct_IO (File_String);
-
-      File     : File_String_IO.File_Type;
-      Contents : File_String;
-   begin
-      File_String_IO.Open (File, File_String_IO.In_File, File_Name);
-      File_String_IO.Read (File, Contents);
-      File_String_IO.Close (File);
-      return Contents;
-   end Read_File;
-
-   procedure Parse_Document (File : String)
-   is
-      Input : constant String := Read_File (File);
-      package Parser is new SXML.Parser (Input, Context);
-      use SXML;
-      use Parser;
-      Result   : Match_Type;
-      Position : Natural;
-   begin
-      Parser.Parse (Match    => Result,
-                    Position => Position);
-      Assert (Result = Match_OK,
-              File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result");
-   end Parse_Document;
-
-   procedure Check_Document (Input    : String;
-                             Output   : String := "INPUT")
-   is
-      package Parser is new SXML.Parser (Input, Context);
-      use SXML;
-      use Parser;
-      Result   : Match_Type;
-      Position : Natural;
-   begin
-      Context := (others => Null_Node);
-      Parser.Parse (Match    => Result,
-                    Position => Position);
-      Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
-      declare
-         Doc : constant String := To_String (Parser.Document);
-      begin
-         --  FIXME: Remove whitespace
-         Assert (Doc = (if Output = "INPUT" then Input else Output),
-            "Invalid result at" & Position'Img &
-            ": (" & Doc & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
-      end;
-   end Check_Document;
-
-   -----------------------------------------------------------------------------
-
-   procedure Check_Invalid (Input : String)
-   is
-      package Parser is new SXML.Parser (Input, Context);
-      use SXML;
-      use Parser;
-      Result   : Match_Type;
-      Position : Natural;
-   begin
-      Parser.Parse (Match    => Result,
-                    Position => Position);
-      pragma Unreferenced (Position);
-      Assert (Result /= Match_OK, "Error expected");
-   end Check_Invalid;
-
-   -----------------------------------------------------------------------------
 
    procedure Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
