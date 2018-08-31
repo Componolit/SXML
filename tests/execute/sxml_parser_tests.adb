@@ -311,6 +311,15 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure File_With_BOM (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : constant String := Read_File ("tests/data/bom.xml");
+   begin
+      Check_Document (Data, "<foo></foo>");
+   end File_With_BOM;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -345,6 +354,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Ignore_Multiple_CDATA'Access, "Ignore multiple CDATA");
       Register_Routine (T, Single_Quote_Content'Access, "Single quote content");
       Register_Routine (T, Attribute_Value_With_Gt'Access, "Attribute value with > sign");
+      Register_Routine (T, File_With_BOM'Access, "File with Unicode byteorder mark");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

@@ -869,6 +869,32 @@ package body SXML.Parser is
 
    end Parse_Internal;
 
+   --------------------------
+   -- Skip_Byte_Order_Mark --
+   --------------------------
+
+   procedure Skip_Byte_Order_Mark;
+
+   procedure Skip_Byte_Order_Mark
+   is
+   begin
+      --  Too little space for BOM
+      if Data'First > Data'Last - Offset - 3
+      then
+         return;
+      end if;
+
+      --  We only support UTF-8 BOM
+      if Data (Data'First + Offset .. Data'First + Offset + 2) =
+        Character'Val (16#ef#) &
+        Character'Val (16#bb#) &
+        Character'Val (16#bf#)
+      then
+         Offset := Offset + 3;
+      end if;
+
+   end Skip_Byte_Order_Mark;
+
    -----------
    -- Parse --
    -----------
@@ -878,6 +904,7 @@ package body SXML.Parser is
    is
    begin
       Context_Valid := False;
+      Skip_Byte_Order_Mark;
       Parse_Internal (Match);
       if Match = Match_OK
       then
