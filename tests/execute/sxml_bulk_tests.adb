@@ -26,9 +26,11 @@ package body SXML_Bulk_Tests is
                                3 => new String'("--directory-prefix=obj/document"),
                                4 => new String'(URL));
       Result : Integer;
+      Wget   : constant access String := Locate_Exec_On_Path ("wget");
    begin
       Ada.Text_IO.Put_Line ("Fetching " & Url);
-      Result := Spawn (Locate_Exec_On_Path ("wget").all, Args);
+      Assert (Wget /= null, "wget missing, please install");
+      Result := Spawn (Wget.all, Args);
       Assert (Result = 0, "Error downloading " & URL & ":" & Result'Img);
       Parse_Document ("obj/document/" & URL (9..URL'Last));
 
