@@ -296,7 +296,9 @@ package body SXML_Parser_Tests is
    procedure Single_Quote_Content (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Check_Document ("<test>='</test><test>'</test>");
+      Check_Document
+         ("<test><test1>='</test1><test2>'</test2></test>",
+          "<test><test1></test1><test2></test2></test>");
    end Single_Quote_Content;
 
    ---------------------------------------------------------------------------

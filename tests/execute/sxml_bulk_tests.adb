@@ -17,8 +17,6 @@ with GNAT.OS_Lib;
 
 package body SXML_Bulk_Tests is
 
-   Context : SXML.Subtree_Type (1 .. 1000000);
-
    procedure Test_URL (T : in out Test_Cases.Test_Case'Class)
    is
       use GNAT.OS_Lib;
