@@ -320,6 +320,54 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Gone321 (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/321gone.xml");
+   end Gone321;
+
+   ---------------------------------------------------------------------------
+
+   procedure Ebay (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/ebay.xml");
+   end Ebay;
+
+   ---------------------------------------------------------------------------
+
+   procedure Reed (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/reed.xml");
+   end Reed;
+
+   ---------------------------------------------------------------------------
+
+   procedure SigmodRecord(T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/SigmodRecord.xml");
+   end SigmodRecord;
+
+   ---------------------------------------------------------------------------
+
+   procedure Ubid (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/ubid.xml");
+   end Ubid;
+
+   ---------------------------------------------------------------------------
+
+   procedure Yahoo (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/yahoo.xml");
+   end Yahoo;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -355,6 +403,12 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Single_Quote_Content'Access, "Single quote content");
       Register_Routine (T, Attribute_Value_With_Gt'Access, "Attribute value with > sign");
       Register_Routine (T, File_With_BOM'Access, "File with Unicode byteorder mark");
+      Register_Routine (T, Yahoo'Access, "Yahoo test set");
+      Register_Routine (T, Ubid'Access, "Ubid");
+      Register_Routine (T, SigmodRecord'Access, "SigmodRecord");
+      Register_Routine (T, Reed'Access, "Reed");
+      Register_Routine (T, Ebay'Access, "Ebay");
+      Register_Routine (T, Gone321'Access, "321 gone");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

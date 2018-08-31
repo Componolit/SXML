@@ -7,3 +7,11 @@ License: CPDL - http://www2.cpdl.org/wiki/index.php/ChoralWiki:CPDL
 
 * Bach-himmel.xml
 * Ws-bach243b.xml
+
+Various samples from the XML data repository at
+http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/www/repository.html#pir
+
+* 321gone.xml
+* ebay.xml
+* ubid.xml
+* yahoo.xml
