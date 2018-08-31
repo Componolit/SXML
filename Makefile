@@ -17,9 +17,13 @@ testonly: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@obj/tests
 
-testbulk: MODE ?= sloppy
 testbulk: export SXML_BULK_TESTS ?= 1
 testbulk: SXML.gpr
+	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
+	@obj/tests
+
+testinsane: export SXML_INSANE_TESTS ?= 1
+testinsane: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@obj/tests
 

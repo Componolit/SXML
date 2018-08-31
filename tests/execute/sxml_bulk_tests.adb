@@ -44,14 +44,20 @@ package body SXML_Bulk_Tests is
       File : File_Type;
       use GNAT.OS_Lib;
       Run_Bulk_Tests : access String := null;
+      Run_Insane_Tests : access String := null;
    begin
       Run_Bulk_Tests := Getenv ("SXML_BULK_TESTS");
-      if Run_Bulk_Tests = null or else
-         Run_Bulk_Tests.all = ""
+      Run_Insane_Tests := Getenv ("SXML_INSANE_TESTS");
+      if (Run_Bulk_Tests = null or else
+          Run_Bulk_Tests.all = "") and
+         (Run_Insane_Tests = null or else
+          Run_Insane_Tests.all = "")
       then
          return;
       end if;
-      Open (File, In_File, "tests/data/bulk_urls.txt");
+      Open (File, In_File, (if Run_Insane_Tests /= null and then Run_Insane_Tests.all /= ""
+                            then "tests/data/bulk_insane_urls.txt"
+                            else "tests/data/bulk_urls.txt"));
       while not End_Of_File (File)
       loop
          Register_Routine (T, Test_URL'Access, Get_Line (File));
