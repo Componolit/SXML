@@ -36,3 +36,4 @@ clean:
 	gnatclean -P tests/execute/tests.gpr
 	gnatclean -P examples/examples
 	gnatprove -P examples/examples --clean
+	rm -rf obj/document

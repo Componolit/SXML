@@ -21,10 +21,13 @@ package body SXML_Bulk_Tests is
    is
       use GNAT.OS_Lib;
       URL : constant String := T.Routine_Name.all;
-      Args : Argument_List := (1 => new String'("-r"),
-                               2 => new String'("--quiet"),
-                               3 => new String'("--directory-prefix=obj/document"),
-                               4 => new String'(URL));
+      Args : Argument_List := (new String'("-r"),
+                               new String'("--quiet"),
+                               new String'("--directory-prefix=obj/document"),
+                               new String'("--progress=dot"),
+                               new String'("--show-progress"),
+                               new String'("--no-check-certificate"),
+                               new String'(URL));
       Result : Integer;
       Wget   : constant access String := Locate_Exec_On_Path ("wget");
    begin
