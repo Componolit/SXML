@@ -2,6 +2,6 @@ with "../SXML";
 
 project Examples
 is
-   for Main use ("exec.adb", "simple.adb");
+   for Main use ("exec.adb", "simple.adb", "parse.adb");
    for Exec_Dir use "../obj";
 end Examples;
