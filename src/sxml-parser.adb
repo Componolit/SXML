@@ -152,7 +152,7 @@ package body SXML.Parser is
       Unused : Character;
    begin
       Match_Set (Valid, Invalid, Result, Unused);
-      pragma Unused (Unused);
+      pragma Unreferenced (Unused);
    end Match_Set;
 
    ------------------
