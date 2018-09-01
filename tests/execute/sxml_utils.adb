@@ -17,7 +17,7 @@ with SXML.Parser;
 
 package body SXML_Utils
 is
-   Context : SXML.Subtree_Type (1 .. 1000000);
+   Context : SXML.Subtree_Type (1 .. 100000000);
 
    -------------------
    -- Check_Invalid --
