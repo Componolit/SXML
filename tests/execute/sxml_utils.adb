@@ -10,8 +10,8 @@
 --
 
 with AUnit.Assertions; use AUnit.Assertions;
-with Ada.Direct_IO;
 with Ada.Directories;
+with Ada.Text_IO.Text_Streams;
 with SXML;
 with SXML.Parser;
 
@@ -41,20 +41,31 @@ is
    -- Read_File --
    ---------------
 
-   function Read_File (File_Name : String) return String
+   function Read_File (File_Name : String) return access String
    is
+      Block_Size : constant := 1024;
+      use Ada.Text_IO;
+      use Ada.Text_IO.Text_Streams;
       File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
-      subtype File_String is String (1 .. File_Size);
-      package File_String_IO is new Ada.Direct_IO (File_String);
-
-      File     : File_String_IO.File_Type;
-      Contents : File_String;
+      Result : access String := new String (1 .. File_Size);
+      File : File_Type;
+      Len  : Natural;
+      Off  : Natural := 1;
    begin
-      File_String_IO.Open (File, File_String_IO.In_File, File_Name);
-      File_String_IO.Read (File, Contents);
-      File_String_IO.Close (File);
-      return Contents;
+      Open (File, In_File, File_Name);
+      loop
+         Len := (if File_Size - Off > Block_Size then Block_Size else File_Size - Off);
+         String'Read (Stream (File), Result.all (Off .. Off + Len - 1));
+         Off := Off + Len;
+         exit when Off >= File_Size;
+      end loop;
+      Close (File);
+      return Result;
    end Read_File;
+
+   --------------------
+   -- Parse_Document --
+   --------------------
 
    procedure Parse_Document (File : String)
    is
