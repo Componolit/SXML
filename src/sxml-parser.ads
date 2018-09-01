@@ -1,5 +1,5 @@
 generic
-   Data    : String;
+   Data    : in out String;
    Context : in out Subtree_Type;
 package SXML.Parser is
 

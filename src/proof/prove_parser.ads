@@ -1,6 +1,6 @@
 package Prove_Parser is
 
-   procedure Parse (XML    : String;
+   procedure Parse (XML    : in out String;
                     Result : out Boolean)
    with
       Pre => XML'First >= 0 and

@@ -23,7 +23,7 @@ is
    -- Check_Invalid --
    -------------------
  
-   procedure Check_Invalid (Input : String)
+   procedure Check_Invalid (Input : in out String)
    is
       package Parser is new SXML.Parser (Input, Context);
       use SXML;
@@ -58,8 +58,8 @@ is
 
    procedure Parse_Document (File : String)
    is
-      Input : constant String := Read_File (File);
-      package Parser is new SXML.Parser (Input, Context);
+      Input : access String := Read_File (File);
+      package Parser is new SXML.Parser (Input.all, Context);
       use SXML;
       use Parser;
       Result   : Match_Type;
@@ -75,7 +75,7 @@ is
    -- Check_Document --
    --------------------
 
-   procedure Check_Document (Input    : String;
+   procedure Check_Document (Input    : in out String;
                              Output   : String := "INPUT")
    is
       package Parser is new SXML.Parser (Input, Context);

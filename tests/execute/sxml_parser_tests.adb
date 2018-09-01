@@ -18,8 +18,9 @@ package body SXML_Parser_Tests is
 
    procedure Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<valid></valid>";
    begin
-      Check_Document ("<valid></valid>");
+      Check_Document (Data);
    end Single_Node;
 
    -----------------------------------------------------------------------------
@@ -27,8 +28,9 @@ package body SXML_Parser_Tests is
    procedure Long_Node (T : in out Test_Cases.Test_Case'Class)
    is
       Tag : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+      Data : String := "<" & Tag & "></" & Tag & ">";
    begin
-      Check_Document ("<" & Tag & "></" & Tag & ">");
+      Check_Document (Data);
    end Long_Node;
 
    -----------------------------------------------------------------------------
@@ -40,8 +42,9 @@ package body SXML_Parser_Tests is
       loop
          declare
             Tag : constant String (1 .. I) := (others => 'Y');
+            Data : String := "<" & Tag & "></" & Tag & ">";
          begin
-            Check_Document ("<" & Tag & "></" & Tag & ">");
+            Check_Document (Data);
          end;
       end loop;
    end Multiple_Of_Chunk_Tag;
@@ -50,16 +53,18 @@ package body SXML_Parser_Tests is
 
    procedure Single_Short_Node (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<valid/>";
    begin
-      Check_Document ("<valid/>", "<valid></valid>");
+      Check_Document (Data, "<valid></valid>");
    end Single_Short_Node;
 
    ---------------------------------------------------------------------------
 
    procedure Multiple_Children (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent><child1/><child2/></parent>";
    begin
-      Check_Document ("<parent><child1/><child2/></parent>",
+      Check_Document (Data,
                       "<parent><child1></child1><child2></child2></parent>");
    end Multiple_Children;
 
@@ -67,52 +72,62 @@ package body SXML_Parser_Tests is
 
    procedure Invalid_Whitespace (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<   valid></valid>";
    begin
-      Check_Invalid ("<   valid></valid>");
+      Check_Invalid (Data);
    end Invalid_Whitespace;
 
    -----------------------------------------------------------------------------
 
    procedure Valid_Whitespace (T : in out Test_Cases.Test_Case'Class)
    is
+      Data1 : String := "<valid     ></valid>";
+      Data2 : String := "<valid" & Character'Val(16#D#) & "></valid>";
+      Data3 : String := "<valid></valid  " & Character'Val(16#9#) & ">";
+      Data4 : String := "<valid></valid  " & Character'Val(16#A#) & ">";
    begin
-      Check_Document ("<valid     ></valid>", "<valid></valid>");
-      Check_Document ("<valid" & Character'Val(16#D#) & "></valid>", "<valid></valid>");
-      Check_Document ("<valid></valid  " & Character'Val(16#9#) & ">", "<valid></valid>");
-      Check_Document ("<valid></valid  " & Character'Val(16#A#) & ">", "<valid></valid>");
+      Check_Document (Data1, "<valid></valid>");
+      Check_Document (Data2, "<valid></valid>");
+      Check_Document (Data3, "<valid></valid>");
+      Check_Document (Data4, "<valid></valid>");
    end Valid_Whitespace;
 
    ---------------------------------------------------------------------------
 
    procedure Simple_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr=""test""></parent>";
    begin
-      Check_Document ("<parent attr=""test""></parent>");
+      Check_Document (Data);
    end Simple_Attribute;
 
    ---------------------------------------------------------------------------
 
    procedure Empty_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr=""""></parent>";
    begin
-      Check_Document ("<parent attr=""""></parent>");
+      Check_Document (Data);
    end Empty_Attribute;
 
    ---------------------------------------------------------------------------
 
    procedure Single_Quote_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr='test'></parent>";
    begin
-      Check_Document ("<parent attr='test'></parent>", "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""></parent>");
    end Single_Quote_Attribute;
 
    ---------------------------------------------------------------------------
 
    procedure Invalid_Mixed_Quote_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data1 : String := "<parent attr='test""></parent>";
+      Data2 : String := "<parent attr=""test'></parent>";
    begin
-      Check_Invalid ("<parent attr='test""></parent>");
-      Check_Invalid ("<parent attr=""test'></parent>");
+      Check_Invalid (Data1);
+      Check_Invalid (Data2);
    end Invalid_Mixed_Quote_Attribute;
 
    ---------------------------------------------------------------------------
@@ -120,8 +135,9 @@ package body SXML_Parser_Tests is
    procedure Long_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       Attr : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+      Data : String := "<parent attr=""" & Attr & """></parent>";
    begin
-      Check_Document ("<parent attr=""" & Attr & """></parent>");
+      Check_Document (Data);
    end Long_Attribute;
 
    ---------------------------------------------------------------------------
@@ -135,8 +151,9 @@ package body SXML_Parser_Tests is
       loop
          declare
             Name : constant String (1 .. I) := (others => 'X');
+            Data : String := "<parent " & Name & "=""value""></parent>";
          begin
-            Check_Document ("<parent " & Name & "=""value""></parent>");
+            Check_Document (Data);
          end;
       end loop;
    end Multiple_Of_Chunk_Attribute_Name;
@@ -152,8 +169,9 @@ package body SXML_Parser_Tests is
       loop
          declare
             Attr : constant String (1 .. I) := (others => 'X');
+            Data : String := "<parent attr=""" & Attr & """></parent>";
          begin
-            Check_Document ("<parent attr=""" & Attr & """></parent>");
+            Check_Document (Data);
          end;
       end loop;
    end Multiple_Of_Chunk_Attribute_Value;
@@ -162,88 +180,92 @@ package body SXML_Parser_Tests is
 
    procedure Slash_In_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr=""/foo/bar/baz""></parent>";
    begin
-      Check_Document ("<parent attr=""/foo/bar/baz""></parent>");
+      Check_Document (Data);
    end Slash_In_Attribute;
 
    ---------------------------------------------------------------------------
 
    procedure Whitespace_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr = ""test""   ></parent>";
    begin
-      Check_Document ("<parent attr = ""test""   ></parent>", "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""></parent>");
    end Whitespace_Attribute;
 
    ---------------------------------------------------------------------------
 
    procedure Multiple_Attributes (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr1=""data1"" attr2=""data2"" attr3=""data3""></parent>";
    begin
-      Check_Document ("<parent attr1=""data1"" attr2=""data2"" attr3=""data3""></parent>");
+      Check_Document (Data);
    end Multiple_Attributes;
 
    ---------------------------------------------------------------------------
 
    procedure Whitespace_Between_Nodes (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent attr=""test"">     </parent>";
    begin
-      Check_Document ("<parent attr=""test"">     </parent>", "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""></parent>");
    end Whitespace_Between_Nodes;
 
    ---------------------------------------------------------------------------
 
    procedure Complex_File_Without_Attributes (T : in out Test_Cases.Test_Case'Class)
    is
-      Data     : constant String := Read_File ("tests/data/complex1.xml");
-      Expected : constant String := Read_File ("tests/data/complex1_expect.xml");
+      Data     : access String := Read_File ("tests/data/complex1.xml");
+      Expected : access String := Read_File ("tests/data/complex1_expect.xml");
    begin
-      Check_Document (Data, Expected (Expected'First .. Expected'Last - 1));
+      Check_Document (Data.all, Expected.all (Expected.all'First .. Expected.all'Last - 1));
    end Complex_File_Without_Attributes;
 
    ---------------------------------------------------------------------------
 
    procedure Complex_File (T : in out Test_Cases.Test_Case'Class)
    is
-      Data     : constant String := Read_File ("tests/data/complex2.xml");
-      Expected : constant String := Read_File ("tests/data/complex2_expect.xml");
+      Data     : access String := Read_File ("tests/data/complex2.xml");
+      Expected : access String := Read_File ("tests/data/complex2_expect.xml");
    begin
-      Check_Document (Data, Expected (Expected'First .. Expected'Last - 1));
+      Check_Document (Data.all, Expected.all (Expected.all'First .. Expected.all'Last - 1));
    end Complex_File;
 
    ---------------------------------------------------------------------------
 
    procedure Ignore_Node_Content (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent>Node content to be ignored</parent>";
    begin
-      Check_Document ("<parent>Node content to be ignored</parent>",
-                      "<parent></parent>");
+      Check_Document (Data, "<parent></parent>");
    end Ignore_Node_Content;
 
    ---------------------------------------------------------------------------
 
    procedure Ignore_Comments (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/comments.xml");
+      Data : access String := Read_File ("tests/data/comments.xml");
    begin
-      Check_Document (Data, "<parent><child></child></parent>");
+      Check_Document (Data.all, "<parent><child></child></parent>");
    end Ignore_Comments;
 
    ---------------------------------------------------------------------------
 
    procedure PI_And_Comment (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/pi_and_comment.xml");
+      Data : access String := Read_File ("tests/data/pi_and_comment.xml");
    begin
-      Check_Document (Data, "<bar></bar>");
+      Check_Document (Data.all, "<bar></bar>");
    end PI_And_Comment;
 
    ---------------------------------------------------------------------------
 
    procedure Ignore_Processing_Information (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/pi.xml");
+      Data : access String := Read_File ("tests/data/pi.xml");
    begin
-      Check_Document (Data, "<parent><child></child></parent>");
+      Check_Document (Data.all, "<parent><child></child></parent>");
    end Ignore_Processing_Information;
 
    ---------------------------------------------------------------------------
@@ -274,48 +296,48 @@ package body SXML_Parser_Tests is
 
    procedure Ignore_CDATA (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>";
    begin
-      Check_Document (
-         "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>",
-         "<parent></parent>");
+      Check_Document (Data, "<parent></parent>");
    end Ignore_CDATA;
 
    ---------------------------------------------------------------------------
 
    procedure Ignore_Multiple_CDATA (T : in out Test_Cases.Test_Case'Class)
    is
-   begin
-      Check_Document (
+      Data : String :=
          "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
-         "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>",
-         "<parent></parent>");
+         "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>";
+   begin
+      Check_Document (Data, "<parent></parent>");
    end Ignore_Multiple_CDATA;
 
    ---------------------------------------------------------------------------
 
    procedure Single_Quote_Content (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<test><test1>='</test1><test2>'</test2></test>";
    begin
       Check_Document
-         ("<test><test1>='</test1><test2>'</test2></test>",
-          "<test><test1></test1><test2></test2></test>");
+         (Data, "<test><test1></test1><test2></test2></test>");
    end Single_Quote_Content;
 
    ---------------------------------------------------------------------------
 
    procedure Attribute_Value_With_Gt (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<test attr="">""></test>";
    begin
-      Check_Document ("<test attr="">""></test>");
+      Check_Document (Data);
    end Attribute_Value_With_Gt;
 
    ---------------------------------------------------------------------------
 
    procedure File_With_BOM (T : in out Test_Cases.Test_Case'Class)
    is
-      Data : constant String := Read_File ("tests/data/bom.xml");
+      Data : access String := Read_File ("tests/data/bom.xml");
    begin
-      Check_Document (Data, "<foo></foo>");
+      Check_Document (Data.all, "<foo></foo>");
    end File_With_BOM;
 
    ---------------------------------------------------------------------------
@@ -370,8 +392,9 @@ package body SXML_Parser_Tests is
 
    procedure Comment_Single (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<elem><!--Comment--></elem>";
    begin
-      Check_Document ("<elem><!--Comment--></elem>", "<elem></elem>");
+      Check_Document (Data, "<elem></elem>");
    end Comment_Single;
 
    ---------------------------------------------------------------------------
@@ -386,16 +409,18 @@ package body SXML_Parser_Tests is
 
    procedure Comments_Inside_Content (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<elem> Here is <!--Comment--> some content </elem>";
    begin
-      Check_Document ("<elem> Here is <!--Comment--> some content </elem>", "<elem></elem>");
+      Check_Document (Data, "<elem></elem>");
    end Comments_Inside_Content;
 
    ---------------------------------------------------------------------------
 
    procedure Processing_Info_Inside_Content (T : in out Test_Cases.Test_Case'Class)
    is
+      Data : String := "<elem> Here is <?some processing info?> some content </elem>";
    begin
-      Check_Document ("<elem> Here is <?some processing info?> some content </elem>", "<elem></elem>");
+      Check_Document (Data, "<elem></elem>");
    end Processing_Info_Inside_Content;
 
    ---------------------------------------------------------------------------

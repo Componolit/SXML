@@ -11,12 +11,12 @@
 
 package SXML_Utils
 is
-   procedure Check_Invalid (Input : String);
+   procedure Check_Invalid (Input : in out String);
 
-   function Read_File (File_Name : String) return String;
+   function Read_File (File_Name : String) return access String;
 
    procedure Parse_Document (File : String);
 
-   procedure Check_Document (Input    : String;
+   procedure Check_Document (Input    : in out String;
                              Output   : String := "INPUT");
 end SXML_Utils;
