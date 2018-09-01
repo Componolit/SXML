@@ -18,7 +18,7 @@ is
    begin
       Open (File, In_File, Name);
       loop
-         Len := (if File_Size - Off > Block_Size then Block_Size else File_Size - Off);
+         Len := (if File_Size - Off > Block_Size then Block_Size else File_Size - Off + 1);
          String'Read (Stream (File), Result.all (Off .. Off + Len - 1));
          Off := Off + Len;
          exit when Off >= File_Size;
