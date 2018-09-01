@@ -400,6 +400,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Large_File (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/orders.xml");
+   end Large_File;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -445,6 +453,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Doctype_With_Elements'Access, "Doctype with elements");
       Register_Routine (T, Comments_Inside_Content'Access, "Comments inside content");
       Register_Routine (T, Processing_Info_Inside_Content'Access, "Processing info inside content");
+      Register_Routine (T, Large_File'Access, "Large file");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
