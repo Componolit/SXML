@@ -384,6 +384,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Comments_Inside_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<elem> Here is <!--Comment--> some content </elem>", "<elem></elem>");
+   end Comments_Inside_Content;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -427,6 +435,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Gone321'Access, "321 gone");
       Register_Routine (T, Comment_Single'Access, "Only comment between tags");
       Register_Routine (T, Doctype_With_Elements'Access, "Doctype with elements");
+      Register_Routine (T, Comments_Inside_Content'Access, "Comments inside content");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

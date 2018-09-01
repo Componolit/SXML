@@ -801,6 +801,7 @@ package body SXML.Parser is
       Content       : Range_Type;
       Match_Content : Match_Type;
       Match_CDATA   : Match_Type;
+      Match_Comment : Match_Type;
    begin
       if Data_Overflow
       then
@@ -810,7 +811,11 @@ package body SXML.Parser is
       loop
          Match_Until_Set ("<", Empty_Set, Match_Content, Content);
          Parse_CDATA (Match_CDATA);
-         exit when Match_Content /= Match_OK and Match_CDATA /= Match_OK;
+         Parse_Comment (Match_Comment);
+         exit when
+           Match_Content /= Match_OK and
+           Match_CDATA /= Match_OK and
+           Match_Comment /= Match_OK;
       end loop;
 
       pragma Unreferenced (Content);
