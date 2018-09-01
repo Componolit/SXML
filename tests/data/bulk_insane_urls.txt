@@ -1,19 +1,19 @@
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/pir/psd7003.xml 
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/SwissProt/SwissProt.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/dblp/dblp.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/uwm.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/wsu.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/nasa/nasa.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/part.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/lineitem.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/partsupp.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/supplier.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/orders.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/nation.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/region.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/customer.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/treebank/treebank_e.xml
-http://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/mondial/mondial-3.0.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/pir/psd7003.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/SwissProt/SwissProt.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/dblp/dblp.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/uwm.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/wsu.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/nasa/nasa.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/part.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/lineitem.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/partsupp.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/supplier.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/orders.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/nation.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/region.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/customer.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/treebank/treebank_e.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/mondial/mondial-3.0.xml
 https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/hernia.xml
 https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/breast surgery.xml
 https://github.com/jmandel/sample_ccdas/raw/master/mTuitive OpNote Samples/colonoscopy.xml
@@ -2960,7 +2960,6 @@ https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/ch01.
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/ch04.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/ch03.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/ch00.xml
-https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/bookbody.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/schema/catalog.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/ch02.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/appc.xml
@@ -2976,7 +2975,6 @@ https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/refp
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/refpages/intro-elements.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/errs/context.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/errs/badpcdata.xml
-https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/errs/misspell.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/printer/user-guide.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/printer/quick-start.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide5/examples/printer/topic.xml
