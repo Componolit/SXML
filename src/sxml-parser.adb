@@ -710,14 +710,45 @@ package body SXML.Parser is
    -------------------
 
    procedure Parse_Doctype (Result : out Match_Type)
-   with
-      Pre => Data_Valid;
+     with
+       Pre => Data_Valid;
 
    procedure Parse_Doctype (Result : out Match_Type)
    is
-      Unused : Match_Type;
+      Old_Offset   : constant Natural := Offset;
+      Tmp_Result   : Match_Type;
+      Unused, Text : Range_Type;
    begin
-      Parse_Sections ("<!DOCTYPE", ">", Result);
+      Result := Match_Invalid;
+      Skip (Whitespace);
+      Match_String ("<!DOCTYPE", Tmp_Result);
+      if Tmp_Result /= Match_OK or
+        Data_Overflow
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
+
+      Match_Until_Set ("[", ">", Tmp_Result, Unused);
+      if Tmp_Result = Match_OK or Data_Overflow
+      then
+         Match_Until_Set ("]", Empty_Set, Tmp_Result, Unused);
+         if Tmp_Result /= Match_OK or Data_Overflow
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+      end if;
+      pragma Unreferenced (Unused);
+
+      Skip (Whitespace);
+      Match_Until_String (">", Text);
+      if Text = Null_Range
+      then
+         Restore_Offset (Old_Offset);
+         return;
+      end if;
+      Result := Match_OK;
    end Parse_Doctype;
 
    -------------------

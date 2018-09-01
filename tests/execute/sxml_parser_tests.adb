@@ -376,6 +376,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Doctype_With_Elements (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/doctype.xml");
+   end Doctype_With_Elements;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -418,6 +426,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Ebay'Access, "Ebay");
       Register_Routine (T, Gone321'Access, "321 gone");
       Register_Routine (T, Comment_Single'Access, "Only comment between tags");
+      Register_Routine (T, Doctype_With_Elements'Access, "Doctype with elements");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
