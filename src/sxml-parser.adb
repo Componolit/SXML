@@ -830,9 +830,10 @@ package body SXML.Parser is
          return;
       end if;
 
+      Parse_Sections;
+
       if Done
       then
-         Parse_Sections;
          Context_Put (Value  => Close (Data (Name.First .. Name.Last)),
                       Result => Valid);
          if not Valid

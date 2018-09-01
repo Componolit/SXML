@@ -344,7 +344,7 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure SigmodRecord(T : in out Test_Cases.Test_Case'Class)
+   procedure SigmodRecord (T : in out Test_Cases.Test_Case'Class)
    is
    begin
       Parse_Document ("tests/data/SigmodRecord.xml");
@@ -365,6 +365,14 @@ package body SXML_Parser_Tests is
    begin
       Parse_Document ("tests/data/yahoo.xml");
    end Yahoo;
+
+   ---------------------------------------------------------------------------
+
+   procedure Comment_Single (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<elem><!--Comment--></elem>", "<elem></elem>");
+   end Comment_Single;
 
    ---------------------------------------------------------------------------
 
@@ -409,6 +417,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Reed'Access, "Reed");
       Register_Routine (T, Ebay'Access, "Ebay");
       Register_Routine (T, Gone321'Access, "321 gone");
+      Register_Routine (T, Comment_Single'Access, "Only comment between tags");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
