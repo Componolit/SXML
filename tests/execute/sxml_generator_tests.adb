@@ -10,7 +10,7 @@
 --
 
 with AUnit.Assertions; use AUnit.Assertions;
-with SXML;
+with SXML.Generator; use SXML.Generator;
 
 package body SXML_Generator_Tests is
 

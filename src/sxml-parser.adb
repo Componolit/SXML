@@ -1,3 +1,5 @@
+with SXML.Generator;
+
 package body SXML.Parser is
 
    Context_Index : Index_Type := Context'First;
@@ -366,12 +368,12 @@ package body SXML.Parser is
 
    procedure Parse_Attribute (Match : out Match_Type)
    is
-      Old_Offset    : constant Natural := Offset;
-      Attr_Name     : Range_Type;
-      Attr_Value    : Range_Type;
-      Match_Tmp     : Match_Type;
-      Valid         : Boolean;
-      Separator     : Character;
+      Old_Offset      : constant Natural := Offset;
+      Attribute_Name  : Range_Type;
+      Attribute_Value : Range_Type;
+      Match_Tmp       : Match_Type;
+      Valid           : Boolean;
+      Separator       : Character;
    begin
 
       if Context_Overflow
@@ -389,7 +391,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until_Set (Whitespace & "=", ">", Match_Tmp, Attr_Name);
+      Match_Until_Set (Whitespace & "=", ">", Match_Tmp, Attribute_Name);
       if Match_Tmp /= Match_OK
       then
          Restore_Offset (Old_Offset);
@@ -425,7 +427,7 @@ package body SXML.Parser is
          return;
       end if;
 
-      Match_Until_Set ("" & Separator, "<", Match_Tmp, Attr_Value);
+      Match_Until_Set ("" & Separator, "<", Match_Tmp, Attribute_Value);
       if (Match_Tmp /= Match_OK and Match_Tmp /= Match_None) or
          Data_Overflow
       then
@@ -434,9 +436,11 @@ package body SXML.Parser is
       end if;
       Offset := Offset + 1;
 
-      Context_Put (Value  => A (Name  => Data (Attr_Name.First .. Attr_Name.Last),
-                                Value =>  Data (Attr_Value.First .. Attr_Value.Last)),
-                   Result => Valid);
+      Context_Put
+         (Value  => SXML.Generator.A
+            (Name  => Data (Attribute_Name.First .. Attribute_Name.Last),
+             Value =>  Data (Attribute_Value.First .. Attribute_Value.Last)),
+          Result => Valid);
       if not Valid
       then
          Restore_Offset (Old_Offset);

@@ -12,7 +12,7 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with Ada.Directories;
 with Ada.Text_IO.Text_Streams;
-with SXML;
+with SXML.Generator; use SXML.Generator;
 with SXML.Parser;
 
 package body SXML_Utils
