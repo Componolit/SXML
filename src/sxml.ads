@@ -1,15 +1,18 @@
 package SXML
-   with SPARK_Mode
+with
+   SPARK_Mode
 is
-   type Node_Type is private;
    type Index_Type is new Natural range 1 .. Natural'Last / 2;
+
+   type Node_Type is private;
+   Null_Node : constant Node_Type;
+
    type Subtree_Type is array (Index_Type range <>) of Node_Type;
+   Null_Tree : constant Subtree_Type;
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
-   is
-      (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length)
    with
-       Ghost;
+      Ghost;
 
    function Concatenate (Left, Right : Subtree_Type) return Subtree_Type
    is (Left & Right)
@@ -18,13 +21,9 @@ is
 
    overriding
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   is (Concatenate (Left, Right))
    with
       Pre  => Is_Valid (Left, Right),
       Post => "&"'Result'Length = Left'Length + Right'Length;
-
-   Null_Node : constant Node_Type;
-   Null_Tree : constant Subtree_Type;
 
    ----------
    -- Open --
@@ -73,5 +72,13 @@ private
                                       Length => 0,
                                       Data   => Null_Data);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
+
+   function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   is
+      (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
+
+   overriding
+   function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   is (Concatenate (Left, Right));
 
 end SXML;

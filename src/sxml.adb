@@ -1,7 +1,6 @@
 package body SXML
    with SPARK_Mode
 is
-
    --------------
    -- Set_Data --
    --------------

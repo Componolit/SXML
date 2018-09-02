@@ -1,4 +1,7 @@
-package SXML.Generator is
+package SXML.Generator
+with
+   SPARK_Mode
+is
 
    -------
    -- E --
