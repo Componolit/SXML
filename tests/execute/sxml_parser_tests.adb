@@ -20,7 +20,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<valid></valid>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<valid/>");
    end Single_Node;
 
    -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ package body SXML_Parser_Tests is
       Tag : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
       Data : String := "<" & Tag & "></" & Tag & ">";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<" & Tag & "/>");
    end Long_Node;
 
    -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ package body SXML_Parser_Tests is
             Tag : constant String (1 .. I) := (others => 'Y');
             Data : String := "<" & Tag & "></" & Tag & ">";
          begin
-            Check_Document (Data);
+            Check_Document (Data, "<" & Tag & "/>");
          end;
       end loop;
    end Multiple_Of_Chunk_Tag;
@@ -55,7 +55,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<valid/>";
    begin
-      Check_Document (Data, "<valid></valid>");
+      Check_Document (Data, "<valid/>");
    end Single_Short_Node;
 
    ---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ package body SXML_Parser_Tests is
       Data : String := "<parent><child1/><child2/></parent>";
    begin
       Check_Document (Data,
-                      "<parent><child1></child1><child2></child2></parent>");
+                      "<parent><child1/><child2/></parent>");
    end Multiple_Children;
 
    -----------------------------------------------------------------------------
@@ -86,10 +86,10 @@ package body SXML_Parser_Tests is
       Data3 : String := "<valid></valid  " & Character'Val(16#9#) & ">";
       Data4 : String := "<valid></valid  " & Character'Val(16#A#) & ">";
    begin
-      Check_Document (Data1, "<valid></valid>");
-      Check_Document (Data2, "<valid></valid>");
-      Check_Document (Data3, "<valid></valid>");
-      Check_Document (Data4, "<valid></valid>");
+      Check_Document (Data1, "<valid/>");
+      Check_Document (Data2, "<valid/>");
+      Check_Document (Data3, "<valid/>");
+      Check_Document (Data4, "<valid/>");
    end Valid_Whitespace;
 
    ---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr=""test""></parent>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<parent attr=""test""/>");
    end Simple_Attribute;
 
    ---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr=""""></parent>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<parent attr=""""/>");
    end Empty_Attribute;
 
    ---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr='test'></parent>";
    begin
-      Check_Document (Data, "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""/>");
    end Single_Quote_Attribute;
 
    ---------------------------------------------------------------------------
@@ -137,7 +137,7 @@ package body SXML_Parser_Tests is
       Attr : constant String := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
       Data : String := "<parent attr=""" & Attr & """></parent>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<parent attr=""" & Attr & """/>");
    end Long_Attribute;
 
    ---------------------------------------------------------------------------
@@ -153,7 +153,7 @@ package body SXML_Parser_Tests is
             Name : constant String (1 .. I) := (others => 'X');
             Data : String := "<parent " & Name & "=""value""></parent>";
          begin
-            Check_Document (Data);
+            Check_Document (Data, "<parent " & Name & "=""value""/>");
          end;
       end loop;
    end Multiple_Of_Chunk_Attribute_Name;
@@ -171,7 +171,7 @@ package body SXML_Parser_Tests is
             Attr : constant String (1 .. I) := (others => 'X');
             Data : String := "<parent attr=""" & Attr & """></parent>";
          begin
-            Check_Document (Data);
+            Check_Document (Data, "<parent attr=""" & Attr & """/>");
          end;
       end loop;
    end Multiple_Of_Chunk_Attribute_Value;
@@ -182,7 +182,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr=""/foo/bar/baz""></parent>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<parent attr=""/foo/bar/baz""/>");
    end Slash_In_Attribute;
 
    ---------------------------------------------------------------------------
@@ -191,7 +191,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr = ""test""   ></parent>";
    begin
-      Check_Document (Data, "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""/>");
    end Whitespace_Attribute;
 
    ---------------------------------------------------------------------------
@@ -200,7 +200,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr1=""data1"" attr2=""data2"" attr3=""data3""></parent>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<parent attr1=""data1"" attr2=""data2"" attr3=""data3""/>");
    end Multiple_Attributes;
 
    ---------------------------------------------------------------------------
@@ -209,7 +209,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr=""test"">     </parent>";
    begin
-      Check_Document (Data, "<parent attr=""test""></parent>");
+      Check_Document (Data, "<parent attr=""test""/>");
    end Whitespace_Between_Nodes;
 
    ---------------------------------------------------------------------------
@@ -238,7 +238,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent>Node content to be ignored</parent>";
    begin
-      Check_Document (Data, "<parent></parent>");
+      Check_Document (Data, "<parent/>");
    end Ignore_Node_Content;
 
    ---------------------------------------------------------------------------
@@ -247,7 +247,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/comments.xml");
    begin
-      Check_Document (Data.all, "<parent><child></child></parent>");
+      Check_Document (Data.all, "<parent><child/></parent>");
    end Ignore_Comments;
 
    ---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/pi_and_comment.xml");
    begin
-      Check_Document (Data.all, "<bar></bar>");
+      Check_Document (Data.all, "<bar/>");
    end PI_And_Comment;
 
    ---------------------------------------------------------------------------
@@ -265,7 +265,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/pi.xml");
    begin
-      Check_Document (Data.all, "<parent><child></child></parent>");
+      Check_Document (Data.all, "<parent><child/></parent>");
    end Ignore_Processing_Information;
 
    ---------------------------------------------------------------------------
@@ -298,7 +298,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>";
    begin
-      Check_Document (Data, "<parent></parent>");
+      Check_Document (Data, "<parent/>");
    end Ignore_CDATA;
 
    ---------------------------------------------------------------------------
@@ -309,7 +309,7 @@ package body SXML_Parser_Tests is
          "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
          "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>";
    begin
-      Check_Document (Data, "<parent></parent>");
+      Check_Document (Data, "<parent/>");
    end Ignore_Multiple_CDATA;
 
    ---------------------------------------------------------------------------
@@ -319,7 +319,7 @@ package body SXML_Parser_Tests is
       Data : String := "<test><test1>='</test1><test2>'</test2></test>";
    begin
       Check_Document
-         (Data, "<test><test1></test1><test2></test2></test>");
+         (Data, "<test><test1/><test2/></test>");
    end Single_Quote_Content;
 
    ---------------------------------------------------------------------------
@@ -328,7 +328,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<test attr="">""></test>";
    begin
-      Check_Document (Data);
+      Check_Document (Data, "<test attr="">""/>");
    end Attribute_Value_With_Gt;
 
    ---------------------------------------------------------------------------
@@ -337,7 +337,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/bom.xml");
    begin
-      Check_Document (Data.all, "<foo></foo>");
+      Check_Document (Data.all, "<foo/>");
    end File_With_BOM;
 
    ---------------------------------------------------------------------------
@@ -394,7 +394,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<elem><!--Comment--></elem>";
    begin
-      Check_Document (Data, "<elem></elem>");
+      Check_Document (Data, "<elem/>");
    end Comment_Single;
 
    ---------------------------------------------------------------------------
@@ -411,7 +411,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<elem> Here is <!--Comment--> some content </elem>";
    begin
-      Check_Document (Data, "<elem></elem>");
+      Check_Document (Data, "<elem/>");
    end Comments_Inside_Content;
 
    ---------------------------------------------------------------------------
@@ -420,7 +420,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<elem> Here is <?some processing info?> some content </elem>";
    begin
-      Check_Document (Data, "<elem></elem>");
+      Check_Document (Data, "<elem/>");
    end Processing_Info_Inside_Content;
 
    ---------------------------------------------------------------------------

@@ -20,7 +20,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config");
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config></config>",
+      Assert (XML = "<config/>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_Generate_Single_Node;
 
@@ -32,7 +32,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", A ("attrib", "Foo"));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config attrib=""Foo""></config>",
+      Assert (XML = "<config attrib=""Foo""/>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_Generate_Single_Node_Attrib;
 
@@ -44,7 +44,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", E ("child"));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config><child></child></config>",
+      Assert (XML = "<config><child/></config>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_Generate_Nodes;
 
@@ -56,7 +56,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", "value")));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config><child attr=""value""></child></config>",
+      Assert (XML = "<config><child attr=""value""/></config>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_String_Attribute;
 
@@ -68,7 +68,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", 42)));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config><child attr=""42""></child></config>",
+      Assert (XML = "<config><child attr=""42""/></config>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_Integer_Attribute;
 
@@ -80,7 +80,7 @@ package body SXML_Generator_Tests is
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", 3.14)));
       XML : String := To_String (Doc);
    begin
-      Assert (XML = "<config><child attr=""3.14000E+00""></child></config>",
+      Assert (XML = "<config><child attr=""3.14000E+00""/></config>",
          "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
 	end Test_Float_Attribute;
 
