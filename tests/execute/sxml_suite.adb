@@ -13,6 +13,7 @@
 with SXML_Generator_Tests;
 with SXML_Parser_Tests;
 with SXML_Bulk_Tests;
+with SXML_Query_Tests;
 
 package body SXML_Suite is
 
@@ -25,12 +26,14 @@ package body SXML_Suite is
    Generator_Tests : aliased SXML_Generator_Tests.Test_Case;
    Parser_Tests    : aliased SXML_Parser_Tests.Test_Case;
    Bulk_Tests      : aliased SXML_Bulk_Tests.Test_Case;
+   Query_Tests     : aliased SXML_Query_Tests.Test_Case;
 
    function Suite return Access_Test_Suite is
    begin
       Add_Test (Result'Access, Generator_Tests'Access);
       Add_Test (Result'Access, Parser_Tests'Access);
       Add_Test (Result'Access, Bulk_Tests'Access);
+      Add_Test (Result'Access, Query_Tests'Access);
       return Result'Access;
    end Suite;
 
