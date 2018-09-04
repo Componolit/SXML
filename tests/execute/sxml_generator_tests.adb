@@ -122,7 +122,10 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Long : String (1 .. 100) := (others => 'x');
-      Doc  : Subtree_Type := E ("parent", A ("attr1", "value") & A ("attr2", Long) & A ("attr3_" & Long, "value"));
+      Doc  : Subtree_Type := E ("parent",
+                                A ("attr1", "value") +
+                                A ("attr2", Long) +
+                                A ("attr3_" & Long, "value"));
    begin
       Expect (To_String (Doc), "<parent attr1=""value"" attr2=""" & Long & """ attr3_" & Long & "=""value""/>");
 	end Multiple_Attributes;
@@ -133,11 +136,11 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Doc  : Subtree_Type :=
-          E ("parent", A ("attr1", "value1") &
-                       A ("attr2", "value2") &
-                       A ("attr3", "value3") &
+          E ("parent", A ("attr1", "value1") +
+                       A ("attr2", "value2") +
+                       A ("attr3", "value3") +
                        A ("attr4", "value4"),
-            E ("child1") &
+            E ("child1") +
             E ("child2",
                E ("subchild")));
    begin

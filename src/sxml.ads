@@ -11,6 +11,16 @@ is
    type Subtree_Type is array (Index_Type range <>) of Node_Type;
    Null_Tree : constant Subtree_Type;
 
+   function "+" (Left, Right : Subtree_Type) return Subtree_Type
+   with
+      Pre  => Is_Valid (Left, Right);
+      --  Post => "&"'Result'Length = Left'Length + Right'Length;
+
+   type Attributes_Type is array (Index_Type range <>) of Node_Type;
+   Null_Attributes : constant Attributes_Type;
+
+   function "+" (Left, Right : Attributes_Type) return Attributes_Type;
+
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    with
       Ghost;
@@ -19,12 +29,6 @@ is
    is (Left & Right)
    with
      Pre => Is_Valid (Left, Right);
-
-   overriding
-   function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   with
-      Pre  => Is_Valid (Left, Right);
-      --  Post => "&"'Result'Length = Left'Length + Right'Length;
 
    ----------
    -- Open --
@@ -37,7 +41,7 @@ is
    ---------------
 
    function Attribute (Name : String;
-                       Data : String) return Subtree_Type;
+                       Data : String) return Attributes_Type;
 
    ---------------
    -- To_String --
@@ -65,9 +69,9 @@ private
       Data   : Data_Type;
       case Kind is
          when Kind_Element_Open =>
-            Element_Name   : Offset_Type;
             Attributes     : Offset_Type;
             Children       : Offset_Type;
+            Siblings       : Offset_Type;
          when Kind_Attribute =>
             Next_Attribute : Offset_Type;
             Value          : Offset_Type;
@@ -83,12 +87,11 @@ private
                                       Length => 0);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
+   --  type Attributes_Type is new Subtree_Type;
+   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
+
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
-
-   overriding
-   function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   is (Concatenate (Left, Right));
 
 end SXML;
