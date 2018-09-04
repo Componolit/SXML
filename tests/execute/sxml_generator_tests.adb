@@ -86,6 +86,45 @@ package body SXML_Generator_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Long_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Val : String (1 .. 100) := (others => 'x');
+      Doc : Subtree_Type := E ("config", A ("attr", Val));
+      XML : String := To_String (Doc);
+   begin
+      Assert (XML = "<config attr=""" & Val & """ />",
+         "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
+	end Long_Attribute_Value;
+
+   ---------------------------------------------------------------------------
+
+   procedure Long_Attribute_Name (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Aname : String (1 .. 100) := (others => 'x');
+      Doc : Subtree_Type := E ("config", A (Aname, "value"));
+      XML : String := To_String (Doc);
+   begin
+      Assert (XML = "<config " & Aname & "=""value"" />",
+         "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
+	end Long_Attribute_Name;
+
+   ---------------------------------------------------------------------------
+
+   procedure Long_Tag_Name (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Name : String (1 .. 100) := (others => 'x');
+      Doc  : Subtree_Type := E (Name, A ("attr", "value"));
+      XML  : String := To_String (Doc);
+   begin
+      Assert (XML = "<" & Name & " attr=""value"" />",
+         "Unexpected document: (" & XML & ") len:" & XML'Length'Img);
+	end Long_Tag_Name;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -95,6 +134,9 @@ package body SXML_Generator_Tests is
       Register_Routine (T, Test_String_Attribute'Access, "String attribute");
       Register_Routine (T, Test_Integer_Attribute'Access, "Integer attribute");
       Register_Routine (T, Test_Float_Attribute'Access, "Float attribute");
+      Register_Routine (T, Long_Tag_Name'Access, "Long tag name");
+      Register_Routine (T, Long_Attribute_Name'Access, "Long attribute name");
+      Register_Routine (T, Long_Attribute_Value'Access, "Long attribute value");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
