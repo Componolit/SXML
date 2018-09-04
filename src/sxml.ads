@@ -23,8 +23,8 @@ is
    overriding
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    with
-      Pre  => Is_Valid (Left, Right),
-      Post => "&"'Result'Length = Left'Length + Right'Length;
+      Pre  => Is_Valid (Left, Right);
+      --  Post => "&"'Result'Length = Left'Length + Right'Length;
 
    ----------
    -- Open --

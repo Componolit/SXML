@@ -23,7 +23,6 @@ is
                 Length         => 0,
                 Next           => Null_Offset,
                 Data           => Null_Data,
-                Attribute_Name => Null_Offset,
                 Value          => Null_Offset);
 
    ------------------
@@ -51,9 +50,13 @@ is
       Ada.Text_IO.Put_Line ("Put_String: " & Name);
       for I in Index_Type range 1 .. Index_Type (Num_Elements (Name))
       loop
-         Len := (if Name'Length - Offset > Subtree (I).Data'Length
-                 then Subtree (I).Data'Length
-                 else Name'Length);
+         if Name'Length - Offset > Subtree (I).Data'Length
+         then
+            Len := Subtree (I).Data'Length;
+            Subtree (I).Next := 1;
+         else
+            Len := Name'Length - Offset;
+         end if;
          Subtree (I).Data (1 .. Len) :=
            Name (Name'First + Offset .. Name'First + Offset + Len - 1);
          Subtree (I).Length := Length_Type (Len);
@@ -89,8 +92,8 @@ is
         (others => Null_Data_Element);
    begin
       Put_String (Name_Tree, Name);
-      Name_Tree (1).Attribute_Name := (if Name_Tree'Length > 1 then 1 else 0);
-      Name_Tree (1).Value          := Name_Tree'Length;
+      Name_Tree (1).Next  := (if Name_Tree'Length > 1 then 1 else 0);
+      Name_Tree (1).Value := Name_Tree'Length;
       Put_String (Data_Tree, Data);
       return Name_Tree & Data_Tree;
    end Attribute;
@@ -107,7 +110,7 @@ is
    begin
       return N.Data (1 .. Natural (N.Length)) &
          (if N.Next /= Null_Offset
-          then Data (T (N.Next .. T'Last))
+          then Data (T (T'First + N.Next .. T'Last))
           else "");
    end Data;
 

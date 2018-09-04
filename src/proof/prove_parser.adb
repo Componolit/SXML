@@ -7,13 +7,13 @@ package body Prove_Parser is
    procedure Parse (XML    : in out String;
                     Result : out Boolean)
    is
-      package Parser is new SXML.Parser (XML, Context);
-      use Parser;
+      package P is new SXML.Parser (XML, Context);
+      use P;
       Match : Match_Type;
       Position : Natural;
    begin
-      Parser.Parse (Match    => Match,
-                    Position => Position);
+      P.Parse (Match    => Match,
+               Position => Position);
       pragma Unreferenced (Position);
       Result := Match = Match_OK;
    end Parse;
