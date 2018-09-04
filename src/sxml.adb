@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 package body SXML
    with SPARK_Mode
 is
@@ -36,35 +34,6 @@ is
    ----------------
    -- Put_String --
    ----------------
-
-   procedure Put_String (Subtree : in out Attributes_Type;
-                         Name    : String)
-   with
-      Pre => Subtree'Length >= Num_Elements (Name);
-
-   procedure Put_String (Subtree : in out Attributes_Type;
-                         Name    : String)
-   is
-      Offset : Natural := 0;
-      Len    : Natural;
-   begin
-      for I in Index_Type range 1 .. Index_Type (Num_Elements (Name))
-      loop
-         if Name'Length - Offset > Subtree (I).Data'Length
-         then
-            Len := Subtree (I).Data'Length;
-            Subtree (I).Next := 1;
-         else
-            Len := Name'Length - Offset;
-         end if;
-         Subtree (I).Data (1 .. Len) :=
-           Name (Name'First + Offset .. Name'First + Offset + Len - 1);
-         Subtree (I).Length := Length_Type (Len);
-         Offset := Offset + Len;
-      end loop;
-   end Put_String;
-
-   --  FIXME: Refactor
 
    procedure Put_String (Subtree : in out Subtree_Type;
                          Name    : String)
@@ -112,12 +81,12 @@ is
    ---------------
 
    function Attribute (Name : String;
-                       Data : String) return Attributes_Type
+                       Data : String) return Subtree_Type
    is
-      Name_Tree : Attributes_Type (1 .. Num_Elements (Name)) :=
+      Name_Tree : Subtree_Type (1 .. Num_Elements (Name)) :=
         (1      => Null_Attribute_Element,
          others => Null_Data_Element);
-      Data_Tree : Attributes_Type (1 .. Num_Elements (Data)) :=
+      Data_Tree : Subtree_Type (1 .. Num_Elements (Data)) :=
         (others => Null_Data_Element);
    begin
       Put_String (Name_Tree, Name);
@@ -188,49 +157,5 @@ is
           then "/>"
           else ">" & To_String (T (T'First + N.Children .. T'Last)) & "</" & Tag & ">");
    end To_String;
-
-   ---------
-   -- "+"--
-   ---------
-
-   function "+" (Left, Right : Subtree_Type) return Subtree_Type
-   is
-      Result : Subtree_Type := Concatenate (Left, Right);
-      I : Offset_Type := 0;
-   begin
-      if Right'Length = 0
-      then
-         return Left;
-      end if;
-
-      --  Find last element
-      loop
-         exit when Left (Left'First + I).Siblings = Null_Offset;
-         I := I + Left (Left'First + I).Siblings;
-      end loop;
-
-      Result (Result'First + I).Siblings := Left'Length - I;
-      return Result;
-   end "+";
-
-   ---------
-   -- "+" --
-   ---------
-
-   function "+" (Left, Right : Attributes_Type) return Attributes_Type
-   is
-      Result : Attributes_Type :=
-        Attributes_Type (Subtree_Type (Left) & Subtree_Type (Right));
-      I : Offset_Type := 0;
-   begin
-      --  Find last attibute
-      loop
-         exit when Left (Left'First + I).Next_Attribute = Null_Offset;
-         I := I + Left (Left'First + I).Next_Attribute;
-      end loop;
-
-      Result (Result'First + I).Next_Attribute := Left'Length - I;
-      return Result;
-   end "+";
 
 end SXML;

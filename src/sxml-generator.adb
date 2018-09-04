@@ -94,7 +94,51 @@ package body SXML.Generator is
                Value : String) return Attributes_Type
    is
    begin
-      return SXML.Attribute (Name, Value);
+      return Attributes_Type (SXML.Attribute (Name, Value));
    end A;
+
+   ---------
+   -- "+"--
+   ---------
+
+   function "+" (Left, Right : Subtree_Type) return Subtree_Type
+   is
+      Result : Subtree_Type := Concatenate (Left, Right);
+      I : Offset_Type := 0;
+   begin
+      if Right'Length = 0
+      then
+         return Left;
+      end if;
+
+      --  Find last element
+      loop
+         exit when Left (Left'First + I).Siblings = Null_Offset;
+         I := I + Left (Left'First + I).Siblings;
+      end loop;
+
+      Result (Result'First + I).Siblings := Left'Length - I;
+      return Result;
+   end "+";
+
+   ---------
+   -- "+" --
+   ---------
+
+   function "+" (Left, Right : Attributes_Type) return Attributes_Type
+   is
+      Result : Attributes_Type :=
+        Attributes_Type (Subtree_Type (Left) & Subtree_Type (Right));
+      I : Offset_Type := 0;
+   begin
+      --  Find last attibute
+      loop
+         exit when Left (Left'First + I).Next_Attribute = Null_Offset;
+         I := I + Left (Left'First + I).Next_Attribute;
+      end loop;
+
+      Result (Result'First + I).Next_Attribute := Left'Length - I;
+      return Result;
+   end "+";
 
 end SXML.Generator;

@@ -2,6 +2,18 @@ package SXML.Generator
 with
    SPARK_Mode
 is
+
+   type Attributes_Type (<>) is private;
+   Null_Attributes : constant Attributes_Type;
+
+   ---------
+   -- "+" --
+   ---------
+
+   function "+" (Left, Right : Subtree_Type) return Subtree_Type;
+
+   function "+" (Left, Right : Attributes_Type) return Attributes_Type;
+
    -------
    -- E --
    -------
@@ -40,6 +52,9 @@ is
                Value : String) return Attributes_Type;
 
 private
+
+   type Attributes_Type is new Subtree_Type;
+   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
 
    function To_String (Value : Float) return String
    with

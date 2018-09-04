@@ -1,5 +1,3 @@
-with SXML.Generator;
-
 package body SXML.Parser is
 
    Context_Index : Index_Type := Context'First;
@@ -437,9 +435,9 @@ package body SXML.Parser is
       Offset := Offset + 1;
 
       Context_Put
-         (Value  => SXML.Subtree_Type (SXML.Generator.A
-            (Name  => Data (Attribute_Name.First .. Attribute_Name.Last),
-             Value =>  Data (Attribute_Value.First .. Attribute_Value.Last))),
+         (Value  => SXML.Attribute
+            (Name => Data (Attribute_Name.First .. Attribute_Name.Last),
+             Data => Data (Attribute_Value.First .. Attribute_Value.Last)),
           Result => Valid);
       if not Valid
       then

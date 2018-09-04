@@ -11,16 +11,6 @@ is
    type Subtree_Type is array (Index_Type range <>) of Node_Type;
    Null_Tree : constant Subtree_Type;
 
-   function "+" (Left, Right : Subtree_Type) return Subtree_Type
-   with
-      Pre  => Is_Valid (Left, Right);
-      --  Post => "&"'Result'Length = Left'Length + Right'Length;
-
-   type Attributes_Type is array (Index_Type range <>) of Node_Type;
-   Null_Attributes : constant Attributes_Type;
-
-   function "+" (Left, Right : Attributes_Type) return Attributes_Type;
-
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    with
       Ghost;
@@ -41,7 +31,7 @@ is
    ---------------
 
    function Attribute (Name : String;
-                       Data : String) return Attributes_Type;
+                       Data : String) return Subtree_Type;
 
    ---------------
    -- To_String --
@@ -86,9 +76,6 @@ private
                                       Data   => Null_Data,
                                       Length => 0);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
-
-   --  type Attributes_Type is new Subtree_Type;
-   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
