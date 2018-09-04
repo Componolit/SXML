@@ -5,6 +5,9 @@ is
    type Attributes_Type is new SXML.Subtree_Type;
    Null_Attributes : constant Attributes_Type;
 
+   overriding
+   function "&" (Left, Right : Attributes_Type) return Attributes_Type;
+
    -------
    -- E --
    -------

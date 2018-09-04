@@ -1,5 +1,26 @@
 package body SXML.Generator is
 
+   ---------
+   -- "&" --
+   ---------
+
+   overriding
+   function "&" (Left, Right : Attributes_Type) return Attributes_Type
+   is
+      Result : Attributes_Type :=
+        Attributes_Type (Subtree_Type (Left) & Subtree_Type (Right));
+      I : Offset_Type := 0;
+   begin
+      --  Find last attibute
+      loop
+         exit when Left (Left'First + I).Next_Attribute = Null_Offset;
+         I := I + Left (Left'First + I).Next_Attribute;
+      end loop;
+
+      Result (Result'First + I).Next_Attribute := Left'Length - I;
+      return Result;
+   end "&";
+
    ---------------
    -- To_String --
    ---------------

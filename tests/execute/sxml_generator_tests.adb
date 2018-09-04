@@ -135,12 +135,13 @@ package body SXML_Generator_Tests is
       Doc  : Subtree_Type :=
           E ("parent", A ("attr1", "value1") &
                        A ("attr2", "value2") &
-                       A ("attr3", "value3"),
+                       A ("attr3", "value3") &
+                       A ("attr4", "value4"),
             E ("child1") &
             E ("child2",
                E ("subchild")));
    begin
-      Expect (To_String (Doc), "<parent attr1=""value1"" attr2=""value2"" attr3=""value3""><child1/><child2><subchild/></child2></parent>");
+      Expect (To_String (Doc), "<parent attr1=""value1"" attr2=""value2"" attr3=""value3"" attr4=""value4""><child1/><child2><subchild/></child2></parent>");
 	end Nested;
 
    ---------------------------------------------------------------------------

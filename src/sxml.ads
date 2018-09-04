@@ -69,6 +69,7 @@ private
             Attributes     : Offset_Type;
             Children       : Offset_Type;
          when Kind_Attribute =>
+            Next_Attribute : Offset_Type;
             Value          : Offset_Type;
          when Kind_Data |
               Kind_Invalid =>
