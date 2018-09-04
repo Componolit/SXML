@@ -15,10 +15,15 @@ is
    with
       Ghost;
 
-   function Concatenate (Left, Right : Subtree_Type) return Subtree_Type
+   function "*" (Left, Right : Subtree_Type) return Subtree_Type
    is (Left & Right)
    with
      Pre => Is_Valid (Left, Right);
+
+   overriding
+   function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   with
+     Pre => False;
 
    ----------
    -- Open --

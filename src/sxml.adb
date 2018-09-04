@@ -93,7 +93,7 @@ is
       Name_Tree (1).Next  := (if Name_Tree'Length > 1 then 1 else 0);
       Name_Tree (1).Value := Name_Tree'Length;
       Put_String (Data_Tree, Data);
-      return Name_Tree & Data_Tree;
+      return Name_Tree * Data_Tree;
    end Attribute;
 
    ----------
@@ -131,15 +131,14 @@ is
          return "";
       end if;
 
-      return
-         " " &
-         Data (T, I) &
-         "=""" &
-         Data (T, I + N.Value) &
-         """" &
-         (if N.Next_Attribute /= Null_Offset
-          then Attributes (T, I + N.Next_Attribute)
-          else "");
+      return " "
+           & Data (T, I)
+           & "="""
+           & Data (T, I + N.Value)
+           & """"
+           & (if N.Next_Attribute /= Null_Offset
+              then Attributes (T, I + N.Next_Attribute)
+              else "");
    end Attributes;
 
    ---------------
@@ -151,15 +150,23 @@ is
       N   : constant Node_Type := T (T'First);
       Tag : constant String    := Data (T, 0);
    begin
-      return
-        "<" & Tag &
-        Attributes (T, N.Attributes) &
-        (if N.Children = Null_Offset
-         then "/>"
-         else ">" & To_String (T (T'First + N.Children .. T'Last)) & "</" & Tag & ">") &
-        (if N.Siblings = Null_Offset
-         then ""
-         else To_String (T (T'First + N.Siblings .. T'Last)));
+      return "<"
+           & Tag
+           & Attributes (T, N.Attributes)
+           & (if N.Children = Null_Offset
+              then "/>"
+              else ">" & To_String (T (T'First + N.Children .. T'Last)) & "</" & Tag & ">")
+           & (if N.Siblings = Null_Offset
+              then ""
+              else To_String (T (T'First + N.Siblings .. T'Last)));
    end To_String;
+
+   overriding
+   function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   is
+      pragma Unreferenced (Left, Right);
+   begin
+      return Null_Tree;
+   end "&";
 
 end SXML;

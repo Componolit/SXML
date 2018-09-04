@@ -50,7 +50,7 @@ package body SXML.Generator is
         (if Attributes = Null_Attributes then Null_Offset else O'Length);
       O (O'First).Children :=
         (if Children = Null_Tree then Null_Offset else O'Length + Attributes'Length);
-      return O & Subtree_Type (Attributes) & Children;
+      return O * Subtree_Type (Attributes) * Children;
    end E;
 
    function E (Name       : String;
@@ -103,7 +103,7 @@ package body SXML.Generator is
 
    function "+" (Left, Right : Subtree_Type) return Subtree_Type
    is
-      Result : Subtree_Type := Concatenate (Left, Right);
+      Result : Subtree_Type := Left * Right;
       I : Offset_Type := 0;
    begin
       if Right'Length = 0
@@ -127,8 +127,7 @@ package body SXML.Generator is
 
    function "+" (Left, Right : Attributes_Type) return Attributes_Type
    is
-      Result : Attributes_Type :=
-        Attributes_Type (Subtree_Type (Left) & Subtree_Type (Right));
+      Result : Attributes_Type := Left * Right;
       I : Offset_Type := 0;
    begin
       --  Find last attibute
