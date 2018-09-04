@@ -1,46 +1,65 @@
+with Ada.Text_IO;
+
 package body SXML
    with SPARK_Mode
 is
-   --------------
-   -- Set_Data --
-   --------------
+   Null_Open_Element : constant Node_Type :=
+     Node_Type'(Kind           => Kind_Element_Open,
+                Length         => 0,
+                Next           => Null_Offset,
+                Data           => Null_Data,
+                Element_Name   => Null_Offset,
+                Attributes     => Null_Offset,
+                Children       => Null_Offset);
 
-   function Set_Data (Data : String;
-                      Kind : Kind_Type) return Subtree_Type;
+   Null_Data_Element : constant Node_Type :=
+     Node_Type'(Kind           => Kind_Data,
+                Length         => 0,
+                Next           => Null_Offset,
+                Data           => Null_Data);
 
-   function Set_Data (Data : String;
-                      Kind : Kind_Type) return Subtree_Type
+   Null_Attribute_Element : constant Node_Type :=
+     Node_Type'(Kind           => Kind_Attribute,
+                Length         => 0,
+                Next           => Null_Offset,
+                Data           => Null_Data,
+                Attribute_Name => Null_Offset,
+                Value          => Null_Offset);
+
+   ------------------
+   -- Num_Elements --
+   ------------------
+
+   function Num_Elements (D : String) return Offset_Type
+   is ((D'Length + Data_Type'Length - 1) / Data_Type'Length);
+
+   ----------------
+   -- Put_String --
+   ----------------
+
+   procedure Put_String (Subtree : in out Subtree_Type;
+                         Name    : String)
+   with
+      Pre => Subtree'Length >= Num_Elements (Name);
+
+   procedure Put_String (Subtree : in out Subtree_Type;
+                         Name    : String)
    is
-      Num_Chunks : constant Index_Type :=
-        (Data'Length - 1) / Data_Type'Length + 1;
-
-      Data_Offset : Natural := 0;
-      Chunk_Kind  : Kind_Type := Kind;
+      Offset : Natural := 0;
+      Len    : Natural;
    begin
-      return Result : Subtree_Type (1 .. Num_Chunks) := (others => Null_Node)
-      do
-         for Chunk of Result
-         loop
-            declare
-               Chunk_Len : constant Natural :=
-                 (if Data'Length - Data_Offset < Data_Type'Length
-                  then Data'Length - Data_Offset
-                  else Data_Type'Length);
-
-               Elem          : Data_Type := (others => Character'Val (0));
-               Data_Position : constant Natural := Data'First + Data_Offset;
-            begin
-               Elem (Data_Type'First .. Data_Type'First + Chunk_Len - 1) :=
-                     Data (Data_Position .. Data_Position + Chunk_Len - 1);
-               Chunk := Node_Type'(Kind   => Chunk_Kind,
-                                   Length => Length_Type (Chunk_Len),
-                                   Data   => Elem);
-               Chunk_Kind := Kind_Data;
-               Data_Offset := Data_Offset + Chunk_Len;
-            end;
-         end loop;
-      end return;
-   end Set_Data;
+      Ada.Text_IO.Put_Line ("Put_String: " & Name);
+      for I in Index_Type range 1 .. Index_Type (Num_Elements (Name))
+      loop
+         Len := (if Name'Length - Offset > Subtree (I).Data'Length
+                 then Subtree (I).Data'Length
+                 else Name'Length);
+         Subtree (I).Data (1 .. Len) :=
+           Name (Name'First + Offset .. Name'First + Offset + Len - 1);
+         Subtree (I).Length := Length_Type (Len);
+         Offset := Offset + Len;
+      end loop;
+   end Put_String;
 
    ----------
    -- Open --
@@ -48,32 +67,80 @@ is
 
    function Open (Name : String) return Subtree_Type
    is
+      Result : Subtree_Type (1 .. Num_Elements (Name)) :=
+        (1      => Null_Open_Element,
+         others => Null_Data_Element);
    begin
-      return Set_Data (Name, Kind_Element_Open);
+      Put_String (Result, Name);
+      return Result;
    end Open;
 
-   -----------
-   -- Close --
-   -----------
+   ---------------
+   -- Attribute --
+   ---------------
 
-   function Close (Name : String) return Subtree_Type
+   function Attribute (Name : String;
+                       Data : String) return Subtree_Type
    is
+      Name_Tree : Subtree_Type (1 .. Num_Elements (Name)) :=
+        (1      => Null_Attribute_Element,
+         others => Null_Data_Element);
+      Data_Tree : Subtree_Type (1 .. Num_Elements (Data)) :=
+        (others => Null_Data_Element);
    begin
-      return Set_Data (Name, Kind_Element_Close);
-   end Close;
+      Put_String (Name_Tree, Name);
+      Name_Tree (1).Attribute_Name := (if Name_Tree'Length > 1 then 1 else 0);
+      Name_Tree (1).Value          := Name_Tree'Length;
+      Put_String (Data_Tree, Data);
+      return Name_Tree & Data_Tree;
+   end Attribute;
+
+   ----------
+   -- Data --
+   ----------
+
+   function Data (T : Subtree_Type) return String;
+
+   function Data (T : Subtree_Type) return String
+   is
+      N : constant Node_Type := T (T'First);
+   begin
+      return N.Data (1 .. Natural (N.Length)) &
+         (if N.Next /= Null_Offset
+          then Data (T (N.Next .. T'Last))
+          else "");
+   end Data;
+
+   ----------------
+   -- Attributes --
+   ----------------
+
+   function Attributes (T : Subtree_Type) return String;
+
+   function Attributes (T : Subtree_Type) return String
+   is
+      Value : constant Offset_Type :=  T (T'First).Value;
+   begin
+      return " " & Data (T) & "=""" &
+        Data (T (T'First + Value .. T'Last)) & """";
+   end Attributes;
 
    ---------------
-   -- Attr_Name --
+   -- To_String --
    ---------------
 
-   function Attr_Name (Name : String) return Subtree_Type
-   is (Set_Data (Name, Kind_Attr_Name));
-
-   ---------------
-   -- Attr_Data --
-   ---------------
-
-   function Attr_Data (Data : String) return Subtree_Type
-   is (Set_Data (Data, Kind_Attr_Data));
+   function To_String (T : Subtree_Type) return String
+   is
+      N   : constant Node_Type := T (T'First);
+      Tag : constant String    := Data (T);
+   begin
+      return "<" & Tag &
+         (if N.Attributes = Null_Offset
+          then ""
+          else Attributes (T (T'First + N.Attributes .. T'Last))) &
+         (if N.Children = Null_Offset
+          then "/>"
+          else ">" & To_String (T (T'First + N.Children .. T'Last)) & "</" & Tag & ">");
+   end To_String;
 
 end SXML;

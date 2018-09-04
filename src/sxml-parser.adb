@@ -437,9 +437,9 @@ package body SXML.Parser is
       Offset := Offset + 1;
 
       Context_Put
-         (Value  => SXML.Generator.A
+         (Value  => SXML.Subtree_Type (SXML.Generator.A
             (Name  => Data (Attribute_Name.First .. Attribute_Name.Last),
-             Value =>  Data (Attribute_Value.First .. Attribute_Value.Last)),
+             Value =>  Data (Attribute_Value.First .. Attribute_Value.Last))),
           Result => Valid);
       if not Valid
       then
@@ -565,7 +565,6 @@ package body SXML.Parser is
       Old_Offset   : constant Natural := Offset;
       Closing_Name : Range_Type;
       Match_Tmp    : Match_Type;
-      Valid        : Boolean;
    begin
       Match := Match_Invalid;
 
@@ -620,14 +619,6 @@ package body SXML.Parser is
       then
          Restore_Offset (Old_Offset);
          Match := Match_None_Wellformed;
-         return;
-      end if;
-
-      Context_Put (Value  => Close (Name => Name),
-                   Result => Valid);
-      if not Valid
-      then
-         Restore_Offset (Old_Offset);
          return;
       end if;
 
@@ -845,7 +836,6 @@ package body SXML.Parser is
       Done       : Boolean;
       Name       : Range_Type;
       Sub_Match  : Match_Type;
-      Valid      : Boolean;
    begin
 
       Match := Match_Invalid;
@@ -877,14 +867,6 @@ package body SXML.Parser is
 
       if Done
       then
-         Context_Put (Value  => Close (Data (Name.First .. Name.Last)),
-                      Result => Valid);
-         if not Valid
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-
          Match := Match_OK;
          return;
       end if;

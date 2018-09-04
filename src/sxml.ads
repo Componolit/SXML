@@ -2,7 +2,8 @@ package SXML
 with
    SPARK_Mode
 is
-   type Index_Type is new Natural range 1 .. Natural'Last / 2;
+   type Offset_Type is new Natural range 0 .. Natural'Last / 2;
+   subtype Index_Type is Offset_Type range 1 .. Offset_Type'Last;
 
    type Node_Type is private;
    Null_Node : constant Node_Type;
@@ -31,23 +32,18 @@ is
 
    function Open (Name : String) return Subtree_Type;
 
-   -----------
-   -- Close --
-   -----------
-
-   function Close (Name : String) return Subtree_Type;
-
    ---------------
-   -- Attr_Name --
+   -- Attribute --
    ---------------
 
-   function Attr_Name (Name : String) return Subtree_Type;
+   function Attribute (Name : String;
+                       Data : String) return Subtree_Type;
 
    ---------------
-   -- Attr_Data --
+   -- To_String --
    ---------------
 
-   function Attr_Data (Data : String) return Subtree_Type;
+   function To_String (T : Subtree_Type) return String;
 
 private
 
@@ -57,20 +53,33 @@ private
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
-                      Kind_Element_Close,
-                      Kind_Attr_Name,
-                      Kind_Attr_Data,
+                      Kind_Attribute,
                       Kind_Data);
+
+   Null_Offset : constant Offset_Type := 0;
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
       Length : Length_Type;
+      Next   : Offset_Type;
       Data   : Data_Type;
+      case Kind is
+         when Kind_Element_Open =>
+            Element_Name   : Offset_Type;
+            Attributes     : Offset_Type;
+            Children       : Offset_Type;
+         when Kind_Attribute =>
+            Value          : Offset_Type;
+         when Kind_Data |
+              Kind_Invalid =>
+            null;
+      end case;
    end record;
 
    Null_Node : constant Node_Type := (Kind   => Kind_Invalid,
-                                      Length => 0,
-                                      Data   => Null_Data);
+                                      Next   => 0,
+                                      Data   => Null_Data,
+                                      Length => 0);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
