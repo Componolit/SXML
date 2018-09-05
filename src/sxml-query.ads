@@ -52,6 +52,27 @@ package SXML.Query is
       Post'Class => Bound (Document, State) and
                     (if Result /= Result_OK then State = State'Old);
 
+   ---------------
+   -- Attribute --
+   ---------------
+
+   procedure Attribute (State    : in out State_Type;
+                        Document : Subtree_Type;
+                        Result   : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State) and
+                    (if Result /= Result_OK then State = State'Old);
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value (State    : in out State_Type;
+                    Document : Subtree_Type) return String
+   with
+      Pre'Class  => Bound (Document, State);
+
 private
 
    type State_Type is tagged

@@ -74,4 +74,37 @@ package body SXML.Query is
       State.Offset := State.Offset + Siblings;
    end Sibling;
 
+   ---------------
+   -- Attribute --
+   ---------------
+
+   procedure Attribute (State    : in out State_Type;
+                        Document : Subtree_Type;
+                        Result   : out Result_Type)
+   is
+      Attributes : constant Offset_Type :=
+        Document (Document'First + State.Offset).Attributes;
+   begin
+      if Attributes = Null_Offset
+      then
+         Result := Result_Not_Found;
+         return;
+      end if;
+      Result := Result_OK;
+      State.Offset := State.Offset + Attributes;
+   end Attribute;
+
+   -----------
+   -- Value --
+   -----------
+
+   function Value (State    : State_Type;
+                   Document : Subtree_Type) return String
+   is
+      Val : constant Offset_Type :=
+        Document (Document'First + State.Offset).Value;
+   begin
+      return Get_String (Document, State.Offset + Val);
+   end Value;
+
 end SXML.Query;

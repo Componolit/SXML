@@ -15,6 +15,8 @@ with SXML.Query; use SXML.Query;
 
 package body SXML_Query_Tests is
 
+   ---------------------------------------------------------------------------
+
    procedure Test_Query_Node_Name (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
@@ -84,6 +86,27 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Query_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      use SXML.Query;
+      Doc    : Subtree_Type := E ("config", A ("attribute1", "value1"));
+      State  : State_Type   := Init (Doc);
+      Result : Result_Type;
+   begin
+      State.Attribute (Doc, Result);
+      Assert (Result = Result_OK, "Invalid attribute");
+      declare
+         Name  : String := State.Name (Doc);
+         Value : String := State.Value (Doc);
+      begin
+         Assert (Name = "attribute1", "Unexpected name: """ & Name & """ (expected ""attribute1"")");
+         Assert (Value = "value1", "Unexpected value: """ & Value & """ (expected ""value1"")");
+      end;
+	end Test_Query_Attribute;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -91,6 +114,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Query_Child'Access, "Query child");
       Register_Routine (T, Test_Query_No_Child'Access, "Query no child");
       Register_Routine (T, Test_Query_All_Children'Access, "Query all children");
+      Register_Routine (T, Test_Query_Attribute'Access, "Query attribute name and value");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
