@@ -73,6 +73,17 @@ package SXML.Query is
    with
       Pre'Class  => Bound (Document, State);
 
+   --------------------
+   -- Next_Attribute --
+   --------------------
+
+   procedure Next_Attribute (State    : in out State_Type;
+                             Document : Subtree_Type;
+                             Result   : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State);
+
 private
 
    type State_Type is tagged

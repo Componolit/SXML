@@ -107,6 +107,40 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Query_Multiple_Attributes (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      use SXML.Query;
+      Doc    : Subtree_Type := E ("config",
+                                  A ("attribute1", "value1") +
+                                  A ("attribute2", "value2") +
+                                  A ("attribute3", "value3") +
+                                  A ("attribute4", "value4"));
+      State  : State_Type   := Init (Doc);
+      Result : Result_Type;
+   begin
+      State.Attribute (Doc, Result);
+      Assert (Result = Result_OK, "Invalid attribute");
+      Assert (State.Name (Doc) = "attribute1", "Unexpected name");
+      Assert (State.Value (Doc) = "value1", "Unexpected name");
+      State.Next_Attribute (Doc, Result);
+      Assert (Result = Result_OK, "Invalid attribute");
+      Assert (State.Name (Doc) = "attribute2", "Unexpected name");
+      Assert (State.Value (Doc) = "value2", "Unexpected name");
+      State.Next_Attribute (Doc, Result);
+      Assert (Result = Result_OK, "Invalid attribute");
+      Assert (State.Name (Doc) = "attribute3", "Unexpected name");
+      Assert (State.Value (Doc) = "value3", "Unexpected name");
+      State.Next_Attribute (Doc, Result);
+      Assert (Result = Result_OK, "Invalid attribute");
+      Assert (State.Name (Doc) = "attribute4", "Unexpected name");
+      Assert (State.Value (Doc) = "value4", "Unexpected name");
+      State.Next_Attribute (Doc, Result);
+      Assert (Result = Result_Not_Found, "Expected end of attributes");
+   end Test_Query_Multiple_Attributes;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -115,6 +149,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Query_No_Child'Access, "Query no child");
       Register_Routine (T, Test_Query_All_Children'Access, "Query all children");
       Register_Routine (T, Test_Query_Attribute'Access, "Query attribute name and value");
+      Register_Routine (T, Test_Query_Multiple_Attributes'Access, "Query multiple attribute");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

@@ -94,6 +94,26 @@ package body SXML.Query is
       State.Offset := State.Offset + Attributes;
    end Attribute;
 
+   --------------------
+   -- Next_Attribute --
+   --------------------
+
+   procedure Next_Attribute (State    : in out State_Type;
+                             Document : Subtree_Type;
+                             Result   : out Result_Type)
+   is
+      Next : constant Offset_Type :=
+        Document (Document'First + State.Offset).Next_Attribute;
+   begin
+      if Next = Null_Offset
+      then
+         Result := Result_Not_Found;
+         return;
+      end if;
+      Result := Result_OK;
+      State.Offset := State.Offset + Next;
+   end Next_Attribute;
+
    -----------
    -- Value --
    -----------
