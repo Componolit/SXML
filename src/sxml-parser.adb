@@ -479,12 +479,13 @@ package body SXML.Parser is
                                 Start : out Index_Type;
                                 Done  : out Boolean)
    is
-      Old_Index       : constant Index_Type := Context_Index;
-      Old_Offset      : constant Natural := Offset;
-      Match_Attr      : Match_Type;
-      Match_Tmp       : Match_Type;
-      Valid           : Boolean;
-      Attribute_Start : Index_Type;
+      Old_Index          : constant Index_Type := Context_Index;
+      Old_Offset         : constant Natural := Offset;
+      Match_Attr         : Match_Type;
+      Match_Tmp          : Match_Type;
+      Valid              : Boolean;
+      Attribute_Start    : Index_Type;
+      Previous_Attribute : Index_Type := Invalid_Index;
    begin
       Name  := Null_Range;
       Match := Match_Invalid;
@@ -532,6 +533,13 @@ package body SXML.Parser is
       loop
          Parse_Attribute (Attribute_Start, Match_Attr);
          exit when Match_Attr /= Match_OK;
+         if Previous_Attribute = Invalid_Index
+         then
+            Context (Start).Attributes := Attribute_Start - Start;
+         else
+            Context (Previous_Attribute).Next_Attribute := Attribute_Start - Previous_Attribute;
+         end if;
+         Previous_Attribute := Attribute_Start;
       end loop;
 
       --  Short form node?
