@@ -1,5 +1,9 @@
 package SXML.Query is
 
+   type Result_Type is (Result_Invalid,
+                        Result_Not_Found,
+                        Result_OK);
+
    type State_Type is tagged private;
 
    function Bound (Document : Subtree_Type;
@@ -23,6 +27,30 @@ package SXML.Query is
                   Document : Subtree_Type) return String
    with
       Pre'Class => Bound (Document, State);
+
+   -----------
+   -- Child --
+   -----------
+
+   procedure Child (State    : in out State_Type;
+                    Document : Subtree_Type;
+                    Result   : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State) and
+                    (if Result /= Result_OK then State = State'Old);
+
+   -------------
+   -- Sibling --
+   -------------
+
+   procedure Sibling (State    : in out State_Type;
+                      Document : Subtree_Type;
+                      Result   : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State) and
+                    (if Result /= Result_OK then State = State'Old);
 
 private
 
