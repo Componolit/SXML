@@ -7,6 +7,6 @@ project Tests is
    for Exec_Dir use "../../obj";
 
    package Linker is
-      for Default_Switches ("Ada") use ("-mcmodel=medium");
+      for Default_Switches ("Ada") use ("-mcmodel=medium", "-fPIC");
    end Linker;
 end Tests;
