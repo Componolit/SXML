@@ -68,8 +68,8 @@ package SXML.Query is
    -- Value --
    -----------
 
-   function Value (State    : in out State_Type;
-                    Document : Subtree_Type) return String
+   function Value (State    : State_Type;
+                   Document : Subtree_Type) return String
    with
       Pre'Class  => Bound (Document, State);
 
