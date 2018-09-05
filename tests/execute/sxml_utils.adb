@@ -17,7 +17,7 @@ with SXML.Parser;
 
 package body SXML_Utils
 is
-   Context : SXML.Subtree_Type (1 .. 100000000);
+   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 10000000);
 
    -------------------
    -- Check_Invalid --
@@ -25,7 +25,7 @@ is
  
    procedure Check_Invalid (Input : in out String)
    is
-      package Parser is new SXML.Parser (Input, Context);
+      package Parser is new SXML.Parser (Input, Context.all);
       use SXML;
       use Parser;
       Result   : Match_Type;
@@ -70,7 +70,7 @@ is
    procedure Parse_Document (File : String)
    is
       Input : access String := Read_File (File);
-      package Parser is new SXML.Parser (Input.all, Context);
+      package Parser is new SXML.Parser (Input.all, Context.all);
       use SXML;
       use Parser;
       Result   : Match_Type;
@@ -89,13 +89,13 @@ is
    procedure Check_Document (Input    : in out String;
                              Output   : String := "INPUT")
    is
-      package Parser is new SXML.Parser (Input, Context);
+      package Parser is new SXML.Parser (Input, Context.all);
       use SXML;
       use Parser;
       Result   : Match_Type;
       Position : Natural;
    begin
-      Context := (others => Null_Node);
+      Context.all := (others => Null_Node);
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
