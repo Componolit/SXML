@@ -1,4 +1,6 @@
-with SXML; use SXML;
+with SXML.Generator;
+use SXML;
+use SXML.Generator;
 
 function Exec return String
 with
@@ -25,7 +27,7 @@ is
       return Result;
    end To_Subtree;
 
-   function "+" (Value : String) return Argument_Type
+   function "+" (Value : String) return Arg_Type
    is
       Result : Argument_Type := (others => Character'Val (0));
    begin
@@ -81,8 +83,7 @@ is
    function Execute (Program   : String;
                      Arguments : Arguments_Type) return String
    with
-      Pre => Is_Valid (Program) and
-             Arguments'First < Arguments'Last;
+      Pre => Arguments'First < Arguments'Last;
 
    function Execute (Program   : String;
                      Arguments : Arguments_Type) return String
@@ -91,45 +92,42 @@ is
        E ("config",
          E ("report",
            A ("delay_ms", 500)
-         ) &
+         ) +
          E ("parent-provides",
-           E ("service", A ("name", "CAP")) &
-           E ("service", A ("name", "CPU")) &
-           E ("service", A ("name", "LOG")) &
-           E ("service", A ("name", "PD")) &
-           E ("service", A ("name", "ROM")) &
-           E ("service", A ("name", "File_system")) &
-           E ("service", A ("name", "Timer")) &
-           E ("service", A ("name", "Rtc")) &
+           E ("service", A ("name", "CAP")) +
+           E ("service", A ("name", "CPU")) +
+           E ("service", A ("name", "LOG")) +
+           E ("service", A ("name", "PD")) +
+           E ("service", A ("name", "ROM")) +
+           E ("service", A ("name", "File_system")) +
+           E ("service", A ("name", "Timer")) +
+           E ("service", A ("name", "Rtc")) +
            E ("service", A ("name", "Report"))
-         ) &
+         ) +
          E ("start",
-            A ("name", Program) &
-            A ("caps", 500) &
+            A ("name", Program) + A ("caps", 500),
             E ("binary",
-               A ("name", Program)) &
+               A ("name", Program)) +
             E ("resource",
-               A ("name", "RAM") &
-               A ("quantum", "16MB")) &
+               A ("name", "RAM") + A ("quantum", "16MB")
+            ) +
             E ("config",
                E ("argv",
-                  A ("progname", Program) &
+                  A ("progname", Program),
                   To_Subtree (Arguments)
-               ) &
+               ) +
                E ("vfs",
                   E ("dir",
-                     A ("name", "dev") &
-                     E ("log") &
-                     E ("rtc") &
-                     E ("null")) &
+                     A ("name", "dev"),
+                     E ("log") +
+                     E ("rtc") +
+                     E ("null")) +
                   E ("fs")
-               ) &
+               ) +
                E ("libc",
-                  A ("stdout", "/dev/log") &
-                  A ("stderr", "/dev/log") &
-                  A ("rtc", "/dev/rtc")
+                  A ("stdout", "/dev/log") + A ("stderr", "/dev/log") + A ("rtc", "/dev/rtc")
                )
-            ) &
+            ) +
             E ("route",
                E ("any-service",
                   E ("parent")
@@ -141,7 +139,7 @@ is
       return To_String (Doc);
    end Execute;
 
-   A : constant Arguments_Type := (+"foo", +"bar", +"baz");
+   A : constant Args_Type := (+"foo", +"bar", +"baz");
 begin
    return (Execute ("foo", A));
 end Exec;
