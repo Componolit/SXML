@@ -12,7 +12,6 @@ test: SXML.gpr
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
-testonly: MODE ?= sloppy
 testonly: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@obj/tests
