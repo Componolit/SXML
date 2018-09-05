@@ -203,17 +203,23 @@ package body SXML.Parser is
    -----------------
 
    procedure Context_Put (Value  : Subtree_Type;
+                          Start  : out Index_Type;
                           Result : out Boolean);
 
    procedure Context_Put (Value  : Subtree_Type;
+                          Start  : out Index_Type;
                           Result : out Boolean)
    is
    begin
       Result := False;
+      Start  := Invalid_Index;
+
       if Context_Index > Context'Last - Value'Length
       then
          return;
       end if;
+
+      Start := Context_Index;
 
       for V of Value
       loop
@@ -359,12 +365,14 @@ package body SXML.Parser is
    -- Parse_Attribute --
    ---------------------
 
-   procedure Parse_Attribute (Match : out Match_Type)
+   procedure Parse_Attribute (Start : out Index_Type;
+                              Match : out Match_Type)
    with
       Pre  => Data_Valid,
       Post => (if Match /= Match_OK then Offset = Offset'Old);
 
-   procedure Parse_Attribute (Match : out Match_Type)
+   procedure Parse_Attribute (Start : out Index_Type;
+                              Match : out Match_Type)
    is
       Old_Offset      : constant Natural := Offset;
       Attribute_Name  : Range_Type;
@@ -373,6 +381,8 @@ package body SXML.Parser is
       Valid           : Boolean;
       Separator       : Character;
    begin
+
+      Start := Invalid_Index;
 
       if Context_Overflow
       then
@@ -438,6 +448,7 @@ package body SXML.Parser is
          (Value  => SXML.Attribute
             (Name => Data (Attribute_Name.First .. Attribute_Name.Last),
              Data => Data (Attribute_Value.First .. Attribute_Value.Last)),
+          Start  => Start,
           Result => Valid);
       if not Valid
       then
@@ -455,6 +466,7 @@ package body SXML.Parser is
 
    procedure Parse_Opening_Tag (Match : out Match_Type;
                                 Name  : out Range_Type;
+                                Start : out Index_Type;
                                 Done  : out Boolean)
    with
       Pre  => Data_Valid,
@@ -464,13 +476,15 @@ package body SXML.Parser is
 
    procedure Parse_Opening_Tag (Match : out Match_Type;
                                 Name  : out Range_Type;
+                                Start : out Index_Type;
                                 Done  : out Boolean)
    is
-      Old_Index   : constant Index_Type := Context_Index;
-      Old_Offset  : constant Natural := Offset;
-      Match_Attr  : Match_Type;
-      Match_Tmp   : Match_Type;
-      Valid       : Boolean;
+      Old_Index       : constant Index_Type := Context_Index;
+      Old_Offset      : constant Natural := Offset;
+      Match_Attr      : Match_Type;
+      Match_Tmp       : Match_Type;
+      Valid           : Boolean;
+      Attribute_Start : Index_Type;
    begin
       Name  := Null_Range;
       Match := Match_Invalid;
@@ -507,6 +521,7 @@ package body SXML.Parser is
       end if;
 
       Context_Put (Value  => Open (Data (Name.First .. Name.Last)),
+                   Start  => Start,
                    Result => Valid);
       if not Valid
       then
@@ -515,7 +530,7 @@ package body SXML.Parser is
       end if;
 
       loop
-         Parse_Attribute (Match_Attr);
+         Parse_Attribute (Attribute_Start, Match_Attr);
          exit when Match_Attr /= Match_OK;
       end loop;
 
@@ -821,22 +836,28 @@ package body SXML.Parser is
    -- Parse_Internal --
    --------------------
 
-   procedure Parse_Internal (Match : out Match_Type;
-                             Level : Natural := 0)
+   procedure Parse_Internal (Match  : out Match_Type;
+                             Start  : out Index_Type;
+                             Level  : Natural     := 0)
    with
       Pre  => Data_Valid,
       Post => (if Match /= Match_OK then Offset = Offset'Old);
 
-   procedure Parse_Internal (Match : out Match_Type;
-                             Level : Natural := 0)
+   procedure Parse_Internal (Match  : out Match_Type;
+                             Start  : out Index_Type;
+                             Level  : Natural     := 0)
    is
-      Old_Offset : constant Natural := Offset;
-      Done       : Boolean;
-      Name       : Range_Type;
-      Sub_Match  : Match_Type;
+      Old_Offset     : constant Natural := Offset;
+      Done           : Boolean;
+      Name           : Range_Type;
+      Sub_Match      : Match_Type;
+      Child_Start    : Index_Type;
+      Previous_Child : Index_Type := Invalid_Index;
+      Parent         : Index_Type;
    begin
 
       Match := Match_Invalid;
+      Start := Invalid_Index;
 
       Parse_Sections;
 
@@ -846,13 +867,15 @@ package body SXML.Parser is
          return;
       end if;
 
-      Parse_Opening_Tag (Match, Name, Done);
+      Parse_Opening_Tag (Match, Name, Start, Done);
       if Match /= Match_OK
       then
          Restore_Offset (Old_Offset);
          Match := Match_None;
          return;
       end if;
+
+      Parent := Start;
 
       if Context_Overflow
       then
@@ -877,8 +900,16 @@ package body SXML.Parser is
             return;
          end if;
 
-         Parse_Internal (Sub_Match, Level + 1);
+         Parse_Internal (Sub_Match, Child_Start, Level + 1);
          exit when Sub_Match /= Match_OK;
+
+         if Previous_Child = Invalid_Index
+         then
+            Context (Parent).Children := Child_Start - Parent;
+         else
+            Context (Previous_Child).Siblings := Child_Start - Previous_Child;
+         end if;
+         Previous_Child := Child_Start;
       end loop;
 
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
@@ -926,10 +957,12 @@ package body SXML.Parser is
    procedure Parse (Match    : out Match_Type;
                     Position : out Natural)
    is
+      Unused : Index_Type;
    begin
       Context_Valid := False;
       Skip_Byte_Order_Mark;
-      Parse_Internal (Match);
+      Parse_Internal (Match, Unused);
+      pragma Unreferenced (Unused);
       if Match = Match_OK
       then
          Context_Valid := True;

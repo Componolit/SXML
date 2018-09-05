@@ -4,6 +4,7 @@ with
 is
    type Offset_Type is new Natural range 0 .. Natural'Last / 2;
    subtype Index_Type is Offset_Type range 1 .. Offset_Type'Last;
+   Invalid_Index : constant Index_Type;
 
    type Node_Type is private;
    Null_Node : constant Node_Type;
@@ -85,5 +86,7 @@ private
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
+
+   Invalid_Index : constant Index_Type := Index_Type'Last;
 
 end SXML;
