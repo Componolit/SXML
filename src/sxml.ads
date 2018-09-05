@@ -45,6 +45,13 @@ is
 
    function To_String (T : Subtree_Type) return String;
 
+   ----------------
+   -- Get_String --
+   ----------------
+
+   function Get_String (T : Subtree_Type;
+                        I : Offset_Type) return String;
+
 private
 
    type Length_Type is range 0 .. 8 with Size => 8;

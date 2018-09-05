@@ -96,23 +96,20 @@ is
       return Name_Tree * Data_Tree;
    end Attribute;
 
-   ----------
-   -- Data --
-   ----------
+   ----------------
+   -- Get_String --
+   ----------------
 
-   function Data (T : Subtree_Type;
-                  I : Offset_Type) return String;
-
-   function Data (T : Subtree_Type;
-                  I : Offset_Type) return String
+   function Get_String (T : Subtree_Type;
+                        I : Offset_Type) return String
    is
       N : constant Node_Type := T (T'First + I);
    begin
       return N.Data (1 .. Natural (N.Length)) &
          (if N.Next /= Null_Offset
-          then Data (T, I + N.Next)
+          then Get_String (T, I + N.Next)
           else "");
-   end Data;
+   end Get_String;
 
    ----------------
    -- Attributes --
@@ -132,9 +129,9 @@ is
       end if;
 
       return " "
-           & Data (T, I)
+           & Get_String (T, I)
            & "="""
-           & Data (T, I + N.Value)
+           & Get_String (T, I + N.Value)
            & """"
            & (if N.Next_Attribute /= Null_Offset
               then Attributes (T, I + N.Next_Attribute)
@@ -148,7 +145,7 @@ is
    function To_String (T : Subtree_Type) return String
    is
       N   : constant Node_Type := T (T'First);
-      Tag : constant String    := Data (T, 0);
+      Tag : constant String    := Get_String (T, 0);
    begin
       return "<"
            & Tag
