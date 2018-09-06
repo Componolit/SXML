@@ -19,4 +19,7 @@ is
 
    procedure Check_Document (Input    : in out String;
                              Output   : String := "INPUT");
+
+   procedure Generate_XML (Name  : String;
+                           Level : Natural);
 end SXML_Utils;

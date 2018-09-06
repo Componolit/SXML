@@ -13,6 +13,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with SXML;
 with SXML.Parser;
 with SXML_Utils; use SXML_Utils;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body SXML_Parser_Tests is
 
@@ -433,6 +434,29 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Deep_File (T : in out Test_Cases.Test_Case'Class)
+   is
+      File_Name : constant String := "obj/generated.xml";
+      Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+   begin
+      Generate_XML (File_Name, 1000);
+      declare
+         Input : access String := Read_File (File_Name);
+         package Parser is new SXML.Parser (Input.all, Context.all);
+         use SXML;
+         use Parser;
+         Result   : Match_Type;
+         Position : Natural;
+      begin
+         Parser.Parse (Match    => Result,
+                       Position => Position);
+         Assert (Result /= Match_OK,
+                 File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
+      end;
+   end Deep_File;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -479,6 +503,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Comments_Inside_Content'Access, "Comments inside content");
       Register_Routine (T, Processing_Info_Inside_Content'Access, "Processing info inside content");
       Register_Routine (T, Large_File'Access, "Large file");
+      Register_Routine (T, Deep_File'Access, "Deep file");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

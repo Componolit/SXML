@@ -14,6 +14,7 @@ with Ada.Directories;
 with Ada.Text_IO.Text_Streams;
 with SXML.Generator; use SXML.Generator;
 with SXML.Parser;
+with Text_IO;
 
 package body SXML_Utils
 is
@@ -108,5 +109,35 @@ is
             ": (" & Doc & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
       end;
    end Check_Document;
+
+   ------------------
+   -- Generate_XML --
+   ------------------
+
+   procedure Generate_XML (Name  : String;
+                           Level : Natural)
+   is
+      use Text_IO;
+      File : File_Type;
+   begin
+      Create (File, Out_File, Name);
+      for I in 1 .. Level
+      loop
+         declare
+            X : constant Natural := I mod 10;
+         begin
+            Put (File, "<" & X'Img (2 .. 2) & ">");
+         end;
+      end loop;
+      for I in reverse 1 .. Level
+      loop
+         declare
+            X : constant Natural := I mod 10;
+         begin
+            Put (File, "</" & X'Img (2 .. 2) & ">");
+         end;
+      end loop;
+      Close (File);
+   end Generate_XML;
 
 end SXML_Utils;
