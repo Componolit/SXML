@@ -22,4 +22,7 @@ is
 
    procedure Generate_XML (Name  : String;
                            Level : Natural);
+
+   procedure Generate_Large_Attribute (Name  : String;
+                                       Level : Natural);
 end SXML_Utils;

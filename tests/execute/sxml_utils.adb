@@ -140,4 +140,24 @@ is
       Close (File);
    end Generate_XML;
 
+   ------------------------------
+   -- Generate_Large_Attribute --
+   ------------------------------
+
+   procedure Generate_Large_Attribute (Name  : String;
+                                       Level : Natural)
+   is
+      use Text_IO;
+      File : File_Type;
+   begin
+      Create (File, Out_File, Name);
+      Put (File, "<document attr=""");
+      for I in 1 .. Level
+      loop
+         Put (File, I'Img);
+      end loop;
+      Put (File, """></document>");
+      Close (File);
+   end Generate_Large_Attribute;
+
 end SXML_Utils;

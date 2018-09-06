@@ -457,6 +457,29 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Large_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+      File_Name : constant String := "obj/large_attribute.xml";
+      Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+   begin
+      Generate_Large_Attribute (File_Name, 1000000);
+      declare
+         Input : access String := Read_File (File_Name);
+         package Parser is new SXML.Parser (Input.all, Context.all);
+         use SXML;
+         use Parser;
+         Result   : Match_Type;
+         Position : Natural;
+      begin
+         Parser.Parse (Match    => Result,
+                       Position => Position);
+         Assert (Result /= Match_OK,
+                 File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
+      end;
+   end Large_Attribute;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -504,6 +527,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Processing_Info_Inside_Content'Access, "Processing info inside content");
       Register_Routine (T, Large_File'Access, "Large file");
       Register_Routine (T, Deep_File'Access, "Deep file");
+      Register_Routine (T, Large_Attribute'Access, "Large attribute");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
