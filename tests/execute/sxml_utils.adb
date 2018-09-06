@@ -17,7 +17,7 @@ with SXML.Parser;
 
 package body SXML_Utils
 is
-   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 10000000);
+   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 100000000);
 
    -------------------
    -- Check_Invalid --
@@ -95,7 +95,7 @@ is
       Result   : Match_Type;
       Position : Natural;
    begin
-      Context.all := (others => Null_Node);
+      Context.all (1) := Null_Node;
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
