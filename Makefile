@@ -30,14 +30,17 @@ testinsane: SXML.gpr insanedata
 fuzz: GPRBUILD_OPTS += --compiler-subst=Ada,afl-gcc
 fuzz: export AFL_SKIP_CPUFREQ=1
 fuzz: MODE=debug
-fuzz: examples
-	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/parse @@
+fuzz: obj/fuzzdriver
+	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/fuzzdriver @@
 
 bulkdata:
 	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
 
 insanedata:
 	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
+
+obj/fuzzdriver:
+	gprbuild $(GPRBUILD_OPTS) -P examples/fuzzdriver
 
 examples::
 	gprbuild $(GPRBUILD_OPTS) -P examples/examples

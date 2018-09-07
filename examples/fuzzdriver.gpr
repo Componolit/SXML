@@ -1,0 +1,7 @@
+with "../SXML";
+
+project Fuzzdriver
+is
+   for Main use ("fuzzdriver.adb");
+   for Exec_Dir use "../obj";
+end Fuzzdriver;
