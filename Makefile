@@ -34,10 +34,10 @@ fuzz: examples
 	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/parse @@
 
 bulkdata:
-	wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
+	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
 
 insanedata:
-	wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
+	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
 
 examples::
 	gprbuild $(GPRBUILD_OPTS) -P examples/examples
