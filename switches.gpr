@@ -3,7 +3,6 @@ is
    Compiler_Switches :=
    (
       "-gnatA"	 -- Avoid processing gnat.adc, if present file will be ignored
-     ,"-gnata"  -- Enable pragma Assert/Debug
 
      ,"-gnatA"  -- Aliasing checks on subprogram parameters
      ,"-gnatef" -- Full source path in brief error messages
@@ -49,7 +48,12 @@ is
      ,"-gnatyu"    -- check no unnecessary blank lines
      ,"-gnatyx"    -- check extra parentheses around conditionals
 
-     --  ,"-fstack-check"          -- dynamic stack checking
+   );
+
+   Compiler_Debug_Switches :=
+   (
+      "-fstack-check"      -- dynamic stack checking
+     ,"-gnata"             -- Enable pragma Assert/Debug
    );
 
 end Switches;

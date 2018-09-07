@@ -10,3 +10,4 @@ b__*.ad?
 gnatprove
 gnatinspect.db
 tests-loc.xml
+*.cswi
