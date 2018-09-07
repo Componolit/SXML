@@ -26,6 +26,12 @@ testinsane: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@obj/tests
 
+fuzz: GPRBUILD_OPTS += --compiler-subst=Ada,afl-gcc
+fuzz: export AFL_SKIP_CPUFREQ=1
+fuzz: MODE=debug
+fuzz: examples
+	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/parse @@
+
 examples::
 	gprbuild $(GPRBUILD_OPTS) -P examples/examples
 

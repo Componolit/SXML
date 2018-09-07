@@ -1,0 +1,42 @@
+<config>
+	<report delay_ms="500"/>
+	<parent-provides>
+		<service name="CAP"/>
+		<service name="CPU"/>
+		<service name="LOG"/>
+		<service name="PD"/>
+		<service name="ROM"/>
+		<service name="File_system"/>
+		<service name="Timer"/>
+		<service name="Rtc"/>
+		<service name="Report"/>
+	</parent-provides>
+	<start name="write(0)" caps="500">
+		<binary name="write"/>
+		<resource name="RAM" quantum="16MB"/>
+		<config>
+			<argv progname="write">
+				<arg value="/tmp/test"/>
+				<arg value="This value"/>
+			</argv>
+			<environ>
+				<env name="ENVVAR" value="42"/>
+			</environ>
+			<vfs>
+				<dir name="dev">
+					<log/>
+					<rtc/>
+					<null/>
+				</dir>
+				<fs/>
+			</vfs>
+			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc"/>
+		</config>
+		<route>
+			<any-service>
+				<parent/>
+			</any-service>
+		</route>
+	</start>
+</config>
+

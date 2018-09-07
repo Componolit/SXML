@@ -1,0 +1,8 @@
+<!-- This is a comment -->
+<!-- This is another comment -->
+<parent>
+   <!-- Comment for the child node <with><xml/></with> -->
+   <child/>
+   <!-- Comment after child node -->
+</parent>
+<!-- Comment after child node -->
