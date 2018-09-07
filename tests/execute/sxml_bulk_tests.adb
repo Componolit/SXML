@@ -22,36 +22,9 @@ package body SXML_Bulk_Tests is
 
    procedure Test_URL (T : in out Test_Cases.Test_Case'Class)
    is
-      use GNAT.OS_Lib;
       URL : constant String := T.Routine_Name.all;
-      Args : Argument_List := (new String'("-r"),
-                               new String'("--quiet"),
-                               new String'("--directory-prefix=obj/document"),
-                               new String'("--progress=dot"),
-                               new String'("--show-progress"),
-                               new String'("--waitretry=30"),
-                               new String'("--random-wait"),
-                               new String'("--no-check-certificate"),
-                               new String'(URL));
-      Result : Integer;
-      Wget   : constant access String := Locate_Exec_On_Path ("wget");
-
    begin
-      Ada.Text_IO.Put_Line ("Fetching " & Url);
-      Assert (Wget /= null, "wget missing, please install");
-      Result := Spawn (Wget.all, Args);
-      for A of Args
-      loop
-         Free (A);
-      end loop;
-      if Result /= 0
-      then
-         Perror  ("Error spawning wget");
-      end if;
-      Assert (Result = 0, "Error downloading " & URL & ". Exit code:" & Result'Img & ", errno:" & Errno'Img);
       Parse_Document ("obj/document/" & URL (9..URL'Last));
-
-
 	end Test_URL;
 
    ---------------------------------------------------------------------------
