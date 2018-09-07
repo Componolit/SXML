@@ -1,6 +1,9 @@
 sudo: required
 
 language: c
+cache:
+   directories:
+      - obj/document
 
 services:
   - docker
