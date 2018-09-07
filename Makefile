@@ -36,7 +36,7 @@ fuzz: examples
 bulkdata:
 	wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
 
-insantedata:
+insanedata:
 	wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
 
 examples::
