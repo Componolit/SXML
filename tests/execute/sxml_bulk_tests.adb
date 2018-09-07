@@ -17,6 +17,9 @@ with GNAT.OS_Lib;
 
 package body SXML_Bulk_Tests is
 
+   procedure Perror (Message : String);
+   pragma Import (C, Perror);
+
    procedure Test_URL (T : in out Test_Cases.Test_Case'Class)
    is
       use GNAT.OS_Lib;
@@ -32,12 +35,22 @@ package body SXML_Bulk_Tests is
                                new String'(URL));
       Result : Integer;
       Wget   : constant access String := Locate_Exec_On_Path ("wget");
+
    begin
       Ada.Text_IO.Put_Line ("Fetching " & Url);
       Assert (Wget /= null, "wget missing, please install");
       Result := Spawn (Wget.all, Args);
-      Assert (Result = 0, "Error downloading " & URL & ":" & Result'Img);
+      if Result /= 0
+      then
+         Perror  ("Error spawning wget");
+      end if;
+      Assert (Result = 0, "Error downloading " & URL & ". Exit code:" & Result'Img & ", errno:" & Errno'Img);
       Parse_Document ("obj/document/" & URL (9..URL'Last));
+      for A of Args
+      loop
+         Free (A);
+      end loop;
+
 
 	end Test_URL;
 
