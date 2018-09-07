@@ -40,16 +40,16 @@ package body SXML_Bulk_Tests is
       Ada.Text_IO.Put_Line ("Fetching " & Url);
       Assert (Wget /= null, "wget missing, please install");
       Result := Spawn (Wget.all, Args);
+      for A of Args
+      loop
+         Free (A);
+      end loop;
       if Result /= 0
       then
          Perror  ("Error spawning wget");
       end if;
       Assert (Result = 0, "Error downloading " & URL & ". Exit code:" & Result'Img & ", errno:" & Errno'Img);
       Parse_Document ("obj/document/" & URL (9..URL'Last));
-      for A of Args
-      loop
-         Free (A);
-      end loop;
 
 
 	end Test_URL;
