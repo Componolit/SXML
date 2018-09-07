@@ -26,6 +26,8 @@ package body SXML_Bulk_Tests is
                                new String'("--directory-prefix=obj/document"),
                                new String'("--progress=dot"),
                                new String'("--show-progress"),
+                               new String'("--waitretry=30"),
+                               new String'("--random-wait"),
                                new String'("--no-check-certificate"),
                                new String'(URL));
       Result : Integer;
