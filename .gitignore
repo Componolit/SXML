@@ -11,3 +11,4 @@ gnatprove
 gnatinspect.db
 tests-loc.xml
 *.cswi
+*.cgpr
