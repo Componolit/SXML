@@ -36,8 +36,12 @@ is
    -- Attribute --
    ---------------
 
-   function Attribute (Name : String;
-                       Data : String) return Subtree_Type;
+   procedure Attribute (Name   : String;
+                        Data   : String;
+                        Offset : in out Offset_Type;
+                        Output : out Subtree_Type)
+   with
+       Pre => Output'Length >= Offset + Num_Elements (Name) + Num_Elements (Data);
 
    ---------------
    -- To_String --
@@ -51,6 +55,12 @@ is
 
    function Get_String (T : Subtree_Type;
                         I : Offset_Type) return String;
+
+   ------------------
+   -- Num_Elements --
+   ------------------
+
+   function Num_Elements (D : String) return Offset_Type;
 
 private
 

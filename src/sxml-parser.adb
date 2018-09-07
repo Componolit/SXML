@@ -190,7 +190,6 @@ package body SXML.Parser is
 
       Match := Match_OK;
    end Match_String;
-
    ----------------------
    -- Context_Overflow --
    ----------------------
@@ -378,8 +377,8 @@ package body SXML.Parser is
       Attribute_Name  : Range_Type;
       Attribute_Value : Range_Type;
       Match_Tmp       : Match_Type;
-      Valid           : Boolean;
       Separator       : Character;
+      Off             : Offset_Type;
    begin
 
       Start := Invalid_Index;
@@ -444,17 +443,14 @@ package body SXML.Parser is
       end if;
       Offset := Offset + 1;
 
-      Context_Put
-         (Value  => SXML.Attribute
-            (Name => Data (Attribute_Name.First .. Attribute_Name.Last),
-             Data => Data (Attribute_Value.First .. Attribute_Value.Last)),
-          Start  => Start,
-          Result => Valid);
-      if not Valid
-      then
-         Restore_Offset (Old_Offset);
-         return;
-      end if;
+      Start := Context_Index;
+      Off := Context_Index - Context'First;
+      SXML.Attribute
+        (Name   => Data (Attribute_Name.First .. Attribute_Name.Last),
+         Data   => Data (Attribute_Value.First .. Attribute_Value.Last),
+         Offset => Off,
+         Output => Context);
+      Context_Index := Context'First + Off;
 
       Match := Match_OK;
 

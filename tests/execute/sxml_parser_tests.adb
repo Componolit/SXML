@@ -439,7 +439,7 @@ package body SXML_Parser_Tests is
       File_Name : constant String := "obj/generated.xml";
       Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
    begin
-      Generate_XML (File_Name, 1000);
+      Generate_XML (File_Name, 1000000);
       declare
          Input : access String := Read_File (File_Name);
          package Parser is new SXML.Parser (Input.all, Context.all);
@@ -463,19 +463,7 @@ package body SXML_Parser_Tests is
       Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
    begin
       Generate_Large_Attribute (File_Name, 1000000);
-      declare
-         Input : access String := Read_File (File_Name);
-         package Parser is new SXML.Parser (Input.all, Context.all);
-         use SXML;
-         use Parser;
-         Result   : Match_Type;
-         Position : Natural;
-      begin
-         Parser.Parse (Match    => Result,
-                       Position => Position);
-         Assert (Result /= Match_OK,
-                 File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
-      end;
+      Parse_Document (File_Name);
    end Large_Attribute;
 
    ---------------------------------------------------------------------------

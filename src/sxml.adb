@@ -36,29 +36,32 @@ is
    ----------------
 
    procedure Put_String (Subtree : in out Subtree_Type;
+                         Offset  : Offset_Type;
                          Name    : String)
    with
       Pre => Subtree'Length >= Num_Elements (Name);
 
    procedure Put_String (Subtree : in out Subtree_Type;
+                         Offset  : Offset_Type;
                          Name    : String)
    is
-      Offset : Natural := 0;
-      Len    : Natural;
+      Position : Natural := 0;
+      Len      : Natural;
    begin
-      for I in Index_Type range 1 .. Index_Type (Num_Elements (Name))
+      for I in Index_Type range
+        Subtree'First + Offset .. Subtree'First + Offset + Index_Type (Num_Elements (Name)) - 1
       loop
-         if Name'Length - Offset > Subtree (I).Data'Length
+         if Name'Length - Position > Subtree (I).Data'Length
          then
             Len := Subtree (I).Data'Length;
             Subtree (I).Next := 1;
          else
-            Len := Name'Length - Offset;
+            Len := Name'Length - Position;
          end if;
          Subtree (I).Data (1 .. Len) :=
-           Name (Name'First + Offset .. Name'First + Offset + Len - 1);
+           Name (Name'First + Position .. Name'First + Position + Len - 1);
          Subtree (I).Length := Length_Type (Len);
-         Offset := Offset + Len;
+         Position := Position + Len;
       end loop;
    end Put_String;
 
@@ -72,7 +75,7 @@ is
         (1      => Null_Open_Element,
          others => Null_Data_Element);
    begin
-      Put_String (Result, Name);
+      Put_String (Result, 0, Name);
       return Result;
    end Open;
 
@@ -80,20 +83,24 @@ is
    -- Attribute --
    ---------------
 
-   function Attribute (Name : String;
-                       Data : String) return Subtree_Type
+   procedure Attribute (Name   : String;
+                        Data   : String;
+                        Offset : in out Offset_Type;
+                        Output : out Subtree_Type)
    is
-      Name_Tree : Subtree_Type (1 .. Num_Elements (Name)) :=
-        (1      => Null_Attribute_Element,
-         others => Null_Data_Element);
-      Data_Tree : Subtree_Type (1 .. Num_Elements (Data)) :=
-        (others => Null_Data_Element);
+      Name_Elements : constant Offset_Type := Num_Elements (Name);
+      Data_Elements : constant Offset_Type := Num_Elements (Data);
+      Start : constant Index_Type := Output'First + Offset;
    begin
-      Put_String (Name_Tree, Name);
-      Name_Tree (1).Next  := (if Name_Tree'Length > 1 then 1 else 0);
-      Name_Tree (1).Value := Name_Tree'Length;
-      Put_String (Data_Tree, Data);
-      return Name_Tree * Data_Tree;
+      Output (Start) := Null_Attribute_Element;
+      Output (Start + 1 .. Start + Name_Elements + Data_Elements - 1) :=
+        (others => Null_Data_Element);
+
+      Put_String (Output, Offset, Name);
+      Output (Start).Next  := (if Name_Elements > 1 then 1 else 0);
+      Output (Start).Value := Name_Elements;
+      Put_String (Output, Offset + Name_Elements, Data);
+      Offset := Offset + Name_Elements + Data_Elements;
    end Attribute;
 
    ----------------
@@ -128,6 +135,7 @@ is
          return "";
       end if;
 
+      pragma Assert (N.Kind = Kind_Attribute);
       return " "
            & Get_String (T, I)
            & "="""

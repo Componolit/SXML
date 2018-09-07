@@ -93,8 +93,14 @@ package body SXML.Generator is
    function A (Name  : String;
                Value : String) return Attributes_Type
    is
+      Result : Subtree_Type (1 .. Num_Elements (Name) + Num_Elements (Value));
+      Offset : Offset_Type := 0;
    begin
-      return Attributes_Type (SXML.Attribute (Name, Value));
+      SXML.Attribute (Name   => Name,
+                      Data   => Value,
+                      Offset => Offset,
+                      Output => Result);
+      return Attributes_Type (Result);
    end A;
 
    ---------
