@@ -1,7 +1,7 @@
 MODE ?= strict
 CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
-GPRBUILD_OPTS = -d -v -p -XMode=$(MODE)
+GPRBUILD_OPTS = -p -XMode=$(MODE)
 
 all:
 	@gprbuild $(GPRBUILD_OPTS) -P SXML
