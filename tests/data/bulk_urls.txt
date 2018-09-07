@@ -111,3 +111,11 @@ https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/publishers/src
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/refpages/elements/subject/reference.u.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/refpages/elements/lineannotation/refentry.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/defguide/refpages/elements/refsect2/reference.u.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/auctions/321gone.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/auctions/ebay.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/auctions/ubid.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/auctions/yahoo.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/reed.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/supplier.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/nation.xml
+https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/region.xml
