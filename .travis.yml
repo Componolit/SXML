@@ -20,6 +20,6 @@ before_install:
   - git submodule update --init --recursive --depth=1
 
 script:
-  - if [ "$TEST_SUITE" = "gnat-6.3" ]; then docker run -v $PWD:/app -w /app debian:stretch /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends wget gcc gnat gprbuild make libaunit3.7.2-dev && make testbulk"; fi
-  - if [ "$TEST_SUITE" = "gnat-community-2018" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends wget && make testbulk"; fi
-  - if [ "$TEST_SUITE" = "gnat-community-2018-insane" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends wget && make testinsane"; fi
+  - if [ "$TEST_SUITE" = "gnat-6.3" ]; then docker run -v $PWD:/app -w /app debian:stretch /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gcc gnat gprbuild make libaunit3.7.2-dev && make testbulk"; fi
+  - if [ "$TEST_SUITE" = "gnat-community-2018" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && make testbulk"; fi
+  - if [ "$TEST_SUITE" = "gnat-community-2018-insane" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && make testinsane"; fi
