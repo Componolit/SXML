@@ -47,9 +47,15 @@ is
    is
       Position : Natural := 0;
       Len      : Natural;
+      NE       : constant Offset_Type := Num_Elements (Name);
    begin
+      if NE = 0
+      then
+         return;
+      end if;
+
       for I in Index_Type range
-        Subtree'First + Offset .. Subtree'First + Offset + Index_Type (Num_Elements (Name)) - 1
+        Subtree'First + Offset .. Subtree'First + Offset + Index_Type (NE) - 1
       loop
          if Name'Length - Position > Subtree (I).Data'Length
          then
