@@ -49,7 +49,7 @@ is
      ,"-gnatyu"    -- check no unnecessary blank lines
      ,"-gnatyx"    -- check extra parentheses around conditionals
 
-     ,"-fstack-check"          -- dynamic stack checking
+     --  ,"-fstack-check"          -- dynamic stack checking
    );
 
 end Switches;
