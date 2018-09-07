@@ -14,6 +14,7 @@ with SXML;
 with SXML.Parser;
 with SXML_Utils; use SXML_Utils;
 with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Unchecked_Deallocation;
 
 package body SXML_Parser_Tests is
 
@@ -436,20 +437,24 @@ package body SXML_Parser_Tests is
 
    procedure Deep_File (T : in out Test_Cases.Test_Case'Class)
    is
+      use SXML;
+      type Subtree_Access is access Subtree_Type;
+      procedure Free_Subtree is new Ada.Unchecked_Deallocation
+         (Object => Subtree_Type, Name => Subtree_Access);
       File_Name : constant String := "obj/generated.xml";
-      Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Context   : Subtree_Access := new Subtree_Type (1 .. 1000000);
    begin
       Generate_XML (File_Name, 1000000);
       declare
          Input : access String := Read_File (File_Name);
-         package Parser is new SXML.Parser (Input.all, Context.all);
-         use SXML;
-         use Parser;
+         package P is new Parser (Input.all, Context.all);
+         use P;
          Result   : Match_Type;
          Position : Natural;
       begin
-         Parser.Parse (Match    => Result,
-                       Position => Position);
+         P.Parse (Match    => Result,
+                  Position => Position);
+         Free_Subtree (Context);
          Assert (Result /= Match_OK,
                  File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
       end;
@@ -460,7 +465,6 @@ package body SXML_Parser_Tests is
    procedure Large_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       File_Name : constant String := "obj/large_attribute.xml";
-      Context   : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
    begin
       Generate_Large_Attribute (File_Name, 1000000);
       Parse_Document (File_Name);
