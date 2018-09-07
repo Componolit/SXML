@@ -2330,7 +2330,6 @@ https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/website/src/ch
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/website/src/ch01.xml
 https://raw.githubusercontent.com/docbook/defguide/docbook-5.1/en/website/src/index.xml
 https://raw.githubusercontent.com/jmandel/sample_ccdas/master/Allscripts Samples/Enterprise EHR/b2 Adam Everyman ToC.xml
-https://raw.githubusercontent.com/jmandel/sample_ccdas/master/Allscripts Samples/Enterprise EHR/b3 Adam Everyman ToC.xml
 https://raw.githubusercontent.com/jmandel/sample_ccdas/master/Allscripts Samples/Internal Test with MU 2 data/170.314B1_Amb_SummaryOfCare.xml
 https://raw.githubusercontent.com/jmandel/sample_ccdas/master/Allscripts Samples/Internal Test with MU 2 data/170.314(b)(1)InPt_Discharge Summary CED Type.xml
 https://raw.githubusercontent.com/jmandel/sample_ccdas/master/Allscripts Samples/Internal Test with MU 2 data/170.314B2_Amb_CCD.xml
