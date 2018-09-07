@@ -38,7 +38,7 @@ package SXML.Query is
    with
       Pre'Class  => Bound (Document, State),
       Post'Class => Bound (Document, State) and
-                    (if Result /= Result_OK then State = State'Old);
+                    (Result = Result_OK or State = State'Old);
 
    -------------
    -- Sibling --
@@ -50,7 +50,7 @@ package SXML.Query is
    with
       Pre'Class  => Bound (Document, State),
       Post'Class => Bound (Document, State) and
-                    (if Result /= Result_OK then State = State'Old);
+                    (Result = Result_OK or State = State'Old);
 
    ---------------
    -- Attribute --
@@ -62,7 +62,7 @@ package SXML.Query is
    with
       Pre'Class  => Bound (Document, State),
       Post'Class => Bound (Document, State) and
-                    (if Result /= Result_OK then State = State'Old);
+                    (Result = Result_OK or State = State'Old);
 
    -----------
    -- Value --
