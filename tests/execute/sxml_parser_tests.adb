@@ -444,7 +444,7 @@ package body SXML_Parser_Tests is
       File_Name : constant String := "obj/generated.xml";
       Context   : Subtree_Access := new Subtree_Type (1 .. 1000000);
    begin
-      Generate_XML (File_Name, 1000000);
+      Generate_Deep_Nodes (File_Name, 1000000);
       declare
          Input : access String := Read_File (File_Name);
          package P is new Parser (Input.all, Context.all);
@@ -462,6 +462,16 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Many_Nodes (T : in out Test_Cases.Test_Case'Class)
+   is
+      File_Name : constant String := "obj/many_nodes.xml";
+   begin
+      Generate_Many_Nodes (File_Name, 1000000);
+      Parse_Document (File_Name);
+   end Many_Nodes;
+
+   ---------------------------------------------------------------------------
+
    procedure Large_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       File_Name : constant String := "obj/large_attribute.xml";
@@ -469,6 +479,16 @@ package body SXML_Parser_Tests is
       Generate_Large_Attribute (File_Name, 1000000);
       Parse_Document (File_Name);
    end Large_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Many_Attributes (T : in out Test_Cases.Test_Case'Class)
+   is
+      File_Name : constant String := "obj/many_attributes.xml";
+   begin
+      Generate_Many_Attributes (File_Name, 1000000);
+      Parse_Document (File_Name);
+   end Many_Attributes;
 
    ---------------------------------------------------------------------------
 
@@ -519,7 +539,9 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Processing_Info_Inside_Content'Access, "Processing info inside content");
       Register_Routine (T, Large_File'Access, "Large file");
       Register_Routine (T, Deep_File'Access, "Deep file");
+      Register_Routine (T, Many_Nodes'Access, "Many nodes");
       Register_Routine (T, Large_Attribute'Access, "Large attribute");
+      Register_Routine (T, Many_Attributes'Access, "Many attributes");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

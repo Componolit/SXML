@@ -20,9 +20,15 @@ is
    procedure Check_Document (Input    : in out String;
                              Output   : String := "INPUT");
 
-   procedure Generate_XML (Name  : String;
-                           Level : Natural);
+   procedure Generate_Deep_Nodes (Name  : String;
+                                  Level : Natural);
+
+   procedure Generate_Many_Nodes (Name  : String;
+                                  Level : Natural);
 
    procedure Generate_Large_Attribute (Name  : String;
+                                       Level : Natural);
+
+   procedure Generate_Many_Attributes (Name  : String;
                                        Level : Natural);
 end SXML_Utils;

@@ -110,12 +110,12 @@ is
       end;
    end Check_Document;
 
-   ------------------
-   -- Generate_XML --
-   ------------------
+   -------------------------
+   -- Generate_Deep_Nodes --
+   -------------------------
 
-   procedure Generate_XML (Name  : String;
-                           Level : Natural)
+   procedure Generate_Deep_Nodes (Name  : String;
+                                  Level : Natural)
    is
       use Text_IO;
       File : File_Type;
@@ -138,7 +138,31 @@ is
          end;
       end loop;
       Close (File);
-   end Generate_XML;
+   end Generate_Deep_Nodes;
+
+   -------------------------
+   -- Generate_Many_Nodes --
+   -------------------------
+
+   procedure Generate_Many_Nodes (Name  : String;
+                                  Level : Natural)
+   is
+      use Text_IO;
+      File : File_Type;
+   begin
+      Create (File, Out_File, Name);
+      Put (File, "<root>");
+      for I in 1 .. Level
+      loop
+         declare
+            X : constant Natural := I mod 10;
+         begin
+            Put (File, "<" & X'Img (2 .. 2) & "/>");
+         end;
+      end loop;
+      Put (File, "</root>");
+      Close (File);
+   end Generate_Many_Nodes;
 
    ------------------------------
    -- Generate_Large_Attribute --
@@ -159,5 +183,25 @@ is
       Put (File, """></document>");
       Close (File);
    end Generate_Large_Attribute;
+
+   ------------------------------
+   -- Generate_Many_Attributes --
+   ------------------------------
+
+   procedure Generate_Many_Attributes (Name  : String;
+                                       Level : Natural)
+   is
+      use Text_IO;
+      File : File_Type;
+   begin
+      Create (File, Out_File, Name);
+      Put (File, "<document");
+      for I in 1 .. Level
+      loop
+         Put (File, " attr=""" & I'Img & """");
+      end loop;
+      Put (File, "></document>");
+      Close (File);
+   end Generate_Many_Attributes;
 
 end SXML_Utils;
