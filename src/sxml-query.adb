@@ -127,4 +127,106 @@ package body SXML.Query is
       return Get_String (Document, State.Offset + Val);
    end Value;
 
+   ----------
+   -- Path --
+   ----------
+
+   procedure Path (State        : in out State_Type;
+                   Document     : Subtree_Type;
+                   Result       : out Result_Type;
+                   Query_String : String)
+   is
+      First : Natural := Query_String'First;
+      Last  : Natural := Query_String'First - 1;
+      Tmp_Result : Result_Type;
+   begin
+      Result := Result_Not_Found;
+      State := Init (Document);
+
+      loop
+         First := Last + 2;
+         Last  := First;
+         loop
+            exit when Last >= Query_String'Last or else
+                      Query_String (Last + 1) = '/';
+            Last := Last + 1;
+         end loop;
+
+         if  First > Last
+         then
+            exit;
+         end if;
+
+         State.Find_Sibling (Document, Query_String (First .. Last), Tmp_Result);
+         if Tmp_Result /= Result_OK
+         then
+            return;
+         end if;
+
+         --  Query string processed
+         if Last = Query_String'Last
+         then
+            Result := Result_OK;
+            return;
+         end if;
+
+         State.Child (Document, Tmp_Result);
+         if Tmp_Result /= Result_OK
+         then
+            return;
+         end if;
+
+      end loop;
+
+      Result := Result_OK;
+   end Path;
+
+   --------------------
+   -- Find_Attribute --
+   --------------------
+
+   procedure Find_Attribute (State          : in out State_Type;
+                             Document       : Subtree_Type;
+                             Attribute_Name : String;
+                             Result         : out Result_Type)
+   is
+      Tmp_Result : Result_Type;
+   begin
+      Result := Result_Invalid;
+      State.Attribute (Document, Tmp_Result);
+
+      while Tmp_Result = Result_OK
+      loop
+         if State.Name (Document) = Attribute_Name
+         then
+            Result := Result_OK;
+            return;
+         end if;
+         State.Next_Attribute (Document, Tmp_Result);
+      end loop;
+
+   end Find_Attribute;
+
+   ------------------
+   -- Find_Sibling --
+   ------------------
+
+   procedure Find_Sibling (State        : in out State_Type;
+                           Document     : Subtree_Type;
+                           Sibling_Name : String;
+                           Result       : out Result_Type)
+   is
+   begin
+      loop
+         if State.Name (Document) = Sibling_Name
+         then
+            Result := Result_OK;
+            return;
+         end if;
+         State.Sibling (Document, Result);
+         exit when Result = Result_Not_Found;
+
+      end loop;
+   end Find_Sibling;
+
 end SXML.Query;
