@@ -52,6 +52,19 @@ package SXML.Query is
       Post'Class => Bound (Document, State) and
                     (Result = Result_OK or State = State'Old);
 
+   ------------------
+   -- Find_Sibling --
+   ------------------
+
+   procedure Find_Sibling (State        : in out State_Type;
+                           Document     : Subtree_Type;
+                           Sibling_Name : String;
+                           Result       : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State) and
+                    (Result = Result_OK or State = State'Old);
+
    ---------------
    -- Attribute --
    ---------------
@@ -83,6 +96,27 @@ package SXML.Query is
    with
       Pre'Class  => Bound (Document, State),
       Post'Class => Bound (Document, State);
+
+   --------------------
+   -- Find_Attribute --
+   --------------------
+
+   procedure Find_Attribute (State          : in out State_Type;
+                             Document       : Subtree_Type;
+                             Attribute_Name : String;
+                             Result         : out Result_Type)
+   with
+      Pre'Class  => Bound (Document, State),
+      Post'Class => Bound (Document, State);
+
+   ----------
+   -- Path --
+   ----------
+
+   procedure Path (State        : in out State_Type;
+                   Document     : Subtree_Type;
+                   Result       : out Result_Type;
+                   Query_String : String);
 
 private
 
