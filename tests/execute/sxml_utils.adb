@@ -81,6 +81,11 @@ is
                     Position => Position);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
+      declare
+         Data : constant String := To_String (Context.all);
+      begin
+         null;
+      end;
    end Parse_Document;
 
    --------------------

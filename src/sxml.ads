@@ -2,6 +2,10 @@ package SXML
 with
    SPARK_Mode
 is
+   To_String_Depth  : constant := 100;
+   Attributes_Depth : constant := 100;
+   Get_String_Depth : constant := 100;
+
    type Offset_Type is new Natural range 0 .. Natural'Last / 2;
    subtype Index_Type is Offset_Type range 1 .. Offset_Type'Last;
    Invalid_Index : constant Index_Type;
@@ -47,14 +51,16 @@ is
    -- To_String --
    ---------------
 
-   function To_String (T : Subtree_Type) return String;
+   function To_String (T : Subtree_Type;
+                       L : Natural := To_String_Depth) return String;
 
    ----------------
    -- Get_String --
    ----------------
 
    function Get_String (T : Subtree_Type;
-                        I : Offset_Type) return String;
+                        I : Offset_Type;
+                        L : Natural := Get_String_Depth) return String;
 
    ------------------
    -- Num_Elements --

@@ -114,13 +114,19 @@ is
    ----------------
 
    function Get_String (T : Subtree_Type;
-                        I : Offset_Type) return String
+                        I : Offset_Type;
+                        L : Natural := Get_String_Depth) return String
    is
       N : constant Node_Type := T (T'First + I);
    begin
+      if L = 0
+      then
+         return "OVERFLOW";
+      end if;
+
       return N.Data (1 .. Natural (N.Length)) &
          (if N.Next /= Null_Offset
-          then Get_String (T, I + N.Next)
+          then Get_String (T, I + N.Next, L - 1)
           else "");
    end Get_String;
 
@@ -129,14 +135,16 @@ is
    ----------------
 
    function Attributes (T : Subtree_Type;
-                        I : Offset_Type) return String;
+                        I : Offset_Type;
+                        L : Natural := Attributes_Depth) return String;
 
    function Attributes (T : Subtree_Type;
-                        I : Offset_Type) return String
+                        I : Offset_Type;
+                        L : Natural := Attributes_Depth) return String
    is
       N : constant Node_Type := T (T'First + I);
    begin
-      if I = Null_Offset
+      if I = Null_Offset or L = 0
       then
          return "";
       end if;
@@ -148,7 +156,7 @@ is
            & Get_String (T, I + N.Value)
            & """"
            & (if N.Next_Attribute /= Null_Offset
-              then Attributes (T, I + N.Next_Attribute)
+              then Attributes (T, I + N.Next_Attribute, L - 1)
               else "");
    end Attributes;
 
@@ -156,20 +164,26 @@ is
    -- To_String --
    ---------------
 
-   function To_String (T : Subtree_Type) return String
+   function To_String (T : Subtree_Type;
+                       L : Natural := To_String_Depth) return String
    is
       N   : constant Node_Type := T (T'First);
       Tag : constant String    := Get_String (T, 0);
    begin
+      if L = 0
+      then
+         return "STACK OVERFLOW";
+      end if;
+
       return "<"
            & Tag
            & Attributes (T, N.Attributes)
            & (if N.Children = Null_Offset
               then "/>"
-              else ">" & To_String (T (T'First + N.Children .. T'Last)) & "</" & Tag & ">")
+              else ">" & To_String (T (T'First + N.Children .. T'Last), L - 1) & "</" & Tag & ">")
            & (if N.Siblings = Null_Offset
               then ""
-              else To_String (T (T'First + N.Siblings .. T'Last)));
+              else To_String (T (T'First + N.Siblings .. T'Last), L - 1));
    end To_String;
 
    overriding
