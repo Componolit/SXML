@@ -219,6 +219,24 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Query_Find_Attribute_Missing (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      use SXML.Query;
+      Doc    : Subtree_Type := E ("config",
+                                  A ("attribute1", "value1") +
+                                  A ("attribute2", "value2") +
+                                  A ("attribute3", "value3") +
+                                  A ("attribute4", "value4"));
+      State  : State_Type := Init (Doc);
+      Result : Result_Type;
+   begin
+      State.Find_Attribute (Doc, "does_not_exist", Result);
+      Assert (Result = Result_Not_Found, "Attribute must not be found: " & Result'Img);
+   end Test_Query_Find_Attribute_Missing;
+
+   ---------------------------------------------------------------------------
+
    procedure Test_Query_Find_Sub_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
@@ -297,6 +315,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Query_Attribute'Access, "Query attribute name and value");
       Register_Routine (T, Test_Query_Multiple_Attributes'Access, "Query multiple attribute");
       Register_Routine (T, Test_Query_Find_Attribute'Access, "Find attribute");
+      Register_Routine (T, Test_Query_Find_Attribute_Missing'Access, "Find missing attribute");
       Register_Routine (T, Test_Query_Find_Sub_Attribute'Access, "Find attribute in sub-tree");
       Register_Routine (T, Test_Path_Query_Simple'Access, "Simple path query");
       Register_Routine (T, Test_Path_Query_Simple_Missing'Access, "Simple path query for missing path");

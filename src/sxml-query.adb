@@ -192,7 +192,7 @@ package body SXML.Query is
    is
       Tmp_Result : Result_Type;
    begin
-      Result := Result_Invalid;
+      Result := Result_Not_Found;
       State.Attribute (Document, Tmp_Result);
 
       while Tmp_Result = Result_OK
