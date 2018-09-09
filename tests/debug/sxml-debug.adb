@@ -42,6 +42,7 @@ is
                 ", Children: " & Offset (I, N.Children) &
                 ", Siblings: " & Offset (I, N.Siblings),
               when Kind_Invalid => "",
+              when Kind_Content => "",
               when Kind_Data => "",
               when Kind_Attribute =>
                 ", Next_Attribute: " & Offset (I, N.Next_Attribute) &

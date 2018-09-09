@@ -51,6 +51,12 @@ is
    function A (Name  : String;
                Value : String) return Attributes_Type;
 
+   -------
+   -- C --
+   -------
+
+   function C (Value : String) return Subtree_Type;
+
 private
 
    type Attributes_Type is new Subtree_Type;

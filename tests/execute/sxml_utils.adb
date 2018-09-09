@@ -47,7 +47,7 @@ is
       Block_Size : constant := 1024;
       use Ada.Text_IO;
       use Ada.Text_IO.Text_Streams;
-      File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
+      File_Size : Natural := Natural (Ada.Directories.Size (File_Name)) - 1;
       Result : access String := new String (1 .. File_Size);
       File : File_Type;
       Len  : Natural;

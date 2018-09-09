@@ -57,7 +57,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<valid/>";
    begin
-      Check_Document (Data, "<valid/>");
+      Check_Document (Data);
    end Single_Short_Node;
 
    ---------------------------------------------------------------------------
@@ -66,8 +66,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent><child1/><child2/></parent>";
    begin
-      Check_Document (Data,
-                      "<parent><child1/><child2/></parent>");
+      Check_Document (Data);
    end Multiple_Children;
 
    -----------------------------------------------------------------------------
@@ -211,7 +210,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent attr=""test"">     </parent>";
    begin
-      Check_Document (Data, "<parent attr=""test""/>");
+      Check_Document (Data);
    end Whitespace_Between_Nodes;
 
    ---------------------------------------------------------------------------
@@ -219,9 +218,8 @@ package body SXML_Parser_Tests is
    procedure Complex_File_Without_Attributes (T : in out Test_Cases.Test_Case'Class)
    is
       Data     : access String := Read_File ("tests/data/complex1.xml");
-      Expected : access String := Read_File ("tests/data/complex1_expect.xml");
    begin
-      Check_Document (Data.all, Expected.all (Expected.all'First .. Expected.all'Last - 1));
+      Check_Document (Data.all);
    end Complex_File_Without_Attributes;
 
    ---------------------------------------------------------------------------
@@ -229,9 +227,8 @@ package body SXML_Parser_Tests is
    procedure Complex_File (T : in out Test_Cases.Test_Case'Class)
    is
       Data     : access String := Read_File ("tests/data/complex2.xml");
-      Expected : access String := Read_File ("tests/data/complex2_expect.xml");
    begin
-      Check_Document (Data.all, Expected.all (Expected.all'First .. Expected.all'Last - 1));
+      Check_Document (Data.all);
    end Complex_File;
 
    ---------------------------------------------------------------------------
@@ -240,7 +237,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent>Node content to be ignored</parent>";
    begin
-      Check_Document (Data, "<parent/>");
+      Check_Document (Data);
    end Ignore_Node_Content;
 
    ---------------------------------------------------------------------------
@@ -249,7 +246,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/comments.xml");
    begin
-      Check_Document (Data.all, "<parent><child/></parent>");
+      Check_Document (Data.all, "<parent>" & ASCII.LF & "   <child/>" & ASCII.LF & "</parent>");
    end Ignore_Comments;
 
    ---------------------------------------------------------------------------
@@ -267,7 +264,7 @@ package body SXML_Parser_Tests is
    is
       Data : access String := Read_File ("tests/data/pi.xml");
    begin
-      Check_Document (Data.all, "<parent><child/></parent>");
+      Check_Document (Data.all, "<parent>" & ASCII.LF & "   <child/>" & ASCII.LF & "</parent>");
    end Ignore_Processing_Information;
 
    ---------------------------------------------------------------------------
@@ -300,7 +297,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>";
    begin
-      Check_Document (Data, "<parent/>");
+      Check_Document (Data, "<parent>Content  More content </parent>");
    end Ignore_CDATA;
 
    ---------------------------------------------------------------------------
@@ -311,7 +308,7 @@ package body SXML_Parser_Tests is
          "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
          "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>";
    begin
-      Check_Document (Data, "<parent/>");
+      Check_Document (Data, "<parent>Content  More content  even more !!! </parent>");
    end Ignore_Multiple_CDATA;
 
    ---------------------------------------------------------------------------
@@ -321,7 +318,7 @@ package body SXML_Parser_Tests is
       Data : String := "<test><test1>='</test1><test2>'</test2></test>";
    begin
       Check_Document
-         (Data, "<test><test1/><test2/></test>");
+         (Data, "<test><test1>='</test1><test2>'</test2></test>");
    end Single_Quote_Content;
 
    ---------------------------------------------------------------------------
@@ -492,6 +489,15 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Simple_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : String := "<valid>Some content</valid>";
+   begin
+      Check_Document (Data);
+   end Simple_Content;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -542,6 +548,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Many_Nodes'Access, "Many nodes");
       Register_Routine (T, Large_Attribute'Access, "Large attribute");
       Register_Routine (T, Many_Attributes'Access, "Many attributes");
+      Register_Routine (T, Simple_Content'Access, "Simple content");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

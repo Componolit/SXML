@@ -149,6 +149,31 @@ package body SXML_Generator_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Generate_Simple_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("Some content"));
+   begin
+      Expect (To_String (Doc), "<config attrib=""Foo"">Some content</config>");
+	end Test_Generate_Simple_Content;
+
+   ---------------------------------------------------------------------------
+
+   procedure Test_Generate_Interleaved_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"),
+                               C ("Some") +
+                               C (" content") +
+                               E ("element2") +
+                               C ("More content") +
+                               E ("element3"));
+   begin
+      Expect (To_String (Doc), "<config attrib=""Foo"">Some content<element2/>More content<element3/></config>");
+	end Test_Generate_Interleaved_Content;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -163,6 +188,8 @@ package body SXML_Generator_Tests is
       Register_Routine (T, Long_Attribute_Value'Access, "Long attribute value");
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
       Register_Routine (T, Nested'Access, "Nested");
+      Register_Routine (T, Test_Generate_Simple_Content'Access, "Simple content");
+      Register_Routine (T, Test_Generate_Interleaved_Content'Access, "Interleaved content");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

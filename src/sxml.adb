@@ -24,6 +24,15 @@ is
                 Data           => Null_Data,
                 Value          => Null_Offset);
 
+   Null_Content_Element : constant Node_Type :=
+     Node_Type'(Kind           => Kind_Content,
+                Length         => 0,
+                Next           => Null_Offset,
+                Data           => Null_Data,
+                Attributes     => Null_Offset,
+                Children       => Null_Offset,
+                Siblings       => Null_Offset);
+
    ------------------
    -- Num_Elements --
    ------------------
@@ -84,6 +93,20 @@ is
       Put_String (Result, 0, Name);
       return Result;
    end Open;
+
+   -------------
+   -- Content --
+   -------------
+
+   function Content (Value : String) return Subtree_Type
+   is
+      Result : Subtree_Type (1 .. Num_Elements (Value)) :=
+        (1      => Null_Content_Element,
+         others => Null_Data_Element);
+   begin
+      Put_String (Result, 0, Value);
+      return Result;
+   end Content;
 
    ---------------
    -- Attribute --
@@ -173,6 +196,14 @@ is
       if L = 0
       then
          return "STACK OVERFLOW";
+      end if;
+
+      if N.Kind = Kind_Content
+      then
+         return Get_String (T, 0, L - 1)
+           & (if N.Siblings = Null_Offset
+              then ""
+              else To_String (T (T'First + N.Siblings .. T'Last), L - 1));
       end if;
 
       return "<"

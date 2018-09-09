@@ -1,5 +1,7 @@
 package body SXML.Parser is
 
+   Parse_Internal_Depth : constant := 100;
+
    Context_Index : Index_Type := Context'First;
    Context_Valid : Boolean    := False;
    Offset        : Natural    := 0;
@@ -11,6 +13,9 @@ package body SXML.Parser is
       Last  : Natural;
    end record;
    Null_Range : constant Range_Type := (Natural'Last, 0);
+
+   function Length (R : Range_Type) return Natural
+   is (R.Last - R.First + 1);
 
    type Set_Type is new String;
    Empty_Set : constant Set_Type := "";
@@ -786,6 +791,17 @@ package body SXML.Parser is
 
    end Parse_Sections;
 
+   --------------------
+   -- Parse_Internal --
+   --------------------
+
+   procedure Parse_Internal (Match  : out Match_Type;
+                             Start  : out Index_Type;
+                             Level  : Natural := Parse_Internal_Depth)
+   with
+      Pre  => Data_Valid,
+      Post => (if Match /= Match_OK then Offset = Offset'Old);
+
    -----------------
    -- Parse_CDATA --
    -----------------
@@ -804,36 +820,69 @@ package body SXML.Parser is
    -- Parse_Content --
    -------------------
 
-   procedure Parse_Content
+   procedure Parse_Content (Match : out Match_Type;
+                            Start : out Offset_Type;
+                            Level : Natural)
    with
       Pre => Data_Valid;
 
-   procedure Parse_Content
+   procedure Parse_Content (Match : out Match_Type;
+                            Start : out Offset_Type;
+                            Level : Natural)
    is
-      Content       : Range_Type;
+      Content_Range : Range_Type;
       Match_Content : Match_Type;
       Match_CDATA   : Match_Type;
       Match_Comment : Match_Type;
       Match_PI      : Match_Type;
+      Match_Child   : Match_Type;
+      Valid         : Boolean;
    begin
+      Start := Invalid_Index;
+      Match := Match_Invalid;
       if Data_Overflow
       then
          return;
       end if;
 
-      loop
-         Match_Until_Set ("<", Empty_Set, Match_Content, Content);
-         Parse_CDATA (Match_CDATA);
-         Parse_Comment (Match_Comment);
-         Parse_Processing_Information (Match_PI);
-         exit when
-           Match_Content /= Match_OK and
-           Match_CDATA /= Match_OK and
-           Match_Comment /= Match_OK and
-           Match_PI /= Match_OK;
-      end loop;
+      Match := Match_OK;
 
-      pragma Unreferenced (Content);
+      Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
+      if Length (Content_Range) > 0
+      then
+         Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
+                      Start  => Start,
+                      Result => Valid);
+         return;
+      end if;
+
+      Parse_Internal (Match_Child, Start, Level - 1);
+      if Match_Child = Match_OK
+      then
+         return;
+      end if;
+
+      Parse_CDATA (Match_CDATA);
+      if Match_CDATA = Match_OK
+      then
+         return;
+      end if;
+
+      Parse_Comment (Match_Comment);
+      if Match_Comment = Match_OK
+      then
+         return;
+      end if;
+
+      Parse_Processing_Information (Match_PI);
+      if Match_PI = Match_OK
+      then
+         return;
+      end if;
+
+      Match := Match_None;
+      return;
+
    end Parse_Content;
 
    --------------------
@@ -842,14 +891,7 @@ package body SXML.Parser is
 
    procedure Parse_Internal (Match  : out Match_Type;
                              Start  : out Index_Type;
-                             Level  : Natural     := 0)
-   with
-      Pre  => Data_Valid,
-      Post => (if Match /= Match_OK then Offset = Offset'Old);
-
-   procedure Parse_Internal (Match  : out Match_Type;
-                             Start  : out Index_Type;
-                             Level  : Natural     := 0)
+                             Level  : Natural := Parse_Internal_Depth)
    is
       Old_Offset     : constant Natural := Offset;
       Done           : Boolean;
@@ -862,6 +904,11 @@ package body SXML.Parser is
 
       Match := Match_Invalid;
       Start := Invalid_Index;
+
+      if Level = 0
+      then
+         return;
+      end if;
 
       Parse_Sections;
 
@@ -897,14 +944,7 @@ package body SXML.Parser is
       end if;
 
       loop
-         Parse_Content;
-
-         if Level > 100
-         then
-            return;
-         end if;
-
-         Parse_Internal (Sub_Match, Child_Start, Level + 1);
+         Parse_Content (Sub_Match, Child_Start, Level - 1);
          exit when Sub_Match /= Match_OK;
 
          if Previous_Child = Invalid_Index

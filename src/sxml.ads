@@ -36,6 +36,12 @@ is
 
    function Open (Name : String) return Subtree_Type;
 
+   -------------
+   -- Content --
+   -------------
+
+   function Content (Value : String) return Subtree_Type;
+
    ---------------
    -- Attribute --
    ---------------
@@ -76,6 +82,7 @@ private
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
+                      Kind_Content,
                       Kind_Attribute,
                       Kind_Data);
 
@@ -87,15 +94,16 @@ private
       Next   : Offset_Type;
       Data   : Data_Type;
       case Kind is
-         when Kind_Element_Open =>
+         when Kind_Element_Open
+            | Kind_Content =>
             Attributes     : Offset_Type;
             Children       : Offset_Type;
             Siblings       : Offset_Type;
          when Kind_Attribute =>
             Next_Attribute : Offset_Type;
             Value          : Offset_Type;
-         when Kind_Data |
-              Kind_Invalid =>
+         when Kind_Data
+            | Kind_Invalid =>
             null;
       end case;
    end record;

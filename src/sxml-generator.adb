@@ -103,6 +103,16 @@ package body SXML.Generator is
       return Attributes_Type (Result);
    end A;
 
+   -------
+   -- C --
+   -------
+
+   function C (Value : String) return Subtree_Type
+   is
+   begin
+      return Content (Value);
+   end C;
+
    ---------
    -- "+"--
    ---------
