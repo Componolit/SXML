@@ -54,6 +54,9 @@ is
    (
       "-fstack-check"      -- dynamic stack checking
      ,"-gnata"             -- Enable pragma Assert/Debug
+     ,"-gnato"             -- Overflow checking
+     ,"-g"                 -- Debug symbols
+     ,"-O0"                -- Debug symbols
    );
 
 end Switches;
