@@ -86,8 +86,9 @@ is
    -- To_String --
    ---------------
 
-   function To_String (Doc   : Subtree_Type;
-                       Level : Natural := To_String_Depth) return String;
+   procedure To_String (Doc      : Subtree_Type;
+                        Data     : in out String;
+                        Position : in out Natural);
 
    ----------------
    -- Get_String --

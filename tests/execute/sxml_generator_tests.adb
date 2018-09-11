@@ -14,12 +14,18 @@ with SXML.Generator; use SXML.Generator;
 
 package body SXML_Generator_Tests is
 
-   procedure Expect (XML : String;
-                    Expected : String)
+   procedure Expect (Doc      : SXML.Subtree_Type;
+                     Expected : String)
    is
+      XML    : access String := new String (1 .. 2 * Expected'Length);
+      Offset : Natural := 0;
+      Last   : Natural;
    begin
-      Assert (XML = Expected,
-         "Unexpected document: (" & XML & ") len:" & XML'Length'Img &
+      SXML.To_String (Doc, XML.all, Offset);
+      Last := XML.all'First + Offset - 1;
+      Assert (Last > 0, "Error serializing");
+      Assert (XML.all (1 .. Last) = Expected,
+         "Unexpected document: (" & XML.all (1 .. Last) & ") len:" & Last'Img &
          ", expected (" & Expected & ") len:" & Expected'Length'Img);
    end Expect;
 
@@ -30,7 +36,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config");
    begin
-      Expect (To_String (Doc), "<config/>");
+      Expect (Doc, "<config/>");
 	end Test_Generate_Single_Node;
 
    ---------------------------------------------------------------------------
@@ -40,7 +46,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", A ("attrib", "Foo"));
    begin
-      Expect (To_String (Doc), "<config attrib=""Foo""/>");
+      Expect (Doc, "<config attrib=""Foo""/>");
 	end Test_Generate_Single_Node_Attrib;
 
    ---------------------------------------------------------------------------
@@ -50,7 +56,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", E ("child"));
    begin
-      Expect (To_String (Doc), "<config><child/></config>");
+      Expect (Doc, "<config><child/></config>");
 	end Test_Generate_Nodes;
 
    ---------------------------------------------------------------------------
@@ -60,7 +66,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", "value")));
    begin
-      Expect (To_String (Doc), "<config><child attr=""value""/></config>");
+      Expect (Doc, "<config><child attr=""value""/></config>");
 	end Test_String_Attribute;
 
    ---------------------------------------------------------------------------
@@ -70,7 +76,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", 42)));
    begin
-      Expect (To_String (Doc), "<config><child attr=""42""/></config>");
+      Expect (Doc, "<config><child attr=""42""/></config>");
 	end Test_Integer_Attribute;
 
    ---------------------------------------------------------------------------
@@ -80,7 +86,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", E ("child", A ("attr", 3.14)));
    begin
-      Expect (To_String (Doc), "<config><child attr=""3.14000E+00""/></config>");
+      Expect (Doc, "<config><child attr=""3.14000E+00""/></config>");
 	end Test_Float_Attribute;
 
    ---------------------------------------------------------------------------
@@ -91,7 +97,7 @@ package body SXML_Generator_Tests is
       Val : String (1 .. 100) := (others => 'x');
       Doc : Subtree_Type := E ("config", A ("attr", Val));
    begin
-      Expect (To_String (Doc), "<config attr=""" & Val & """/>");
+      Expect (Doc, "<config attr=""" & Val & """/>");
 	end Long_Attribute_Value;
 
    ---------------------------------------------------------------------------
@@ -102,7 +108,7 @@ package body SXML_Generator_Tests is
       Aname : String (1 .. 100) := (others => 'x');
       Doc : Subtree_Type := E ("config", A (Aname, "value"));
    begin
-      Expect (To_String (Doc), "<config " & Aname & "=""value""/>");
+      Expect (Doc, "<config " & Aname & "=""value""/>");
 	end Long_Attribute_Name;
 
    ---------------------------------------------------------------------------
@@ -113,7 +119,7 @@ package body SXML_Generator_Tests is
       Name : String (1 .. 100) := (others => 'x');
       Doc  : Subtree_Type := E (Name, A ("attr", "value"));
    begin
-      Expect (To_String (Doc), "<" & Name & " attr=""value""/>");
+      Expect (Doc, "<" & Name & " attr=""value""/>");
 	end Long_Tag_Name;
 
    ---------------------------------------------------------------------------
@@ -127,7 +133,7 @@ package body SXML_Generator_Tests is
                                 A ("attr2", Long) +
                                 A ("attr3_" & Long, "value"));
    begin
-      Expect (To_String (Doc), "<parent attr1=""value"" attr2=""" & Long & """ attr3_" & Long & "=""value""/>");
+      Expect (Doc, "<parent attr1=""value"" attr2=""" & Long & """ attr3_" & Long & "=""value""/>");
 	end Multiple_Attributes;
 
    ---------------------------------------------------------------------------
@@ -144,7 +150,7 @@ package body SXML_Generator_Tests is
             E ("child2",
                E ("subchild")));
    begin
-      Expect (To_String (Doc), "<parent attr1=""value1"" attr2=""value2"" attr3=""value3"" attr4=""value4""><child1/><child2><subchild/></child2></parent>");
+      Expect (Doc, "<parent attr1=""value1"" attr2=""value2"" attr3=""value3"" attr4=""value4""><child1/><child2><subchild/></child2></parent>");
 	end Nested;
 
    ---------------------------------------------------------------------------
@@ -154,7 +160,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("Some content"));
    begin
-      Expect (To_String (Doc), "<config attrib=""Foo"">Some content</config>");
+      Expect (Doc, "<config attrib=""Foo"">Some content</config>");
 	end Test_Generate_Simple_Content;
 
    ---------------------------------------------------------------------------
@@ -164,7 +170,7 @@ package body SXML_Generator_Tests is
       use SXML;
       Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("<XML>""Quoted"" & 'Quoted'<XML/>"));
    begin
-      Expect (To_String (Doc), "<config attrib=""Foo"">&lt;XML&gt;&quot;Quoted&quot; &amp; &apos;Quoted&apos;&lt;XML/&gt;</config>");
+      Expect (Doc, "<config attrib=""Foo"">&lt;XML&gt;&quot;Quoted&quot; &amp; &apos;Quoted&apos;&lt;XML/&gt;</config>");
 	end Test_Generate_Escape_Content;
 
    ---------------------------------------------------------------------------
@@ -179,7 +185,7 @@ package body SXML_Generator_Tests is
                                C ("More content") +
                                E ("element3"));
    begin
-      Expect (To_String (Doc), "<config attrib=""Foo"">Some content<element2/>More content<element3/></config>");
+      Expect (Doc, "<config attrib=""Foo"">Some content<element2/>More content<element3/></config>");
 	end Test_Generate_Interleaved_Content;
 
    ---------------------------------------------------------------------------

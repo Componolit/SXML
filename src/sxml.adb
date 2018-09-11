@@ -228,6 +228,9 @@ is
    ---------------
 
    function To_String (Doc   : Subtree_Type;
+                       Level : Natural := To_String_Depth) return String;
+
+   function To_String (Doc   : Subtree_Type;
                        Level : Natural := To_String_Depth) return String
    is
       N   : constant Node_Type := Doc (Doc'First);
@@ -255,6 +258,23 @@ is
            & (if N.Siblings = Invalid_Relative_Index
               then ""
               else To_String (Doc (Add (Doc'First, N.Siblings) .. Doc'Last), Level - 1));
+   end To_String;
+
+   procedure To_String (Doc      : Subtree_Type;
+                        Data     : in out String;
+                        Position : in out Natural)
+   is
+      D : constant String := To_String (Doc);
+   begin
+      if D'Length > Data'Length
+      then
+         Position := 0;
+         return;
+      end if;
+
+      Data (Data'First + Position .. Data'First + Position + D'Length - 1) := D;
+      Position := Position + D'Length;
+
    end To_String;
 
    overriding

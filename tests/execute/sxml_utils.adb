@@ -76,16 +76,16 @@ is
       use Parser;
       Result   : Match_Type;
       Position : Natural;
+      Data : access String := new String (1 .. 2 * Input'Length);
+      Last : Natural := 1;
    begin
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      declare
-         Data : constant String := To_String (Context.all);
-      begin
-         null;
-      end;
+
+      To_String (Context.all, Data.all, Last);
+      Assert (Last > 0, File & ": Serialization error");
    end Parse_Document;
 
    --------------------
@@ -101,23 +101,23 @@ is
       use Parser;
       Result   : Match_Type;
       Position : Natural;
+      XML    : access String := new String (1 .. 2 * Input'Length);
+      Offset : Natural := 0;
    begin
       Context.all (1) := Null_Node;
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
-      declare
-         Doc : constant String := To_String (Parser.Document);
-      begin
-         --  FIXME: Remove whitespace
-         Assert (Doc = (if Output = "INPUT" then
-                           (if Ignore_Final_Newline then
-                               Input (Input'First .. Input'Last - 1)
-                            else Input)
-                        else Output),
-            "Invalid result at" & Position'Img &
-            ": (" & Doc & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
-      end;
+
+      To_String (Context.all, XML.all, Offset);
+      Assert (Offset > 0, "Error searilizing");
+      Assert (XML.all (1 .. Offset) = (if Output = "INPUT" then
+                                          (if Ignore_Final_Newline then
+                                              Input (Input'First .. Input'Last - 1)
+                                           else Input)
+                                       else Output),
+         "Invalid result at" & Position'Img &
+         ": (" & XML.all (1 .. Offset) & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
    end Check_Document;
 
    -------------------------
