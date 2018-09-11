@@ -308,7 +308,7 @@ package body SXML_Parser_Tests is
          "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
          "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>";
    begin
-      Check_Document (Data, "<parent>Content  More content  even more !!! </parent>");
+      Check_Document (Data, "<parent>Content  More content  even more  !!! </parent>");
    end Ignore_Multiple_CDATA;
 
    ---------------------------------------------------------------------------
@@ -410,7 +410,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<elem> Here is <!--Comment--> some content </elem>";
    begin
-      Check_Document (Data, "<elem/>");
+      Check_Document (Data, "<elem> Here is  some content </elem>");
    end Comments_Inside_Content;
 
    ---------------------------------------------------------------------------
@@ -419,7 +419,7 @@ package body SXML_Parser_Tests is
    is
       Data : String := "<elem> Here is <?some processing info?> some content </elem>";
    begin
-      Check_Document (Data, "<elem/>");
+      Check_Document (Data, "<elem> Here is  some content </elem>");
    end Processing_Info_Inside_Content;
 
    ---------------------------------------------------------------------------

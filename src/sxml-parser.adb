@@ -847,21 +847,6 @@ package body SXML.Parser is
 
       Match := Match_OK;
 
-      Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
-      if Length (Content_Range) > 0
-      then
-         Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
-                      Start  => Start,
-                      Result => Valid);
-         return;
-      end if;
-
-      Parse_Internal (Match_Child, Start, Level - 1);
-      if Match_Child = Match_OK
-      then
-         return;
-      end if;
-
       Parse_CDATA (Match_CDATA);
       if Match_CDATA = Match_OK
       then
@@ -876,6 +861,21 @@ package body SXML.Parser is
 
       Parse_Processing_Information (Match_PI);
       if Match_PI = Match_OK
+      then
+         return;
+      end if;
+
+      Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
+      if Length (Content_Range) > 0
+      then
+         Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
+                      Start  => Start,
+                      Result => Valid);
+         return;
+      end if;
+
+      Parse_Internal (Match_Child, Start, Level - 1);
+      if Match_Child = Match_OK
       then
          return;
       end if;
@@ -947,13 +947,16 @@ package body SXML.Parser is
          Parse_Content (Sub_Match, Child_Start, Level - 1);
          exit when Sub_Match /= Match_OK;
 
-         if Previous_Child = Invalid_Index
+         if Sub_Match = Match_OK and Child_Start /= Invalid_Index
          then
-            Context (Parent).Children := Sub (Child_Start, Parent);
-         else
-            Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
+            if Previous_Child = Invalid_Index
+            then
+               Context (Parent).Children := Sub (Child_Start, Parent);
+            else
+               Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
+            end if;
+            Previous_Child := Child_Start;
          end if;
-         Previous_Child := Child_Start;
       end loop;
 
       Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
