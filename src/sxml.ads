@@ -6,9 +6,38 @@ is
    Attributes_Depth : constant := 100;
    Get_String_Depth : constant := 100;
 
-   type Offset_Type is new Natural range 0 .. Natural'Last / 2;
-   subtype Index_Type is Offset_Type range 1 .. Offset_Type'Last;
-   Invalid_Index : constant Index_Type;
+   type Index_Type is range 1 .. Natural'Last;
+   Invalid_Index : constant Index_Type := Index_Type'Last;
+
+   type Relative_Index_Type is range 0 .. Natural'Last;
+   Invalid_Relative_Index : constant Relative_Index_Type := Relative_Index_Type'First;
+
+   type Offset_Type is new Natural range 0 .. Natural'Last;
+   Null_Offset : constant Offset_Type := Offset_Type'First;
+
+   function Add (Left  : Offset_Type;
+                 Right : Relative_Index_Type) return Offset_Type
+   is (Left + Offset_Type (Right));
+
+   function Add (Left  : Index_Type;
+                 Right : Offset_Type) return Index_Type
+   is (Index_Type (Natural (Left) + Natural (Right)));
+
+   function Add (Left  : Index_Type;
+                 Right : Relative_Index_Type) return Index_Type
+   is (Index_Type (Natural (Left) + Natural (Right)));
+
+   function Sub (Left  : Index_Type;
+                 Right : Index_Type) return Relative_Index_Type
+   is (Relative_Index_Type (Left - Right))
+   with
+      Pre => Left >= Right;
+
+   function Sub (Left  : Index_Type;
+                 Right : Index_Type) return Offset_Type
+   is (Offset_Type (Left - Right))
+   with
+      Pre => Left >= Right;
 
    type Node_Type is private;
    Null_Node : constant Node_Type;
@@ -86,22 +115,20 @@ private
                       Kind_Attribute,
                       Kind_Data);
 
-   Null_Offset : constant Offset_Type := 0;
-
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
       Length : Length_Type;
-      Next   : Offset_Type;
+      Next   : Relative_Index_Type;
       Data   : Data_Type;
       case Kind is
          when Kind_Element_Open
             | Kind_Content =>
-            Attributes     : Offset_Type;
-            Children       : Offset_Type;
-            Siblings       : Offset_Type;
+            Attributes     : Relative_Index_Type;
+            Children       : Relative_Index_Type;
+            Siblings       : Relative_Index_Type;
          when Kind_Attribute =>
-            Next_Attribute : Offset_Type;
-            Value          : Offset_Type;
+            Next_Attribute : Relative_Index_Type;
+            Value          : Relative_Index_Type;
          when Kind_Data
             | Kind_Invalid =>
             null;
@@ -109,7 +136,7 @@ private
    end record;
 
    Null_Node : constant Node_Type := (Kind   => Kind_Invalid,
-                                      Next   => 0,
+                                      Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
    Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
@@ -117,7 +144,5 @@ private
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
-
-   Invalid_Index : constant Index_Type := Index_Type'Last;
 
 end SXML;

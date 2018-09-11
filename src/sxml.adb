@@ -4,41 +4,41 @@ is
    Null_Open_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Element_Open,
                 Length         => 0,
-                Next           => Null_Offset,
+                Next           => Invalid_Relative_Index,
                 Data           => Null_Data,
-                Attributes     => Null_Offset,
-                Children       => Null_Offset,
-                Siblings       => Null_Offset);
+                Attributes     => Invalid_Relative_Index,
+                Children       => Invalid_Relative_Index,
+                Siblings       => Invalid_Relative_Index);
 
    Null_Data_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Data,
                 Length         => 0,
-                Next           => Null_Offset,
+                Next           => Invalid_Relative_Index,
                 Data           => Null_Data);
 
    Null_Attribute_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Attribute,
                 Length         => 0,
-                Next           => Null_Offset,
-                Next_Attribute => Null_Offset,
+                Next           => Invalid_Relative_Index,
+                Next_Attribute => Invalid_Relative_Index,
                 Data           => Null_Data,
-                Value          => Null_Offset);
+                Value          => Invalid_Relative_Index);
 
    Null_Content_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Content,
                 Length         => 0,
-                Next           => Null_Offset,
+                Next           => Invalid_Relative_Index,
                 Data           => Null_Data,
-                Attributes     => Null_Offset,
-                Children       => Null_Offset,
-                Siblings       => Null_Offset);
+                Attributes     => Invalid_Relative_Index,
+                Children       => Invalid_Relative_Index,
+                Siblings       => Invalid_Relative_Index);
 
    ------------------
    -- Num_Elements --
    ------------------
 
    function Num_Elements (D : String) return Offset_Type
-   is ((D'Length + Data_Type'Length - 1) / Data_Type'Length);
+   is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
    ----------------
    -- Put_String --
@@ -64,7 +64,7 @@ is
       end if;
 
       for I in Index_Type range
-        Subtree'First + Offset .. Subtree'First + Offset + Index_Type (NE) - 1
+        Add (Subtree'First, Offset) .. Add (Add (Subtree'First, Offset), NE) - 1
       loop
          if Name'Length - Position > Subtree (I).Data'Length
          then
@@ -86,7 +86,7 @@ is
 
    function Open (Name : String) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. Num_Elements (Name)) :=
+      Result : Subtree_Type (1 .. Add (1, Num_Elements (Name))) :=
         (1      => Null_Open_Element,
          others => Null_Data_Element);
    begin
@@ -100,7 +100,7 @@ is
 
    function Content (Value : String) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. Num_Elements (Value)) :=
+      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value))) :=
         (1      => Null_Content_Element,
          others => Null_Data_Element);
    begin
@@ -119,15 +119,15 @@ is
    is
       Name_Elements : constant Offset_Type := Num_Elements (Name);
       Data_Elements : constant Offset_Type := Num_Elements (Data);
-      Start : constant Index_Type := Output'First + Offset;
+      Start         : constant Index_Type := Add (Output'First, Offset);
    begin
       Output (Start) := Null_Attribute_Element;
-      Output (Start + 1 .. Start + Name_Elements + Data_Elements - 1) :=
+      Output (Start + 1 .. Add (Add (Start, Name_Elements), Data_Elements) - 1) :=
         (others => Null_Data_Element);
 
       Put_String (Output, Offset, Name);
-      Output (Start).Next  := (if Name_Elements > 1 then 1 else 0);
-      Output (Start).Value := Name_Elements;
+      Output (Start).Next  := (if Name_Elements > 1 then 1 else Invalid_Relative_Index);
+      Output (Start).Value := Relative_Index_Type (Name_Elements);
       Put_String (Output, Offset + Name_Elements, Data);
       Offset := Offset + Name_Elements + Data_Elements;
    end Attribute;
@@ -140,7 +140,7 @@ is
                         I : Offset_Type;
                         L : Natural := Get_String_Depth) return String
    is
-      N : constant Node_Type := T (T'First + I);
+      N : constant Node_Type := T (Add (T'First, I));
    begin
       if L = 0
       then
@@ -148,8 +148,8 @@ is
       end if;
 
       return N.Data (1 .. Natural (N.Length)) &
-         (if N.Next /= Null_Offset
-          then Get_String (T, I + N.Next, L - 1)
+         (if N.Next /= Invalid_Relative_Index
+          then Get_String (T, Add (I, N.Next), L - 1)
           else "");
    end Get_String;
 
@@ -165,7 +165,7 @@ is
                         I : Offset_Type;
                         L : Natural := Attributes_Depth) return String
    is
-      N : constant Node_Type := T (T'First + I);
+      N : constant Node_Type := T (Add (T'First, I));
    begin
       if I = Null_Offset or L = 0
       then
@@ -176,10 +176,10 @@ is
       return " "
            & Get_String (T, I)
            & "="""
-           & Get_String (T, I + N.Value)
+           & Get_String (T, Add (I, N.Value))
            & """"
-           & (if N.Next_Attribute /= Null_Offset
-              then Attributes (T, I + N.Next_Attribute, L - 1)
+           & (if N.Next_Attribute /= Invalid_Relative_Index
+              then Attributes (T, Add (I, N.Next_Attribute), L - 1)
               else "");
    end Attributes;
 
@@ -201,20 +201,20 @@ is
       if N.Kind = Kind_Content
       then
          return Get_String (T, 0, L - 1)
-           & (if N.Siblings = Null_Offset
+           & (if N.Siblings = Invalid_Relative_Index
               then ""
-              else To_String (T (T'First + N.Siblings .. T'Last), L - 1));
+              else To_String (T (Add (T'First, N.Siblings) .. T'Last), L - 1));
       end if;
 
       return "<"
            & Tag
-           & Attributes (T, N.Attributes)
-           & (if N.Children = Null_Offset
+           & Attributes (T, Offset_Type (N.Attributes))
+           & (if N.Children = Invalid_Relative_Index
               then "/>"
-              else ">" & To_String (T (T'First + N.Children .. T'Last), L - 1) & "</" & Tag & ">")
-           & (if N.Siblings = Null_Offset
+              else ">" & To_String (T (Add (T'First, N.Children) .. T'Last), L - 1) & "</" & Tag & ">")
+           & (if N.Siblings = Invalid_Relative_Index
               then ""
-              else To_String (T (T'First + N.Siblings .. T'Last), L - 1));
+              else To_String (T (Add (T'First, N.Siblings) .. T'Last), L - 1));
    end To_String;
 
    overriding

@@ -449,13 +449,13 @@ package body SXML.Parser is
       Offset := Offset + 1;
 
       Start := Context_Index;
-      Off := Context_Index - Context'First;
+      Off := Sub (Context_Index, Context'First);
       SXML.Attribute
         (Name   => Data (Attribute_Name.First .. Attribute_Name.Last),
          Data   => Data (Attribute_Value.First .. Attribute_Value.Last),
          Offset => Off,
          Output => Context);
-      Context_Index := Context'First + Off;
+      Context_Index := Add (Context'First, Off);
 
       Match := Match_OK;
 
@@ -536,9 +536,9 @@ package body SXML.Parser is
          exit when Match_Attr /= Match_OK;
          if Previous_Attribute = Invalid_Index
          then
-            Context (Start).Attributes := Attribute_Start - Start;
+            Context (Start).Attributes := Sub (Attribute_Start, Start);
          else
-            Context (Previous_Attribute).Next_Attribute := Attribute_Start - Previous_Attribute;
+            Context (Previous_Attribute).Next_Attribute := Sub (Attribute_Start, Previous_Attribute);
          end if;
          Previous_Attribute := Attribute_Start;
       end loop;
@@ -821,13 +821,13 @@ package body SXML.Parser is
    -------------------
 
    procedure Parse_Content (Match : out Match_Type;
-                            Start : out Offset_Type;
+                            Start : out Index_Type;
                             Level : Natural)
    with
       Pre => Data_Valid;
 
    procedure Parse_Content (Match : out Match_Type;
-                            Start : out Offset_Type;
+                            Start : out Index_Type;
                             Level : Natural)
    is
       Content_Range : Range_Type;
@@ -949,9 +949,9 @@ package body SXML.Parser is
 
          if Previous_Child = Invalid_Index
          then
-            Context (Parent).Children := Child_Start - Parent;
+            Context (Parent).Children := Sub (Child_Start, Parent);
          else
-            Context (Previous_Child).Siblings := Child_Start - Previous_Child;
+            Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
          end if;
          Previous_Child := Child_Start;
       end loop;

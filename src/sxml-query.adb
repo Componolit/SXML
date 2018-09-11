@@ -42,16 +42,16 @@ package body SXML.Query is
                     Document : Subtree_Type;
                     Result   : out Result_Type)
    is
-      Children : constant Offset_Type :=
-        Document (Document'First + State.Offset).Children;
+      Children : constant Relative_Index_Type :=
+        Document (Add (Document'First, State.Offset)).Children;
    begin
-      if Children = Null_Offset
+      if Children = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
       Result := Result_OK;
-      State.Offset := State.Offset + Children;
+      State.Offset := Add (State.Offset, Children);
    end Child;
 
    -------------
@@ -62,16 +62,16 @@ package body SXML.Query is
                       Document : Subtree_Type;
                       Result   : out Result_Type)
    is
-      Siblings : constant Offset_Type :=
-        Document (Document'First + State.Offset).Siblings;
+      Siblings : constant Relative_Index_Type :=
+        Document (Add (Document'First, State.Offset)).Siblings;
    begin
-      if Siblings = Null_Offset
+      if Siblings = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
       Result := Result_OK;
-      State.Offset := State.Offset + Siblings;
+      State.Offset := Add (State.Offset, Siblings);
    end Sibling;
 
    ---------------
@@ -82,16 +82,16 @@ package body SXML.Query is
                         Document : Subtree_Type;
                         Result   : out Result_Type)
    is
-      Attributes : constant Offset_Type :=
-        Document (Document'First + State.Offset).Attributes;
+      Attributes : constant Relative_Index_Type :=
+        Document (Add (Document'First, State.Offset)).Attributes;
    begin
-      if Attributes = Null_Offset
+      if Attributes = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
       Result := Result_OK;
-      State.Offset := State.Offset + Attributes;
+      State.Offset := Add (State.Offset, Attributes);
    end Attribute;
 
    --------------------
@@ -102,16 +102,16 @@ package body SXML.Query is
                              Document : Subtree_Type;
                              Result   : out Result_Type)
    is
-      Next : constant Offset_Type :=
-        Document (Document'First + State.Offset).Next_Attribute;
+      Next : constant Relative_Index_Type :=
+        Document (Add (Document'First, State.Offset)).Next_Attribute;
    begin
-      if Next = Null_Offset
+      if Next = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
       Result := Result_OK;
-      State.Offset := State.Offset + Next;
+      State.Offset := Add (State.Offset, Next);
    end Next_Attribute;
 
    -----------
@@ -121,10 +121,10 @@ package body SXML.Query is
    function Value (State    : State_Type;
                    Document : Subtree_Type) return String
    is
-      Val : constant Offset_Type :=
-        Document (Document'First + State.Offset).Value;
+      Val : constant Relative_Index_Type :=
+        Document (Add (Document'First, State.Offset)).Value;
    begin
-      return Get_String (Document, State.Offset + Val);
+      return Get_String (Document, Add (State.Offset, Val));
    end Value;
 
    ----------

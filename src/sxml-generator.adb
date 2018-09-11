@@ -47,9 +47,9 @@ package body SXML.Generator is
       O : Subtree_Type := Open (Name);
    begin
       O (O'First).Attributes :=
-        (if Attributes = Null_Attributes then Null_Offset else O'Length);
+        (if Attributes = Null_Attributes then Invalid_Relative_Index else O'Length);
       O (O'First).Children :=
-        (if Children = Null_Tree then Null_Offset else O'Length + Attributes'Length);
+        (if Children = Null_Tree then Invalid_Relative_Index else O'Length + Attributes'Length);
       return O * Subtree_Type (Attributes) * Children;
    end E;
 
@@ -93,7 +93,7 @@ package body SXML.Generator is
    function A (Name  : String;
                Value : String) return Attributes_Type
    is
-      Result : Subtree_Type (1 .. Num_Elements (Name) + Num_Elements (Value));
+      Result : Subtree_Type (1 .. Add (Add (1, Num_Elements (Name)), Num_Elements (Value)));
       Offset : Offset_Type := 0;
    begin
       SXML.Attribute (Name   => Name,
@@ -120,7 +120,7 @@ package body SXML.Generator is
    function "+" (Left, Right : Subtree_Type) return Subtree_Type
    is
       Result : Subtree_Type := Left * Right;
-      I : Offset_Type := 0;
+      I      : Relative_Index_Type := 0;
    begin
       if Right'Length = 0
       then
@@ -129,11 +129,11 @@ package body SXML.Generator is
 
       --  Find last element
       loop
-         exit when Left (Left'First + I).Siblings = Null_Offset;
-         I := I + Left (Left'First + I).Siblings;
+         exit when Left (Add (Left'First, I)).Siblings = Invalid_Relative_Index;
+         I := I + Left (Add (Left'First, I)).Siblings;
       end loop;
 
-      Result (Result'First + I).Siblings := Left'Length - I;
+      Result (Add (Result'First, I)).Siblings := Left'Length - I;
       return Result;
    end "+";
 
@@ -144,15 +144,15 @@ package body SXML.Generator is
    function "+" (Left, Right : Attributes_Type) return Attributes_Type
    is
       Result : Attributes_Type := Left * Right;
-      I : Offset_Type := 0;
+      I      : Relative_Index_Type := 0;
    begin
       --  Find last attibute
       loop
-         exit when Left (Left'First + I).Next_Attribute = Null_Offset;
-         I := I + Left (Left'First + I).Next_Attribute;
+         exit when Left (Add (Left'First, I)).Next_Attribute = Invalid_Relative_Index;
+         I := I + Left (Add (Left'First, I)).Next_Attribute;
       end loop;
 
-      Result (Result'First + I).Next_Attribute := Left'Length - I;
+      Result (Add (Result'First, I)).Next_Attribute := Left'Length - I;
       return Result;
    end "+";
 

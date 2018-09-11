@@ -7,14 +7,14 @@ is
    ------------
 
    function Offset (Current : Index_Type;
-                    Off     : Offset_Type) return String;
+                    Off     : Relative_Index_Type) return String;
 
    function Offset (Current : Index_Type;
-                    Off     : Offset_Type) return String
+                    Off     : Relative_Index_Type) return String
    is
-      A : constant Index_Type := Current + Off;
+      A : constant Index_Type := Add (Current, Off);
    begin
-      if Off = 0
+      if Off = Invalid_Relative_Index
       then
          return "- [0]";
       end if;
