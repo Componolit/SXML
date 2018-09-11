@@ -14,16 +14,17 @@ is
    function To_Subtree (Arguments : Args_Type) return Subtree_Type
    is
       Dummy   : constant Arg_Type := (others => 'x');
-      Arg_Len : constant Offset_Type := E ("arg", A ("value", String (Dummy)))'Length;
-      Result  : Subtree_Type (1 .. Arg_Len * Arguments'Length);
+      Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
+      Result  : Subtree_Type (1 .. Index_Type (Arg_Len * Arguments'Length));
    begin
-      for I in Offset_Type range 0 .. Arguments'Length - 1
+      for I in Relative_Index_Type range 0 .. Arguments'Length - 1
       loop
          declare
-            Argument : constant Arg_Type := Arguments (Arguments'First + I);
+            Argument : constant Arg_Type := Arguments (Add (Arguments'First, I));
             Arg : constant Subtree_Type := E ("arg", A ("value", String (Argument)));
          begin
-            Result (Result'First + Arg_Len * I .. Result'First + Arg_Len * I + Arg_Len - 1) := Arg;
+            Result (Add (Result'First, Relative_Index_Type (Arg_Len) * I) ..
+                    Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I), Relative_Index_Type (Arg_Len) - 1)) := Arg;
          end;
       end loop;
       return Result;
