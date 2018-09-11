@@ -21,6 +21,7 @@ package body SXML_Query_Tests is
                          Input_File   : String;
                          Query_String : String;
                          Result       : out Result_Type;
+                         Position     : out Natural;
                          State        : out State_Type)
    is
       use SXML;
@@ -29,7 +30,6 @@ package body SXML_Query_Tests is
       package Parser is new SXML.Parser (Input.all, Context);
       use Parser;
       Match    : Match_Type;
-      Position : Natural;
    begin
       State := Init (Context);
       Result := Result_Invalid;
@@ -126,6 +126,25 @@ package body SXML_Query_Tests is
       State.Find_Sibling (Doc, "child2", Result);
       Assert (State.Name (Doc) = "child2", "Invalid child");
 	end Test_Query_Find_Sibling;
+
+   ---------------------------------------------------------------------------
+
+   procedure Test_Query_Find_Sibling_With_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      use SXML.Query;
+      Doc    : Subtree_Type := E ("config", E ("child1")
+                                          + C ("content")
+                                          + E ("child2")
+                                          + E ("child3"));
+      State  : State_Type   := Init (Doc);
+      Result : Result_Type;
+   begin
+      State.Child (Doc, Result);
+      Assert (Result = Result_OK, "First child not found");
+      State.Find_Sibling (Doc, "child2", Result);
+      Assert (State.Name (Doc) = "child2", "Invalid child");
+	end Test_Query_Find_Sibling_With_Content;
 
    ---------------------------------------------------------------------------
 
@@ -261,12 +280,13 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_Simple (T : in out Test_Cases.Test_Case'Class)
    is
-      State   : State_Type;
-      Result  : Result_Type;
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 100000);
+      State    : State_Type;
+      Result   : Result_Type;
+      Context  : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Position : Natural;
    begin
-      Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/ClinicalDocument", Result, State);
-      Assert (Result = Result_OK, "Invalid result: " & Result'Img);
+      Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/ClinicalDocument", Result, Position, State);
+      Assert (Result = Result_OK, "Invalid result: " & Result'Img & " at" & Position'Img);
       Assert (State.Name (Context.all) = "ClinicalDocument", "Invalid name");
 	end Test_Path_Query_Simple;
 
@@ -274,12 +294,13 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_Simple_Missing (T : in out Test_Cases.Test_Case'Class)
    is
-      State   : State_Type;
-      Result  : Result_Type;
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 100000);
+      State    : State_Type;
+      Result   : Result_Type;
+      Context  : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Position : Natural;
    begin
-      Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/Does_Not_Exist", Result, State);
-      Assert (Result = Result_Not_Found, "Invalid result: " & Result'Img);
+      Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/Does_Not_Exist", Result, Position, State);
+      Assert (Result = Result_Not_Found, "Invalid result: " & Result'Img & " at" & Position'Img);
 	end Test_Path_Query_Simple_Missing;
 
    ---------------------------------------------------------------------------
@@ -288,13 +309,14 @@ package body SXML_Query_Tests is
    is
       State   : State_Type;
       Result  : Result_Type;
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 100000);
+      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Position : Natural;
    begin
       Path_Query (Context.all,
                   "tests/data/Vitera_CCDA_SMART_Sample.xml",
                   "/ClinicalDocument/recordTarget/patientRole/id",
-                  Result, State);
-      Assert (Result = Result_OK, "Invalid result: " & Result'Img);
+                  Result, Position, State);
+      Assert (Result = Result_OK, "Invalid result: " & Result'Img & " at" & Position'Img);
       Assert (State.Name (Context.all) = "id", "Invalid node name: " & State.Name (Context.all));
       State.Find_Attribute (Context.all, "root", Result);
       Assert (Result = Result_OK, "Invalid attribute: " & Result'Img);
@@ -311,6 +333,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Query_No_Child'Access, "Query no child");
       Register_Routine (T, Test_Query_All_Children'Access, "Query all children");
       Register_Routine (T, Test_Query_Find_Sibling'Access, "Find sibling by name");
+      Register_Routine (T, Test_Query_Find_Sibling_With_Content'Access, "Find sibling with content");
       Register_Routine (T, Test_Query_Find_First_Sibling'Access, "Find first sibling by name");
       Register_Routine (T, Test_Query_Attribute'Access, "Query attribute name and value");
       Register_Routine (T, Test_Query_Multiple_Attributes'Access, "Query multiple attribute");
