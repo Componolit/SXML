@@ -39,7 +39,7 @@ bulkdata:
 insanedata:
 	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
 
-obj/fuzzdriver:
+obj/fuzzdriver::
 	gprbuild $(GPRBUILD_OPTS) -P examples/fuzzdriver
 
 examples::
