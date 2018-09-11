@@ -51,4 +51,5 @@ clean:
 	gnatclean -P tests/execute/tests.gpr
 	gnatclean -P examples/examples
 	gnatprove -P examples/examples --clean
+	gnatclean -P examples/fuzzdriver
 	rm -rf obj/document
