@@ -17,8 +17,9 @@ is
 
    procedure Parse_Document (File : String);
 
-   procedure Check_Document (Input    : in out String;
-                             Output   : String := "INPUT");
+   procedure Check_Document (Input                : in out String;
+                             Output               : String := "INPUT";
+                             Ignore_Final_Newline : Boolean := False);
 
    procedure Generate_Deep_Nodes (Name  : String;
                                   Level : Natural);

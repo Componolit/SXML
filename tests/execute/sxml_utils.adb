@@ -47,7 +47,7 @@ is
       Block_Size : constant := 1024;
       use Ada.Text_IO;
       use Ada.Text_IO.Text_Streams;
-      File_Size : Natural := Natural (Ada.Directories.Size (File_Name)) - 1;
+      File_Size : Natural := Natural (Ada.Directories.Size (File_Name));
       Result : access String := new String (1 .. File_Size);
       File : File_Type;
       Len  : Natural;
@@ -92,8 +92,9 @@ is
    -- Check_Document --
    --------------------
 
-   procedure Check_Document (Input    : in out String;
-                             Output   : String := "INPUT")
+   procedure Check_Document (Input                : in out String;
+                             Output               : String := "INPUT";
+                             Ignore_Final_Newline : Boolean := False)
    is
       package Parser is new SXML.Parser (Input, Context.all);
       use SXML;
@@ -109,7 +110,11 @@ is
          Doc : constant String := To_String (Parser.Document);
       begin
          --  FIXME: Remove whitespace
-         Assert (Doc = (if Output = "INPUT" then Input else Output),
+         Assert (Doc = (if Output = "INPUT" then
+                           (if Ignore_Final_Newline then
+                               Input (Input'First .. Input'Last - 1)
+                            else Input)
+                        else Output),
             "Invalid result at" & Position'Img &
             ": (" & Doc & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
       end;

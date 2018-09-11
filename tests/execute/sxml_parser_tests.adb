@@ -219,7 +219,7 @@ package body SXML_Parser_Tests is
    is
       Data     : access String := Read_File ("tests/data/complex1.xml");
    begin
-      Check_Document (Data.all);
+      Check_Document (Data.all, "INPUT", True);
    end Complex_File_Without_Attributes;
 
    ---------------------------------------------------------------------------
@@ -228,7 +228,7 @@ package body SXML_Parser_Tests is
    is
       Data     : access String := Read_File ("tests/data/complex2.xml");
    begin
-      Check_Document (Data.all);
+      Check_Document (Data.all, "INPUT", True);
    end Complex_File;
 
    ---------------------------------------------------------------------------
