@@ -15,7 +15,9 @@ package body SXML.Parser is
    Null_Range : constant Range_Type := (Natural'Last, 0);
 
    function Length (R : Range_Type) return Natural
-   is (R.Last - R.First + 1);
+   is (R.Last - R.First + 1)
+   with
+      Pre => R /= Null_Range or else R.Last >= R.First;
 
    type Set_Type is new String;
    Empty_Set : constant Set_Type := "";
@@ -866,7 +868,7 @@ package body SXML.Parser is
       end if;
 
       Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
-      if Length (Content_Range) > 0
+      if Content_Range /= Null_Range and then Length (Content_Range) > 0
       then
          Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
                       Start  => Start,
