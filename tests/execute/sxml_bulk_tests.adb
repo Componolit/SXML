@@ -17,9 +17,6 @@ with GNAT.OS_Lib;
 
 package body SXML_Bulk_Tests is
 
-   procedure Perror (Message : String);
-   pragma Import (C, Perror);
-
    procedure Test_URL (T : in out Test_Cases.Test_Case'Class)
    is
       URL : constant String := T.Routine_Name.all;

@@ -18,7 +18,7 @@ with Text_IO;
 
 package body SXML_Utils
 is
-   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 100000000);
+   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 150000000);
 
    -------------------
    -- Check_Invalid --
