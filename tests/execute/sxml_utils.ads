@@ -32,4 +32,7 @@ is
 
    procedure Generate_Many_Attributes (Name  : String;
                                        Level : Natural);
+
+   procedure Generate_Large_CDATA (Name  : String;
+                                   Level : Natural);
 end SXML_Utils;

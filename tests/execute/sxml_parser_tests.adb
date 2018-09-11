@@ -314,6 +314,16 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Large_CDATA (T : in out Test_Cases.Test_Case'Class)
+   is
+      File_Name : constant String := "obj/large_cdata.xml";
+   begin
+      Generate_Large_CDATA (File_Name, 1000000);
+      Parse_Document (File_Name);
+   end Large_CDATA;
+
+   ---------------------------------------------------------------------------
+
    procedure Single_Quote_Content (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "<test><test1>='</test1><test2>'</test2></test>";
@@ -531,6 +541,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, MXML_2'Access, "MusicXML sample file #2");
       Register_Routine (T, Handle_CDATA'Access, "Handle CDATA");
       Register_Routine (T, Handle_Multiple_CDATA'Access, "Handle multiple CDATA");
+      Register_Routine (T, Large_CDATA'Access, "Large CDATA");
       Register_Routine (T, Single_Quote_Content'Access, "Single quote content");
       Register_Routine (T, Attribute_Value_With_Gt'Access, "Attribute value with > sign");
       Register_Routine (T, File_With_BOM'Access, "File with Unicode byteorder mark");

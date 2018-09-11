@@ -214,4 +214,24 @@ is
       Close (File);
    end Generate_Many_Attributes;
 
+   --------------------------
+   -- Generate_Large_CDATA --
+   --------------------------
+
+   procedure Generate_Large_CDATA (Name  : String;
+                                   Level : Natural)
+   is
+      use Text_IO;
+      File : File_Type;
+   begin
+      Create (File, Out_File, Name);
+      Put (File, "<document><![CDATA[");
+      for I in 1 .. Level
+      loop
+         Put (File, I'Img);
+      end loop;
+      Put (File, """]]></document>");
+      Close (File);
+   end Generate_Large_CDATA;
+
 end SXML_Utils;
