@@ -132,24 +132,64 @@ is
       Offset := Offset + Name_Elements + Data_Elements;
    end Attribute;
 
+   ------------
+   -- Escape --
+   ------------
+
+   function Escape (Data : String) return String;
+
+   function Escape (Data : String) return String
+   is
+      Length   : Natural := 0;
+      Position : Natural := 1;
+
+      function Char_Escaped (C : Character) return String
+      is (case C is
+             when '"' => "&quot;",
+             when ''' => "&apos;",
+             when '&' => "&amp;",
+             when '>' => "&gt;",
+             when '<' => "&lt;",
+             when others => "" & C);
+
+      function Char_Len (C : Character) return Natural
+      is (Char_Escaped (C)'Length);
+
+   begin
+      for C of Data
+      loop
+         Length := Length + Char_Len (C);
+      end loop;
+
+      return Result : String (1 .. Length) := (others => Character'Val (0))
+      do
+         for C of Data
+         loop
+            Result (Position .. Position + Char_Len (C) - 1) := Char_Escaped (C);
+            Position := Position + Char_Len (C);
+         end loop;
+      end return;
+
+   end Escape;
+
    ----------------
    -- Get_String --
    ----------------
 
-   function Get_String (T : Subtree_Type;
-                        I : Offset_Type;
-                        L : Natural := Get_String_Depth) return String
+   function Get_String (Doc   : Subtree_Type;
+                        Start : Offset_Type;
+                        Level : Natural := Get_String_Depth) return String
    is
-      N : constant Node_Type := T (Add (T'First, I));
+      N : constant Node_Type := Doc (Add (Doc'First, Start));
    begin
-      if L = 0
+      if Level = 0
       then
          return "OVERFLOW";
       end if;
 
       return N.Data (1 .. Natural (N.Length)) &
          (if N.Next /= Invalid_Relative_Index
-          then Get_String (T, Add (I, N.Next), L - 1)
+          then Get_String (Doc, Add (Start, N.Next), Level - 1)
           else "");
    end Get_String;
 
@@ -187,34 +227,34 @@ is
    -- To_String --
    ---------------
 
-   function To_String (T : Subtree_Type;
-                       L : Natural := To_String_Depth) return String
+   function To_String (Doc   : Subtree_Type;
+                       Level : Natural := To_String_Depth) return String
    is
-      N   : constant Node_Type := T (T'First);
-      Tag : constant String    := Get_String (T, 0);
+      N   : constant Node_Type := Doc (Doc'First);
+      Tag : constant String    := Get_String (Doc, 0);
    begin
-      if L = 0
+      if Level = 0
       then
          return "STACK OVERFLOW";
       end if;
 
       if N.Kind = Kind_Content
       then
-         return Get_String (T, 0, L - 1)
+         return Escape (Get_String (Doc, 0, Level - 1))
            & (if N.Siblings = Invalid_Relative_Index
               then ""
-              else To_String (T (Add (T'First, N.Siblings) .. T'Last), L - 1));
+              else To_String (Doc (Add (Doc'First, N.Siblings) .. Doc'Last), Level - 1));
       end if;
 
       return "<"
            & Tag
-           & Attributes (T, Offset_Type (N.Attributes))
+           & Attributes (Doc, Offset_Type (N.Attributes))
            & (if N.Children = Invalid_Relative_Index
               then "/>"
-              else ">" & To_String (T (Add (T'First, N.Children) .. T'Last), L - 1) & "</" & Tag & ">")
+              else ">" & To_String (Doc (Add (Doc'First, N.Children) .. Doc'Last), Level - 1) & "</" & Tag & ">")
            & (if N.Siblings = Invalid_Relative_Index
               then ""
-              else To_String (T (Add (T'First, N.Siblings) .. T'Last), L - 1));
+              else To_String (Doc (Add (Doc'First, N.Siblings) .. Doc'Last), Level - 1));
    end To_String;
 
    overriding

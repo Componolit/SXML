@@ -318,7 +318,7 @@ package body SXML_Parser_Tests is
       Data : String := "<test><test1>='</test1><test2>'</test2></test>";
    begin
       Check_Document
-         (Data, "<test><test1>='</test1><test2>'</test2></test>");
+         (Data, "<test><test1>=&apos;</test1><test2>&apos;</test2></test>");
    end Single_Quote_Content;
 
    ---------------------------------------------------------------------------

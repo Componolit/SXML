@@ -86,16 +86,16 @@ is
    -- To_String --
    ---------------
 
-   function To_String (T : Subtree_Type;
-                       L : Natural := To_String_Depth) return String;
+   function To_String (Doc   : Subtree_Type;
+                       Level : Natural := To_String_Depth) return String;
 
    ----------------
    -- Get_String --
    ----------------
 
-   function Get_String (T : Subtree_Type;
-                        I : Offset_Type;
-                        L : Natural := Get_String_Depth) return String;
+   function Get_String (Doc   : Subtree_Type;
+                        Start : Offset_Type;
+                        Level : Natural := Get_String_Depth) return String;
 
    ------------------
    -- Num_Elements --

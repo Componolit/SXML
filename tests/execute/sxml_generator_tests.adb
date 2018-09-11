@@ -159,6 +159,16 @@ package body SXML_Generator_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Generate_Escape_Content (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("<XML>""Quoted"" & 'Quoted'<XML/>"));
+   begin
+      Expect (To_String (Doc), "<config attrib=""Foo"">&lt;XML&gt;&quot;Quoted&quot; &amp; &apos;Quoted&apos;&lt;XML/&gt;</config>");
+	end Test_Generate_Escape_Content;
+
+   ---------------------------------------------------------------------------
+
    procedure Test_Generate_Interleaved_Content (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
@@ -189,6 +199,7 @@ package body SXML_Generator_Tests is
       Register_Routine (T, Multiple_Attributes'Access, "Multiple attributes");
       Register_Routine (T, Nested'Access, "Nested");
       Register_Routine (T, Test_Generate_Simple_Content'Access, "Simple content");
+      Register_Routine (T, Test_Generate_Escape_Content'Access, "Escaped content");
       Register_Routine (T, Test_Generate_Interleaved_Content'Access, "Interleaved content");
    end Register_Tests;
 
