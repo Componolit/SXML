@@ -656,19 +656,18 @@ package body SXML.Parser is
 
    procedure Parse_Sections (Start_Tag : String;
                              End_Tag   : String;
-                             Result    : out Match_Type)
+                             Result    : out Range_Type)
    with
       Pre => Data_Valid;
 
    procedure Parse_Sections (Start_Tag : String;
                              End_Tag   : String;
-                             Result    : out Match_Type)
+                             Result    : out Range_Type)
    is
       Old_Offset   : Natural;
       Tmp_Result   : Match_Type;
-      Comment_Text : Range_Type;
    begin
-      Result := Match_Invalid;
+      Result := Null_Range;
       loop
          Old_Offset := Offset;
          if Data_Overflow
@@ -686,13 +685,12 @@ package body SXML.Parser is
             return;
          end if;
 
-         Match_Until_String (End_Tag, Comment_Text);
-         if Comment_Text = Null_Range
+         Match_Until_String (End_Tag, Result);
+         if Result = Null_Range
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
-         Result := Match_OK;
       end loop;
    end Parse_Sections;
 
@@ -706,8 +704,10 @@ package body SXML.Parser is
 
    procedure Parse_Comment (Result : out Match_Type)
    is
+      Tmp_Result : Range_Type;
    begin
-      Parse_Sections ("<!--", "-->", Result);
+      Parse_Sections ("<!--", "-->", Tmp_Result);
+      Result := (if Tmp_Result = Null_Range then Match_None else Match_OK);
    end Parse_Comment;
 
    ----------------------------------
@@ -720,8 +720,10 @@ package body SXML.Parser is
 
    procedure Parse_Processing_Information (Result : out Match_Type)
    is
+      Tmp_Result : Range_Type;
    begin
-      Parse_Sections ("<?", "?>", Result);
+      Parse_Sections ("<?", "?>", Tmp_Result);
+      Result := (if Tmp_Result = Null_Range then Match_None else Match_OK);
    end Parse_Processing_Information;
 
    -------------------
@@ -808,14 +810,36 @@ package body SXML.Parser is
    -- Parse_CDATA --
    -----------------
 
-   procedure Parse_CDATA (Result : out Match_Type)
+   procedure Parse_CDATA (Result : out Match_Type;
+                          Start  : out Index_Type)
    with
       Pre => Data_Valid;
 
-   procedure Parse_CDATA (Result : out Match_Type)
+   procedure Parse_CDATA (Result : out Match_Type;
+                          Start  : out Index_Type)
    is
+      Tmp_Result : Range_Type;
+      Tmp_Start  : Index_Type;
+      Valid      : Boolean;
    begin
-      Parse_Sections ("<![CDATA[", "]]>", Result);
+      Result := Match_None;
+      Start  := Invalid_Index;
+
+      Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
+      if Tmp_Result /= Null_Range and then Length (Tmp_Result) > 0
+      then
+         Context_Put (Value  => Content (Data (Tmp_Result.First .. Tmp_Result.Last)),
+                      Start  => Tmp_Start,
+                      Result => Valid);
+         if Valid
+         then
+            Start  := Tmp_Start;
+            Result := Match_OK;
+         else
+            Result := Match_Invalid;
+         end if;
+         return;
+      end if;
    end Parse_CDATA;
 
    -------------------
@@ -849,7 +873,7 @@ package body SXML.Parser is
 
       Match := Match_OK;
 
-      Parse_CDATA (Match_CDATA);
+      Parse_CDATA (Match_CDATA, Start);
       if Match_CDATA = Match_OK
       then
          return;
@@ -873,6 +897,10 @@ package body SXML.Parser is
          Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
                       Start  => Start,
                       Result => Valid);
+         if not Valid
+         then
+            Match := Match_Invalid;
+         end if;
          return;
       end if;
 

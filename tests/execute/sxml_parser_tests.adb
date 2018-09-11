@@ -293,23 +293,24 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure Ignore_CDATA (T : in out Test_Cases.Test_Case'Class)
+   procedure Handle_CDATA (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> More content </parent>";
    begin
-      Check_Document (Data, "<parent>Content  More content </parent>");
-   end Ignore_CDATA;
+      Check_Document (Data, "<parent>Content  The parser shouln&apos;d break if x &lt; 1 &amp; y &gt; 42! ;&lt;/  More content </parent>");
+   end Handle_CDATA;
 
    ---------------------------------------------------------------------------
 
-   procedure Ignore_Multiple_CDATA (T : in out Test_Cases.Test_Case'Class)
+   procedure Handle_Multiple_CDATA (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String :=
          "<parent>Content <![CDATA[ The parser shouln'd break if x < 1 & y > 42! ;</ ]]> " &
          "More content <![CDATA[ Yet another <CDATA>! ]]> even more <![CDATA[content]]> !!! </parent>";
    begin
-      Check_Document (Data, "<parent>Content  More content  even more  !!! </parent>");
-   end Ignore_Multiple_CDATA;
+      Check_Document (Data,"<parent>Content  The parser shouln&apos;d break if x &lt; 1 &amp; y &gt; 42! ;&lt;/  " &
+                           "More content  Yet another &lt;CDATA&gt;!  even more content !!! </parent>");
+   end Handle_Multiple_CDATA;
 
    ---------------------------------------------------------------------------
 
@@ -528,8 +529,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, CCDA_1'Access, "CCDA sample file");
       Register_Routine (T, MXML_1'Access, "MusicXML sample file #1");
       Register_Routine (T, MXML_2'Access, "MusicXML sample file #2");
-      Register_Routine (T, Ignore_CDATA'Access, "Ignore CDATA");
-      Register_Routine (T, Ignore_Multiple_CDATA'Access, "Ignore multiple CDATA");
+      Register_Routine (T, Handle_CDATA'Access, "Handle CDATA");
+      Register_Routine (T, Handle_Multiple_CDATA'Access, "Handle multiple CDATA");
       Register_Routine (T, Single_Quote_Content'Access, "Single quote content");
       Register_Routine (T, Attribute_Value_With_Gt'Access, "Attribute value with > sign");
       Register_Routine (T, File_With_BOM'Access, "File with Unicode byteorder mark");
