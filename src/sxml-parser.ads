@@ -1,6 +1,3 @@
-generic
-   Data    : in out String;
-   Context : in out Subtree_Type;
 package SXML.Parser is
 
    type Match_Type is (Match_OK,
@@ -19,7 +16,7 @@ package SXML.Parser is
    --                              instanciating package
    --  @value Match_Depth_Limit    Recursion depth exceeded
 
-   function Data_Valid return Boolean
+   function Data_Valid (Data : String) return Boolean
    is
       (Data'First >= 0 and
        Data'Last < Natural'Last and
@@ -27,28 +24,18 @@ package SXML.Parser is
    with
       Ghost;
 
-   function Document_Valid return Boolean
-   with
-      Ghost;
-
    -----------
    -- Parse --
    -----------
 
-   procedure Parse (Match    : out Match_Type;
-                    Position : out Natural)
+   procedure Parse (Data         : String;
+                    Context      : in out Subtree_Type;
+                    Parse_Result : out Match_Type;
+                    Position     : out Natural)
    with
-      Pre  => Data_Valid,
-      Post => (if Match = Match_OK then Document_Valid);
+      Pre  => Data_Valid (Data);
    --  Parse an XML file
    --
-   --  @param Match  Result of parsing operation
-
-   --------------
-   -- Document --
-   --------------
-
-   function Document return Subtree_Type;
-   --  Return parsed document
+   --  @param Result Result of parsing operation
 
 end SXML.Parser;

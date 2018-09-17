@@ -26,14 +26,13 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Input   : access String := Read_File (Input_File);
-      package Parser is new SXML.Parser (Input.all, Context);
-      use Parser;
-      Match    : Match_Type;
+      Input : access String := Read_File (Input_File);
+      use SXML.Parser;
+      Match : Match_Type;
    begin
       State := Init (Context);
       Result := Result_Invalid;
-      Parser.Parse (Match, Position);
+      Parser.Parse (Input.all, Context, Match, Position);
       if Match /= Match_OK
       then
          Result := Result_Invalid;

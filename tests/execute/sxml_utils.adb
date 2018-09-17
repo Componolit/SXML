@@ -27,14 +27,15 @@ is
  
    procedure Check_Invalid (Input : in out String)
    is
-      package Parser is new SXML.Parser (Input, Context.all);
       use SXML;
-      use Parser;
+      use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
    begin
-      Parser.Parse (Match    => Result,
-                    Position => Position);
+      Parser.Parse (Data         => Input,
+                    Context      => Context.all,
+                    Parse_Result => Result,
+                    Position     => Position);
       pragma Unreferenced (Position);
       Assert (Result /= Match_OK, "Error expected");
    end Check_Invalid;
@@ -73,17 +74,18 @@ is
                              Stack_Size : Natural := 10000)
    is
       Input : access String := Read_File (File);
-      package Parser is new SXML.Parser (Input.all, Context.all);
       use SXML;
-      use Parser;
+      use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
       Data : access String := new String (1 .. 2 * Input'Length);
       Last : Natural := 1;
       Stack : access Stack_Type;
    begin
-      Parser.Parse (Match    => Result,
-                    Position => Position);
+      Parser.Parse (Data         => Input.all,
+                    Context      => Context.all,
+                    Parse_Result => Result,
+                    Position     => Position);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
 
@@ -100,17 +102,18 @@ is
                              Output               : String := "INPUT";
                              Ignore_Final_Newline : Boolean := False)
    is
-      package Parser is new SXML.Parser (Input, Context.all);
       use SXML;
-      use Parser;
+      use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
       XML      : access String := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
    begin
       Context.all (1) := Null_Node;
-      Parser.Parse (Match    => Result,
-                    Position => Position);
+      Parser.Parse (Data         => Input,
+                    Context      => Context.all,
+                    Parse_Result => Result,
+                    Position     => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
 
       To_String (Context.all, XML.all, Last);

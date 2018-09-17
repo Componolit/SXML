@@ -455,13 +455,14 @@ package body SXML_Parser_Tests is
       Generate_Deep_Nodes (File_Name, 1000000);
       declare
          Input : access String := Read_File (File_Name);
-         package P is new Parser (Input.all, Context.all);
-         use P;
-         Result   : Match_Type;
          Position : Natural;
+         use SXML.Parser;
+         Result   : Match_Type;
       begin
-         P.Parse (Match    => Result,
-                  Position => Position);
+         Parse (Data         => Input.all,
+                Context      => Context.all,
+                Parse_Result => Result,
+                Position     => Position);
          Free_Subtree (Context);
          Assert (Result /= Match_OK,
                  File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
