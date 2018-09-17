@@ -18,7 +18,7 @@ is
       then
          return "- [0]";
       end if;
-      return A'Img (A'Img'First + 1 .. A'Img'Last) & " [" & Off'Img (Off'Img'First + 1 .. Off'Img'Last) & "]";
+      return A'Img (A'Img'First + 1 .. A'Img'Last) & " [" & Off'Img & "]";
    end Offset;
 
    ----------
@@ -32,6 +32,11 @@ is
                   N : Node_Type) return String
    is
    begin
+      if N.Kind = Kind_Invalid
+      then
+         return "[Invalid]";
+      end if;
+
       return N.Kind'Img
         & " (Length:" & N.Length'Img
         & ", Next: " & Offset (I, N.Next)
