@@ -50,12 +50,6 @@ is
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
                          Name    : String)
-   with
-      Pre => Subtree'Length >= Num_Elements (Name);
-
-   procedure Put_String (Subtree : in out Subtree_Type;
-                         Offset  : Offset_Type;
-                         Name    : String)
    is
       Position : Natural := 0;
       Len      : Natural;
@@ -97,19 +91,20 @@ is
       return Result;
    end Open;
 
-   -------------
-   -- Content --
-   -------------
+   -----------------
+   -- Put_Content --
+   -----------------
 
-   function Content (Value : String) return Subtree_Type
+   procedure Put_Content (Subtree : in out Subtree_Type;
+                          Offset  : Offset_Type;
+                          Value   : String)
    is
-      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value))) :=
-        (1      => Null_Content_Element,
-         others => Null_Data_Element);
+      Start : constant Index_Type := Add (Subtree'First, Offset);
    begin
-      Put_String (Result, 0, Value);
-      return Result;
-   end Content;
+      Subtree (Start) := Null_Content_Element;
+      Subtree (Start + 1 .. Add (Start, Num_Elements (Value) - 1)) := (others => Null_Data_Element);
+      Put_String (Subtree, Offset, Value);
+   end Put_Content;
 
    ---------------
    -- Attribute --

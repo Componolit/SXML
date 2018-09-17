@@ -235,6 +235,34 @@ package body SXML.Parser is
       Result := True;
    end Context_Put;
 
+   ------------------------
+   -- Context_Put_String --
+   ------------------------
+
+   procedure Context_Put_String (Value  : String;
+                                 Start  : out Index_Type;
+                                 Result : out Boolean);
+
+   procedure Context_Put_String (Value  : String;
+                                 Start  : out Index_Type;
+                                 Result : out Boolean)
+   is
+      NE : constant Offset_Type := Num_Elements (Value);
+   begin
+      Result := False;
+      Start  := Invalid_Index;
+
+      if Context_Index > Sub (Context'Last, NE)
+      then
+         return;
+      end if;
+
+      Start := Context_Index;
+      Put_Content (Context, Sub (Context_Index, Context'First), Value);
+      Context_Index := Add (Context_Index, NE);
+      Result := True;
+   end Context_Put_String;
+
    ----------------------
    -- Match_Until_Text --
    ----------------------
@@ -828,9 +856,9 @@ package body SXML.Parser is
       Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
       if Tmp_Result /= Null_Range and then Length (Tmp_Result) > 0
       then
-         Context_Put (Value  => Content (Data (Tmp_Result.First .. Tmp_Result.Last)),
-                      Start  => Tmp_Start,
-                      Result => Valid);
+         Context_Put_String (Value  => Data (Tmp_Result.First .. Tmp_Result.Last),
+                             Start  => Tmp_Start,
+                             Result => Valid);
          if Valid
          then
             Start  := Tmp_Start;
@@ -894,9 +922,9 @@ package body SXML.Parser is
       Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
       if Content_Range /= Null_Range and then Length (Content_Range) > 0
       then
-         Context_Put (Value  => Content (Data (Content_Range.First .. Content_Range.Last)),
-                      Start  => Start,
-                      Result => Valid);
+         Context_Put_String (Value  => Data (Content_Range.First .. Content_Range.Last),
+                             Start  => Start,
+                             Result => Valid);
          if not Valid
          then
             Match := Match_Invalid;

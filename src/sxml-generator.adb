@@ -109,8 +109,10 @@ package body SXML.Generator is
 
    function C (Value : String) return Subtree_Type
    is
+      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value) - 1));
    begin
-      return Content (Value);
+      Put_Content (Result, 0, Value);
+      return Result;
    end C;
 
    ---------

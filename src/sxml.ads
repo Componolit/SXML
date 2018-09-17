@@ -2,8 +2,6 @@ package SXML
 with
    SPARK_Mode
 is
-   To_String_Depth  : constant := 100;
-   Attributes_Depth : constant := 100;
    Get_String_Depth : constant := 100;
 
    type Index_Type is range 1 .. Natural'Last;
@@ -39,6 +37,12 @@ is
    with
       Pre => Left >= Right;
 
+   function Sub (Left  : Index_Type;
+                 Right : Offset_Type) return Index_Type
+   is (Left - Index_Type (Right))
+   with
+      Pre => Left >= Index_Type (Right);
+
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
@@ -65,11 +69,13 @@ is
 
    function Open (Name : String) return Subtree_Type;
 
-   -------------
-   -- Content --
-   -------------
+   -----------------
+   -- Put_Content --
+   -----------------
 
-   function Content (Value : String) return Subtree_Type;
+   procedure Put_Content (Subtree : in out Subtree_Type;
+                          Offset  : Offset_Type;
+                          Value   : String);
 
    ---------------
    -- Attribute --
@@ -103,6 +109,16 @@ is
    ------------------
 
    function Num_Elements (D : String) return Offset_Type;
+
+   ----------------
+   -- Put_String --
+   ----------------
+
+   procedure Put_String (Subtree : in out Subtree_Type;
+                         Offset  : Offset_Type;
+                         Name    : String)
+   with
+      Pre => Subtree'Length >= Num_Elements (Name);
 
 private
 
