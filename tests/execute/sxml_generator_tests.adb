@@ -11,6 +11,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML.Generator; use SXML.Generator;
+with SXML.Serialize; use SXML.Serialize;
 
 package body SXML_Generator_Tests is
 
@@ -21,7 +22,7 @@ package body SXML_Generator_Tests is
       Offset : Natural := 0;
       Last   : Natural;
    begin
-      SXML.To_String (Doc, XML.all, Offset);
+      To_String (Doc, XML.all, Offset);
       Last := XML.all'First + Offset - 1;
       Assert (Last > 0, "Error serializing");
       Assert (XML.all (1 .. Last) = Expected,

@@ -13,6 +13,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with Ada.Directories;
 with Ada.Text_IO.Text_Streams;
 with SXML.Generator; use SXML.Generator;
+with SXML.Serialize; use SXML.Serialize;
 with SXML.Parser;
 with Text_IO;
 

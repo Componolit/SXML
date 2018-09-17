@@ -88,14 +88,6 @@ is
    with
        Pre => Output'Length >= Offset + Num_Elements (Name) + Num_Elements (Data);
 
-   ---------------
-   -- To_String --
-   ---------------
-
-   procedure To_String (Doc  : Subtree_Type;
-                        Data : out String;
-                        Last : out Natural);
-
    ----------------
    -- Get_String --
    ----------------
