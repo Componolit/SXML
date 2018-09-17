@@ -1,3 +1,6 @@
+--  with SXML.Debug;
+with SXML.Stack;
+
 package body SXML
    with SPARK_Mode
 is
@@ -132,45 +135,81 @@ is
       Offset := Offset + Name_Elements + Data_Elements;
    end Attribute;
 
-   ------------
-   -- Escape --
-   ------------
+   ---------
+   -- Put --
+   ---------
 
-   function Escape (Data : String) return String;
+   procedure Put (Value    : String;
+                  Data     : in out String;
+                  Position : in out Integer);
 
-   function Escape (Data : String) return String
+   procedure Put (Value    : String;
+                  Data     : in out String;
+                  Position : in out Integer)
    is
-      Length   : Natural := 0;
-      Position : Natural := 1;
-
-      function Char_Escaped (C : Character) return String
-      is (case C is
-             when '"' => "&quot;",
-             when ''' => "&apos;",
-             when '&' => "&amp;",
-             when '>' => "&gt;",
-             when '<' => "&lt;",
-             when others => "" & C);
-
-      function Char_Len (C : Character) return Natural
-      is (Char_Escaped (C)'Length);
-
    begin
-      for C of Data
+      if Position < 0 or else
+         Data'Last - Position < Value'Length
+      then
+         Position := -1;
+         return;
+      end if;
+
+      Data (Data'First + Position .. Data'First + Position + Value'Length - 1) := Value;
+      Position := Position + Value'Length;
+   end Put;
+
+   -----------------
+   -- Put_Escaped --
+   -----------------
+
+   procedure Put_Escaped (Doc      : Subtree_Type;
+                          Start    : Index_Type;
+                          Data     : in out String;
+                          Position : in out Integer);
+
+   procedure Put_Escaped (Doc      : Subtree_Type;
+                          Start    : Index_Type;
+                          Data     : in out String;
+                          Position : in out Integer)
+   is
+      procedure Put_Escaped_Char (Char : Character;
+                                  D    : in out String;
+                                  P    : in out Natural);
+
+      procedure Put_Escaped_Char (Char : Character;
+                                  D    : in out String;
+                                  P    : in out Natural)
+      is
+      begin
+         case Char is
+            when '"' => Put ("&quot;", D, P);
+            when ''' => Put ("&apos;", D, P);
+            when '&' => Put ("&amp;", D, P);
+            when '>' => Put ("&gt;", D, P);
+            when '<' => Put ("&lt;", D, P);
+            when others => Put ("" & Char, D, P);
+         end case;
+      end Put_Escaped_Char;
+
+      N   : Node_Type;
+      Pos : Index_Type := Start;
+   begin
+
       loop
-         Length := Length + Char_Len (C);
-      end loop;
-
-      return Result : String (1 .. Length) := (others => Character'Val (0))
-      do
-         for C of Data
+         N := Doc (Pos);
+         for C of N.Data (1 .. Natural (N.Length))
          loop
-            Result (Position .. Position + Char_Len (C) - 1) := Char_Escaped (C);
-            Position := Position + Char_Len (C);
+            Put_Escaped_Char (C, Data, Position);
+            if Position < 0
+            then
+               return;
+            end if;
          end loop;
-      end return;
-
-   end Escape;
+         exit when N.Next = Invalid_Relative_Index;
+         Pos := Add (Pos, N.Next);
+      end loop;
+   end Put_Escaped;
 
    ----------------
    -- Get_String --
@@ -193,88 +232,168 @@ is
           else "");
    end Get_String;
 
-   ----------------
-   -- Attributes --
-   ----------------
+   ---------------
+   -- Serialize --
+   ---------------
 
-   function Attributes (T : Subtree_Type;
-                        I : Offset_Type;
-                        L : Natural := Attributes_Depth) return String;
+   procedure Serialize (Doc      : Subtree_Type;
+                        Start    : Index_Type;
+                        Data     : in out String;
+                        Position : in out Integer);
 
-   function Attributes (T : Subtree_Type;
-                        I : Offset_Type;
-                        L : Natural := Attributes_Depth) return String
+   procedure Serialize (Doc      : Subtree_Type;
+                        Start    : Index_Type;
+                        Data     : in out String;
+                        Position : in out Integer)
    is
-      N : constant Node_Type := T (Add (T'First, I));
+      N   : Node_Type;
+      Pos : Index_Type := Start;
    begin
-      if I = Null_Offset or L = 0
+
+      loop
+         N := Doc (Pos);
+         Put (N.Data (1 .. Natural (N.Length)), Data, Position);
+         if Position < 0
+         then
+            return;
+         end if;
+         exit when N.Next = Invalid_Relative_Index;
+         Pos := Add (Pos, N.Next);
+      end loop;
+   end Serialize;
+
+   type Mode_Type is (Mode_Open, Mode_Close);
+
+   type Traversal_Type is
+   record
+      Index : Index_Type;
+      Mode  : Mode_Type;
+   end record;
+
+   ------------
+   -- Handle --
+   ------------
+
+   procedure Handle (Doc      : Subtree_Type;
+                     Current  : Index_Type;
+                     Mode     : Mode_Type;
+                     Data     : in out String;
+                     Position : in out Natural);
+
+   procedure Handle (Doc      : Subtree_Type;
+                     Current  : Index_Type;
+                     Mode     : Mode_Type;
+                     Data     : in out String;
+                     Position : in out Natural)
+   is
+      Attr  : Index_Type;
+      Value : Index_Type;
+      Pos   : Relative_Index_Type;
+      N     : constant Node_Type := Doc (Current);
+   begin
+
+      if N.Kind = Kind_Content and
+         Mode = Mode_Open
       then
-         return "";
+         Put_Escaped (Doc, Current, Data, Position);
+         return;
       end if;
 
-      pragma Assert (N.Kind = Kind_Attribute);
-      return " "
-           & Get_String (T, I)
-           & "="""
-           & Get_String (T, Add (I, N.Value))
-           & """"
-           & (if N.Next_Attribute /= Invalid_Relative_Index
-              then Attributes (T, Add (I, N.Next_Attribute), L - 1)
-              else "");
-   end Attributes;
+      if Mode = Mode_Close and N.Children /= Invalid_Relative_Index
+      then
+         Put ("</", Data, Position);
+         Serialize (Doc, Current, Data, Position);
+         Put (">", Data, Position);
+      end if;
+
+      if Mode = Mode_Open
+      then
+         Put ("<", Data, Position);
+         Serialize (Doc, Current, Data, Position);
+         Pos  := N.Attributes;
+         Attr := Current;
+         while Pos /= Invalid_Relative_Index
+         loop
+            Attr  := Add (Attr, Pos);
+            Value := Add (Attr, Doc (Attr).Value);
+            Put (" ", Data, Position);
+            Serialize (Doc, Attr, Data, Position);
+            Put ("=""", Data, Position);
+            Serialize (Doc, Value, Data, Position);
+            Put ("""", Data, Position);
+            Pos := Doc (Attr).Next_Attribute;
+         end loop;
+         if N.Children = Invalid_Relative_Index
+         then
+            Put ("/", Data, Position);
+         end if;
+         Put (">", Data, Position);
+      end if;
+   end Handle;
+
+   package S   is new SXML.Stack (Traversal_Type, 10000000);
+   package Rev is new SXML.Stack (Index_Type, 20000000);
 
    ---------------
    -- To_String --
    ---------------
 
-   function To_String (Doc   : Subtree_Type;
-                       Level : Natural := To_String_Depth) return String;
-
-   function To_String (Doc   : Subtree_Type;
-                       Level : Natural := To_String_Depth) return String
+   procedure To_String (Doc  : Subtree_Type;
+                        Data : out String;
+                        Last : out Natural)
    is
-      N   : constant Node_Type := Doc (Doc'First);
-      Tag : constant String    := Get_String (Doc, 0);
+      Child    : Relative_Index_Type;
+      Element  : Index_Type;
+      Current  : Traversal_Type;
+      Position : Integer := 0;
    begin
-      if Level = 0
-      then
-         return "STACK OVERFLOW";
-      end if;
+      Last := 0;
+      S.Reset;
+      Rev.Reset;
+      S.Push ((Doc'First, Mode_Open));
 
-      if N.Kind = Kind_Content
-      then
-         return Escape (Get_String (Doc, 0, Level - 1))
-           & (if N.Siblings = Invalid_Relative_Index
-              then ""
-              else To_String (Doc (Add (Doc'First, N.Siblings) .. Doc'Last), Level - 1));
-      end if;
+      while not S.Is_Empty
+      loop
+         S.Pop (Current);
+         Handle (Doc, Current.Index, Current.Mode, Data, Position);
+         if Position < 0
+         then
+            return;
+         end if;
 
-      return "<"
-           & Tag
-           & Attributes (Doc, Offset_Type (N.Attributes))
-           & (if N.Children = Invalid_Relative_Index
-              then "/>"
-              else ">" & To_String (Doc (Add (Doc'First, N.Children) .. Doc'Last), Level - 1) & "</" & Tag & ">")
-           & (if N.Siblings = Invalid_Relative_Index
-              then ""
-              else To_String (Doc (Add (Doc'First, N.Siblings) .. Doc'Last), Level - 1));
-   end To_String;
+         if Current.Mode = Mode_Open
+         then
+            if S.Is_Full
+            then
+               return;
+            end if;
+            S.Push ((Current.Index, Mode_Close));
+            Element := Current.Index;
+            Child   := Doc (Element).Children;
+            loop
+               exit when Child = Invalid_Relative_Index;
+               Element := Add (Element, Child);
+               if Rev.Is_Full
+               then
+                  return;
+               end if;
+               Rev.Push (Element);
+               Child := Doc (Element).Siblings;
+            end loop;
+            while not Rev.Is_Empty
+            loop
+               Rev.Pop (Element);
+               if S.Is_Full
+               then
+                  return;
+               end if;
+               S.Push ((Element, Mode_Open));
+            end loop;
+         end if;
 
-   procedure To_String (Doc      : Subtree_Type;
-                        Data     : in out String;
-                        Position : in out Natural)
-   is
-      D : constant String := To_String (Doc);
-   begin
-      if D'Length > Data'Length
-      then
-         Position := 0;
-         return;
-      end if;
+      end loop;
 
-      Data (Data'First + Position .. Data'First + Position + D'Length - 1) := D;
-      Position := Position + D'Length;
-
+      Last := Position;
    end To_String;
 
    overriding

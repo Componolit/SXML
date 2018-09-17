@@ -136,8 +136,11 @@ is
             )
          )
        );
+      Data   : String (1 .. 5000);
+      Offset : Natural := 0;
    begin
-      Put_Line (To_String (Doc));
+      To_String (Doc, Data, Offset);
+      Put_Line (Data (1 .. Offset));
    end Execute;
 
    A : constant Args_Type := (+"foo", +"bar", +"baz");

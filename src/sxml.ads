@@ -86,9 +86,9 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc      : Subtree_Type;
-                        Data     : in out String;
-                        Position : in out Natural);
+   procedure To_String (Doc  : Subtree_Type;
+                        Data : out String;
+                        Last : out Natural);
 
    ----------------
    -- Get_String --

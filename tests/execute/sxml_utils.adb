@@ -101,23 +101,24 @@ is
       use Parser;
       Result   : Match_Type;
       Position : Natural;
-      XML    : access String := new String (1 .. 2 * Input'Length);
-      Offset : Natural := 0;
+      XML      : access String := new String (1 .. 2 * Input'Length);
+      Last     : Integer := 0;
    begin
       Context.all (1) := Null_Node;
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
 
-      To_String (Context.all, XML.all, Offset);
-      Assert (Offset > 0, "Error searilizing");
-      Assert (XML.all (1 .. Offset) = (if Output = "INPUT" then
-                                          (if Ignore_Final_Newline then
-                                              Input (Input'First .. Input'Last - 1)
-                                           else Input)
-                                       else Output),
+      To_String (Context.all, XML.all, Last);
+      Assert (Last >= 0, "Error serializing");
+      Assert (XML.all (1 .. Last) = (if Output = "INPUT" then
+                                        (if Ignore_Final_Newline then
+                                            Input (Input'First .. Input'Last - 1)
+                                         else Input)
+                                     else Output),
          "Invalid result at" & Position'Img &
-         ": (" & XML.all (1 .. Offset) & "), expected: (" & (if Output = "INPUT" then Input else Output) & ")");
+         ": (" & XML.all (1 .. Last) & "), expected: (" & (if Output = "INPUT" then Input else Output) &
+         "), Last=" & Last'Img);
    end Check_Document;
 
    -------------------------
