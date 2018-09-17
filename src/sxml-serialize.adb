@@ -2,14 +2,6 @@ with SXML.Stack;
 
 package body SXML.Serialize is
 
-   type Mode_Type is (Mode_Open, Mode_Close);
-
-   type Traversal_Type is
-   record
-      Index : Index_Type;
-      Mode  : Mode_Type;
-   end record;
-
    ---------
    -- Put --
    ---------
@@ -86,19 +78,19 @@ package body SXML.Serialize is
       end loop;
    end Put_Escaped;
 
-   ---------------
-   -- Serialize --
-   ---------------
+   --------------------
+   -- Serialize_Data --
+   --------------------
 
-   procedure Serialize (Doc      : Subtree_Type;
-                        Start    : Index_Type;
-                        Data     : in out String;
-                        Position : in out Integer);
+   procedure Serialize_Data (Doc      : Subtree_Type;
+                             Start    : Index_Type;
+                             Data     : in out String;
+                             Position : in out Integer);
 
-   procedure Serialize (Doc      : Subtree_Type;
-                        Start    : Index_Type;
-                        Data     : in out String;
-                        Position : in out Integer)
+   procedure Serialize_Data (Doc      : Subtree_Type;
+                             Start    : Index_Type;
+                             Data     : in out String;
+                             Position : in out Integer)
    is
       N   : Node_Type;
       Pos : Index_Type := Start;
@@ -114,10 +106,7 @@ package body SXML.Serialize is
          exit when N.Next = Invalid_Relative_Index;
          Pos := Add (Pos, N.Next);
       end loop;
-   end Serialize;
-
-   package S   is new SXML.Stack (Traversal_Type, 10000000);
-   package Rev is new SXML.Stack (Index_Type, 20000000);
+   end Serialize_Data;
 
    ------------
    -- Handle --
@@ -151,14 +140,14 @@ package body SXML.Serialize is
       if Mode = Mode_Close and N.Children /= Invalid_Relative_Index
       then
          Put ("</", Data, Position);
-         Serialize (Doc, Current, Data, Position);
+         Serialize_Data (Doc, Current, Data, Position);
          Put (">", Data, Position);
       end if;
 
       if Mode = Mode_Open
       then
          Put ("<", Data, Position);
-         Serialize (Doc, Current, Data, Position);
+         Serialize_Data (Doc, Current, Data, Position);
          Pos  := N.Attributes;
          Attr := Current;
          while Pos /= Invalid_Relative_Index
@@ -166,9 +155,9 @@ package body SXML.Serialize is
             Attr  := Add (Attr, Pos);
             Value := Add (Attr, Doc (Attr).Value);
             Put (" ", Data, Position);
-            Serialize (Doc, Attr, Data, Position);
+            Serialize_Data (Doc, Attr, Data, Position);
             Put ("=""", Data, Position);
-            Serialize (Doc, Value, Data, Position);
+            Serialize_Data (Doc, Value, Data, Position);
             Put ("""", Data, Position);
             Pos := Doc (Attr).Next_Attribute;
          end loop;
@@ -180,18 +169,28 @@ package body SXML.Serialize is
       end if;
    end Handle;
 
----------------
+   ---------------
    -- To_String --
    ---------------
 
-   procedure To_String (Doc  : Subtree_Type;
-                        Data : out String;
-                        Last : out Natural)
+   procedure To_String (Doc    : Subtree_Type;
+                        Data   : out String;
+                        Last   : out Natural;
+                        Buffer : out Stack_Type)
    is
       Child    : Relative_Index_Type;
       Element  : Index_Type;
+      Tmp      : Traversal_Type;
       Current  : Traversal_Type;
       Position : Integer := 0;
+
+      package S   is new SXML.Stack (Traversal_Type,
+                                     Stack_Type,
+                                     Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1));
+
+      package Rev is new SXML.Stack (Traversal_Type,
+                                     Stack_Type,
+                                     Buffer (Buffer'First + Buffer'Length / 2 .. Buffer'Last));
    begin
       Last := 0;
       S.Reset;
@@ -223,23 +222,36 @@ package body SXML.Serialize is
                then
                   return;
                end if;
-               Rev.Push (Element);
+               Rev.Push ((Element, Mode_Open));
                Child := Doc (Element).Siblings;
             end loop;
             while not Rev.Is_Empty
             loop
-               Rev.Pop (Element);
+               Rev.Pop (Tmp);
                if S.Is_Full
                then
                   return;
                end if;
-               S.Push ((Element, Mode_Open));
+               S.Push ((Tmp.Index, Mode_Open));
             end loop;
          end if;
 
       end loop;
 
       Last := Position;
+   end To_String;
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   procedure To_String (Doc    : Subtree_Type;
+                        Data   : out String;
+                        Last   : out Natural)
+   is
+      Stack_Buffer : Stack_Type (1 .. 1000);
+   begin
+      To_String (Doc, Data, Last, Stack_Buffer);
    end To_String;
 
 end SXML.Serialize;

@@ -1,6 +1,7 @@
 generic
    type Element_Type is private;
-   Length : Natural;
+   type Stack_Type is array (Natural range <>) of Element_Type;
+   S : in out Stack_Type;
 package SXML.Stack is
 
    function Is_Empty return Boolean;
@@ -24,10 +25,6 @@ package SXML.Stack is
 
 private
 
-   type Stack_Index_Type is new Natural range 0 .. Length;
-   type Stack_Type is array (Stack_Index_Type range 1 .. Stack_Index_Type'Last) of Element_Type;
-
-   Index : Stack_Index_Type := Stack_Index_Type'First;
-   S     : Stack_Type;
+   Index : Natural := S'First;
 
 end SXML.Stack;

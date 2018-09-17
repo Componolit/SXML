@@ -15,7 +15,8 @@ is
 
    function Read_File (File_Name : String) return access String;
 
-   procedure Parse_Document (File : String);
+   procedure Parse_Document (File       : String;
+                             Stack_Size : Natural := 10000);
 
    procedure Check_Document (Input                : in out String;
                              Output               : String := "INPUT";

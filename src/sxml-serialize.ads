@@ -1,11 +1,33 @@
 package SXML.Serialize is
 
+   type Traversal_Type is private;
+   type Stack_Type is array (Natural range <>) of Traversal_Type;
+
    ---------------
    -- To_String --
    ---------------
 
-   procedure To_String (Doc  : Subtree_Type;
-                        Data : out String;
-                        Last : out Natural);
+   procedure To_String (Doc    : Subtree_Type;
+                        Data   : out String;
+                        Last   : out Natural);
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   procedure To_String (Doc    : Subtree_Type;
+                        Data   : out String;
+                        Last   : out Natural;
+                        Buffer : out Stack_Type);
+
+private
+
+   type Mode_Type is (Mode_Open, Mode_Close);
+
+   type Traversal_Type is
+   record
+      Index : Index_Type;
+      Mode  : Mode_Type;
+   end record;
 
 end SXML.Serialize;

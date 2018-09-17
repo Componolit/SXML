@@ -21,7 +21,7 @@ package body SXML_Bulk_Tests is
    is
       URL : constant String := T.Routine_Name.all;
    begin
-      Parse_Document ("obj/document/" & URL (9..URL'Last));
+      Parse_Document ("obj/document/" & URL (9..URL'Last), 10000000);
 	end Test_URL;
 
    ---------------------------------------------------------------------------

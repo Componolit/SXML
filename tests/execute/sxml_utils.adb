@@ -69,7 +69,8 @@ is
    -- Parse_Document --
    --------------------
 
-   procedure Parse_Document (File : String)
+   procedure Parse_Document (File       : String;
+                             Stack_Size : Natural := 10000)
    is
       Input : access String := Read_File (File);
       package Parser is new SXML.Parser (Input.all, Context.all);
@@ -79,13 +80,15 @@ is
       Position : Natural;
       Data : access String := new String (1 .. 2 * Input'Length);
       Last : Natural := 1;
+      Stack : access Stack_Type;
    begin
       Parser.Parse (Match    => Result,
                     Position => Position);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
 
-      To_String (Context.all, Data.all, Last);
+      Stack := new Stack_Type (1 .. Stack_Size);
+      To_String (Context.all, Data.all, Last, Stack.All);
       Assert (Last > 0, File & ": Serialization error");
    end Parse_Document;
 

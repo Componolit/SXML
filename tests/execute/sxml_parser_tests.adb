@@ -438,7 +438,7 @@ package body SXML_Parser_Tests is
    procedure Large_File (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Parse_Document ("tests/data/orders.xml");
+      Parse_Document ("tests/data/orders.xml", 100000);
    end Large_File;
 
    ---------------------------------------------------------------------------
@@ -475,7 +475,7 @@ package body SXML_Parser_Tests is
       File_Name : constant String := "obj/many_nodes.xml";
    begin
       Generate_Many_Nodes (File_Name, 1000000);
-      Parse_Document (File_Name);
+      Parse_Document (File_Name, 3000000);
    end Many_Nodes;
 
    ---------------------------------------------------------------------------

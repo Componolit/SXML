@@ -1,7 +1,7 @@
 package body SXML.Stack is
 
    function Is_Empty return Boolean
-   is (Index = Stack_Index_Type'First);
+   is (Index = S'First);
 
    function Is_Full return Boolean
    is (Index >= S'Last);
@@ -23,7 +23,7 @@ package body SXML.Stack is
    procedure Reset
    is
    begin
-      Index := Stack_Index_Type'First;
+      Index := S'First;
    end Reset;
 
 end SXML.Stack;
