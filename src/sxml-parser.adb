@@ -942,6 +942,31 @@ package body SXML.Parser is
 
       end Parse_Content;
 
+      ----------------
+      -- Link_Child --
+      ----------------
+
+      procedure Link_Child (Child    : Index_Type;
+                            Parent   : Index_Type;
+                            Previous : in out Index_Type);
+
+      procedure Link_Child (Child    : Index_Type;
+                            Parent   : Index_Type;
+                            Previous : in out Index_Type)
+      is
+      begin
+         if Child /= Invalid_Index
+         then
+            if Previous = Invalid_Index
+            then
+               Context (Parent).Children := Sub (Child, Parent);
+            else
+               Context (Previous).Siblings := Sub (Child, Previous);
+            end if;
+            Previous := Child;
+         end if;
+      end Link_Child;
+
       --------------------
       -- Parse_Internal --
       --------------------
@@ -1012,17 +1037,7 @@ package body SXML.Parser is
          loop
             Parse_Internal (Sub_Match, Child_Start, Level - 1);
             exit when Sub_Match /= Match_OK;
-
-            if Sub_Match = Match_OK and Child_Start /= Invalid_Index
-            then
-               if Previous_Child = Invalid_Index
-               then
-                  Context (Parent).Children := Sub (Child_Start, Parent);
-               else
-                  Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
-               end if;
-               Previous_Child := Child_Start;
-            end if;
+            Link_Child (Child_Start, Parent, Previous_Child);
          end loop;
 
          Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
