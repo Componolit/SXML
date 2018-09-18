@@ -19,6 +19,10 @@ package SXML.Stack is
    with
       Pre => not Is_Empty;
 
+   procedure Drop
+   with
+      Pre => not Is_Empty;
+
    procedure Reset
    with
       Post => not Is_Full and Is_Empty;

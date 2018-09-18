@@ -20,6 +20,12 @@ package body SXML.Stack is
       Index := Index - 1;
    end Pop;
 
+   procedure Drop
+   is
+   begin
+      Index := Index - 1;
+   end Drop;
+
    procedure Reset
    is
    begin
