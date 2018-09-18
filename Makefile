@@ -27,6 +27,9 @@ testinsane: SXML.gpr insanedata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@obj/tests
 
+check:
+	@gnatcheck -P SXML
+
 fuzz: GPRBUILD_OPTS += --compiler-subst=Ada,afl-gcc
 fuzz: export AFL_SKIP_CPUFREQ=1
 fuzz: MODE=debug

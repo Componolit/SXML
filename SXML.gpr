@@ -34,4 +34,8 @@ is
       end case;
    end Compiler;
 
+   package Check is
+      for Default_Switches ("Ada") use ("-rules", "-from=rules.gck");
+   end Check;
+
 end SXML;
