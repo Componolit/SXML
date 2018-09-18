@@ -883,21 +883,18 @@ package body SXML.Parser is
       -------------------
 
       procedure Parse_Content (Match : out Match_Type;
-                               Start : out Index_Type;
-                               Level : Natural)
+                               Start : out Index_Type)
         with
           Pre => Data_Valid (Data);
 
       procedure Parse_Content (Match : out Match_Type;
-                               Start : out Index_Type;
-                               Level : Natural)
+                               Start : out Index_Type)
       is
          Content_Range : Range_Type;
          Match_Content : Match_Type;
          Match_CDATA   : Match_Type;
          Match_Comment : Match_Type;
          Match_PI      : Match_Type;
-         Match_Child   : Match_Type;
          Valid         : Boolean;
       begin
          Start := Invalid_Index;
@@ -937,12 +934,6 @@ package body SXML.Parser is
             then
                Match := Match_Invalid;
             end if;
-            return;
-         end if;
-
-         Parse_Internal (Match_Child, Start, Level - 1);
-         if Match_Child = Match_OK
-         then
             return;
          end if;
 
@@ -1010,7 +1001,12 @@ package body SXML.Parser is
          end if;
 
          loop
-            Parse_Content (Sub_Match, Child_Start, Level - 1);
+            Parse_Content (Sub_Match, Child_Start);
+            if Sub_Match /= Match_OK
+            then
+               Parse_Internal (Sub_Match, Child_Start, Level - 1);
+            end if;
+
             exit when Sub_Match /= Match_OK;
 
             if Sub_Match = Match_OK and Child_Start /= Invalid_Index
