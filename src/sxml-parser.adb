@@ -1,3 +1,5 @@
+with SXML.Stack;
+
 package body SXML.Parser is
 
    -----------
@@ -9,10 +11,7 @@ package body SXML.Parser is
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    is
-      Unused : Index_Type;
-
-      Parse_Internal_Depth : constant := 100;
-
+      Unused        : Index_Type;
       Context_Index : Index_Type := Context'First;
       Offset        : Natural    := 0;
       Error_Index   : Natural    := 0;
@@ -836,11 +835,11 @@ package body SXML.Parser is
       --------------------
 
       procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
+                                Start  : out Index_Type)
         with
           Pre  => Data_Valid (Data),
-          Post => (if Match /= Match_OK then Offset = Offset'Old);
+          Post => (if Match /= Match_OK then Offset = Offset'Old),
+          Annotate => (gnatcheck, Exempt_On, "Recursive_Subprograms", "foo");
 
       -----------------
       -- Parse_CDATA --
@@ -883,21 +882,18 @@ package body SXML.Parser is
       -------------------
 
       procedure Parse_Content (Match : out Match_Type;
-                               Start : out Index_Type;
-                               Level : Natural)
+                               Start : out Index_Type)
         with
           Pre => Data_Valid (Data);
 
       procedure Parse_Content (Match : out Match_Type;
-                               Start : out Index_Type;
-                               Level : Natural)
+                               Start : out Index_Type)
       is
          Content_Range : Range_Type;
          Match_Content : Match_Type;
          Match_CDATA   : Match_Type;
          Match_Comment : Match_Type;
          Match_PI      : Match_Type;
-         Match_Child   : Match_Type;
          Valid         : Boolean;
       begin
          Start := Invalid_Index;
@@ -940,41 +936,33 @@ package body SXML.Parser is
             return;
          end if;
 
-         Parse_Internal (Match_Child, Start, Level - 1);
-         if Match_Child = Match_OK
-         then
-            return;
-         end if;
-
          Match := Match_None;
          return;
 
       end Parse_Content;
 
-      --------------------
-      -- Parse_Internal --
-      --------------------
+      -------------------------
+      -- Parse_Internal_Left --
+      -------------------------
 
-      procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
+      procedure Parse_Internal_Left (Match  : out Match_Type;
+                                     Start  : out Index_Type;
+                                     Parent : out Index_Type;
+                                     Name   : out Range_Type;
+                                     Done   : out Boolean);
+
+      procedure Parse_Internal_Left (Match  : out Match_Type;
+                                     Start  : out Index_Type;
+                                     Parent : out Index_Type;
+                                     Name   : out Range_Type;
+                                     Done   : out Boolean)
       is
-         Old_Offset     : constant Natural := Offset;
-         Done           : Boolean;
-         Name           : Range_Type;
-         Sub_Match      : Match_Type;
-         Child_Start    : Index_Type;
-         Previous_Child : Index_Type := Invalid_Index;
-         Parent         : Index_Type;
+         Old_Offset : constant Natural := Offset;
       begin
-
-         Match := Match_Invalid;
-         Start := Invalid_Index;
-
-         if Level = 0
-         then
-            return;
-         end if;
+         Match  := Match_Invalid;
+         Start  := Invalid_Index;
+         Parent := Invalid_Index;
+         Done   := False;
 
          Parse_Sections;
 
@@ -1009,31 +997,118 @@ package body SXML.Parser is
             return;
          end if;
 
-         loop
-            Parse_Content (Sub_Match, Child_Start, Level - 1);
-            exit when Sub_Match /= Match_OK;
+      end Parse_Internal_Left;
 
-            if Sub_Match = Match_OK and Child_Start /= Invalid_Index
-            then
-               if Previous_Child = Invalid_Index
-               then
-                  Context (Parent).Children := Sub (Child_Start, Parent);
-               else
-                  Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
-               end if;
-               Previous_Child := Child_Start;
-            end if;
-         end loop;
+      ----------------
+      -- Link_Child --
+      ----------------
 
-         Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
+      procedure Link_Child (Sub_Match      : Match_Type;
+                            Child_Start    : Index_Type;
+                            Parent         : Index_Type;
+                            Previous_Child : in out Index_Type);
 
-         if Match /= Match_OK
+      procedure Link_Child (Sub_Match      : Match_Type;
+                            Child_Start    : Index_Type;
+                            Parent         : Index_Type;
+                            Previous_Child : in out Index_Type)
+      is
+      begin
+         if Sub_Match = Match_OK and Child_Start /= Invalid_Index
          then
-            Restore_Offset (Old_Offset);
-            return;
+            if Previous_Child = Invalid_Index
+            then
+               Context (Parent).Children := Sub (Child_Start, Parent);
+            else
+               Context (Previous_Child).Siblings := Sub (Child_Start, Previous_Child);
+            end if;
+            Previous_Child := Child_Start;
          end if;
+      end Link_Child;
 
-         Parse_Sections;
+      --------------------
+      -- Parse_Internal --
+      --------------------
+
+      procedure Parse_Internal (Match  : out Match_Type;
+                                Start  : out Index_Type)
+      is
+         Sub_Match      : Match_Type;
+         Child_Start    : Index_Type;
+         Previous_Child : Index_Type := Invalid_Index;
+         Parent         : Index_Type;
+         Name           : Range_Type;
+         Done           : Boolean;
+
+         type Parse_Mode_Type is (Parse_Start, Parse_Cont);
+         type Parse_Element_Type is
+            record
+               Index    : Index_Type;
+               Position : Natural;
+               Mode     : Parse_Mode_Type := Parse_Cont;
+            end record;
+
+         Tmp : Parse_Element_Type;
+         type Parse_Stack_Type is array (Natural range <>) of Parse_Element_Type;
+         Parse_Stack : Parse_Stack_Type (1 .. 100);
+         package S is new SXML.Stack (Parse_Element_Type, Parse_Stack_Type, Parse_Stack);
+      begin
+
+         Match := Match_Invalid;
+         Start := Invalid_Index;
+
+         S.Push ((Context_Index, Position, Parse_Start));
+
+         Outer :
+         loop
+            loop
+               exit Outer when S.Is_Empty;
+
+               S.Pop (Tmp);
+               Position      := Tmp.Position;
+               Context_Index := Tmp.Index;
+
+               if Tmp.Mode = Parse_Start
+               then
+                  Parse_Internal_Left (Sub_Match, Start, Parent, Name, Done);
+                  if Done
+                  then
+                     Match := Match_OK;
+                     exit;
+                  end if;
+
+                  if Sub_Match /= Match_OK
+                  then
+                     S.Drop;
+                     exit;
+                  end if;
+
+                  Parse_Content (Sub_Match, Child_Start);
+                  Link_Child (Sub_Match, Child_Start, Parent, Previous_Child);
+
+                  S.Push ((Context_Index, Position, Parse_Cont));
+                  S.Push ((Context_Index, Position, Parse_Start));
+                  exit;
+
+               end if;
+
+               if Tmp.Mode = Parse_Cont
+               then
+
+                  Parse_Closing_Tag (Data (Name.First .. Name.Last), Match);
+
+                  if Match /= Match_OK
+                  then
+                     S.Drop;
+                     exit;
+                  end if;
+
+                  Parse_Sections;
+                  S.Drop;
+               end if;
+
+            end loop;
+         end loop Outer;
 
       end Parse_Internal;
 
