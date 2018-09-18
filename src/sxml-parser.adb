@@ -967,6 +967,15 @@ package body SXML.Parser is
             return;
          end if;
 
+         if Level < Parse_Internal_Depth
+         then
+            Parse_Content (Match, Start);
+            if Match = Match_OK
+            then
+               return;
+            end if;
+         end if;
+
          Parse_Sections;
 
          if Data_Overflow
@@ -1001,12 +1010,7 @@ package body SXML.Parser is
          end if;
 
          loop
-            Parse_Content (Sub_Match, Child_Start);
-            if Sub_Match /= Match_OK
-            then
-               Parse_Internal (Sub_Match, Child_Start, Level - 1);
-            end if;
-
+            Parse_Internal (Sub_Match, Child_Start, Level - 1);
             exit when Sub_Match /= Match_OK;
 
             if Sub_Match = Match_OK and Child_Start /= Invalid_Index
