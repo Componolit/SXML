@@ -71,6 +71,15 @@ package body SXML_Parser_Tests is
 
    -----------------------------------------------------------------------------
 
+   procedure Content_After_Child (T : in out Test_Cases.Test_Case'Class)
+   is
+      Data : String := "<parent><child/>Some content</parent>";
+   begin
+      Check_Document (Data);
+   end Content_After_Child;
+
+   -----------------------------------------------------------------------------
+
    procedure Invalid_Whitespace (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "<   valid></valid>";
@@ -562,6 +571,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Large_Attribute'Access, "Large attribute");
       Register_Routine (T, Many_Attributes'Access, "Many attributes");
       Register_Routine (T, Simple_Content'Access, "Simple content");
+      Register_Routine (T, Content_After_Child'Access, "Content after child");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
