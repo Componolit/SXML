@@ -1,7 +1,8 @@
 generic
    type Element_Type is private;
    type Stack_Type is array (Natural range <>) of Element_Type;
-   S : in out Stack_Type;
+   S            : in out Stack_Type;
+   Null_Element : Element_Type;
 package SXML.Stack is
 
    function Is_Empty return Boolean;

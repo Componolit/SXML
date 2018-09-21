@@ -186,11 +186,13 @@ package body SXML.Serialize is
 
       package S   is new SXML.Stack (Traversal_Type,
                                      Stack_Type,
-                                     Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1));
+                                     Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1),
+                                     Null_Traversal);
 
       package Rev is new SXML.Stack (Traversal_Type,
                                      Stack_Type,
-                                     Buffer (Buffer'First + Buffer'Length / 2 .. Buffer'Last));
+                                     Buffer (Buffer'First + Buffer'Length / 2 .. Buffer'Last),
+                                     Null_Traversal);
    begin
       Last := 0;
       S.Reset;

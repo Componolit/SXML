@@ -1,6 +1,8 @@
 with Ada.Text_IO;
 
 package body SXML.Debug
+with
+   SPARK_Mode => Off
 is
    ------------
    -- Offset --

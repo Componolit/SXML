@@ -13,17 +13,39 @@ is
    type Offset_Type is new Natural range 0 .. Natural'Last;
    Null_Offset : constant Offset_Type := Offset_Type'First;
 
+   ------------------
+   -- Valid_String --
+   ------------------
+
+   function Valid_String (Data : String) return Boolean
+   with
+       Ghost;
+
+   ---------
+   -- Add --
+   ---------
+
    function Add (Left  : Offset_Type;
                  Right : Relative_Index_Type) return Offset_Type
-   is (Left + Offset_Type (Right));
+   is (Left + Offset_Type (Right))
+   with
+      Pre => Offset_Type (Right) <= Offset_Type'Last - Left;
 
    function Add (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
-   is (Index_Type (Natural (Left) + Natural (Right)));
+   is (Index_Type (Natural (Left) + Natural (Right)))
+   with
+      Pre => Right <= Offset_Type (Index_Type'Last - Left);
 
    function Add (Left  : Index_Type;
                  Right : Relative_Index_Type) return Index_Type
-   is (Index_Type (Natural (Left) + Natural (Right)));
+   is (Index_Type (Natural (Left) + Natural (Right)))
+   with
+      Pre => Right <= Relative_Index_Type (Index_Type'Last - Left);
+
+   ---------
+   -- Sub --
+   ---------
 
    function Sub (Left  : Index_Type;
                  Right : Index_Type) return Relative_Index_Type
@@ -39,9 +61,9 @@ is
 
    function Sub (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
-   is (Left - Index_Type (Right))
+   is (Index_Type (Offset_Type (Left) - Right))
    with
-      Pre => Left >= Index_Type (Right);
+      Pre => Offset_Type (Left) > Right;
 
    type Node_Type is private;
    Null_Node : constant Node_Type;
@@ -58,16 +80,20 @@ is
    with
      Pre => Is_Valid (Left, Right);
 
-   overriding
-   function "&" (Left, Right : Subtree_Type) return Subtree_Type
-   with
-     Pre => False;
+   --  This operator must not be used, as subtrees have to be
+   --  linked together. This is done by the * operator above.
+   pragma Warnings (Off, "precondition is statically False");
+   overriding function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   with Pre => False;
+   pragma Warnings (On, "precondition is statically False");
 
    ----------
    -- Open --
    ----------
 
-   function Open (Name : String) return Subtree_Type;
+   function Open (Name : String) return Subtree_Type
+   with
+      Pre => Valid_String (Name);
 
    -----------------
    -- Put_Content --
@@ -75,7 +101,15 @@ is
 
    procedure Put_Content (Subtree : in out Subtree_Type;
                           Offset  : Offset_Type;
-                          Value   : String);
+                          Value   : String)
+   with
+      Pre => Valid_String (Value) and then
+             Offset < Offset_Type (Index_Type'Last) and then
+             Subtree'First <= Sub (Index_Type'Last, Offset) and then
+             Natural (Num_Elements (Value)) <= Subtree'Length - Natural (Offset) and then
+             Add (Subtree'First, Offset) <= Subtree'Last and then
+             Num_Elements (Value) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
+             Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Value));
 
    ---------------
    -- Attribute --
@@ -84,23 +118,45 @@ is
    procedure Attribute (Name   : String;
                         Data   : String;
                         Offset : in out Offset_Type;
-                        Output : out Subtree_Type)
+                        Output : in out Subtree_Type)
    with
-       Pre => Output'Length >= Offset + Num_Elements (Name) + Num_Elements (Data);
+      Pre => (Valid_String (Name) and Valid_String (Data)) and then
+             Output'Length <= Offset_Type'Last - Offset - Num_Elements (Name) - Num_Elements (Data) and then
+             Offset + Num_Elements (Name) + Num_Elements (Data) < Output'Length and then
+             Num_Elements (Data) <= Offset_Type (Index_Type'Last -
+                                                 Add (Add (Output'First, Offset), Num_Elements (Name)));
 
    ----------------
    -- Get_String --
    ----------------
 
    function Get_String (Doc   : Subtree_Type;
-                        Start : Offset_Type;
-                        Level : Natural := Get_String_Depth) return String;
+                        Start : Offset_Type) return String
+   with
+      Pre      => Start < Doc'Length,
+      Annotate => (Gnatprove, Terminating);
 
    ------------------
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (D : String) return Offset_Type;
+   function Num_Elements (D : String) return Offset_Type
+   with
+      Pre  => Valid_String (D),
+      Post => Num_Elements'Result > 0;
+
+   ---------------
+   -- Same_Kind --
+   ---------------
+
+   function Same_Kind (Current : Subtree_Type;
+                       Old     : Subtree_Type;
+                       Offset  : Offset_Type) return Boolean
+   with
+      Pre => Current'First = Old'First and
+             Current'Last = Old'Last and
+             Offset < Current'Length,
+      Ghost;
 
    ----------------
    -- Put_String --
@@ -110,13 +166,23 @@ is
                          Offset  : Offset_Type;
                          Name    : String)
    with
-      Pre => Subtree'Length >= Num_Elements (Name);
+      Pre  => Valid_String (Name) and then
+              Offset < Offset_Type (Index_Type'Last) and then
+              Num_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
+              Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Name)) and then
+              Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Elements (Name)),
+      Post => Same_Kind (Subtree, Subtree'Old, Offset);
 
 private
 
    type Length_Type is range 0 .. 8 with Size => 8;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
+
+   function Valid_String (Data : String) return Boolean
+   is (Data'Length > 0 and
+       Data'Length < Natural'Last - Data_Type'Length and
+       Data'First <= Natural'Last - Data'Length);
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,
@@ -153,5 +219,11 @@ private
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
+
+   function Same_Kind (Current : Subtree_Type;
+                       Old     : Subtree_Type;
+                       Offset  : Offset_Type) return Boolean
+   is
+      (Current (Add (Current'First, Offset)).Kind = Old (Add (Old'First, Offset)).Kind);
 
 end SXML;

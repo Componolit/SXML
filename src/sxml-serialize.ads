@@ -1,6 +1,8 @@
 package SXML.Serialize is
 
    type Traversal_Type is private;
+   Null_Traversal : constant Traversal_Type;
+
    type Stack_Type is array (Natural range <>) of Traversal_Type;
 
    ---------------
@@ -22,12 +24,14 @@ package SXML.Serialize is
 
 private
 
-   type Mode_Type is (Mode_Open, Mode_Close);
+   type Mode_Type is (Mode_Invalid, Mode_Open, Mode_Close);
 
    type Traversal_Type is
    record
       Index : Index_Type;
       Mode  : Mode_Type;
    end record;
+
+   Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
 
 end SXML.Serialize;
