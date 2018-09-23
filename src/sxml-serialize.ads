@@ -20,7 +20,7 @@ package SXML.Serialize is
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
                         Last   : out Natural;
-                        Buffer : out Stack_Type);
+                        Buffer : in out Stack_Type);
 
 private
 

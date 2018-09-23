@@ -32,6 +32,10 @@ package body SXML.Stack is
       Index := S'First;
    end Reset;
 
-begin
-   S := (others => Null_Element);
+   procedure Init
+   is
+   begin
+      S := (others => Null_Element);
+   end Init;
+
 end SXML.Stack;

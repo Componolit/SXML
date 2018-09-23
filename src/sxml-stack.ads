@@ -28,6 +28,8 @@ package SXML.Stack is
    with
       Post => not Is_Full and Is_Empty;
 
+   procedure Init;
+
 private
 
    Index : Natural := S'First;

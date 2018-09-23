@@ -176,7 +176,7 @@ package body SXML.Serialize is
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
                         Last   : out Natural;
-                        Buffer : out Stack_Type)
+                        Buffer : in out Stack_Type)
    is
       Child    : Relative_Index_Type;
       Element  : Index_Type;
@@ -198,6 +198,7 @@ package body SXML.Serialize is
       S.Reset;
       Rev.Reset;
       S.Push ((Doc'First, Mode_Open));
+      Data := (others => Character'Val (0));
 
       while not S.Is_Empty
       loop
@@ -251,9 +252,10 @@ package body SXML.Serialize is
                         Data   : out String;
                         Last   : out Natural)
    is
-      Stack_Buffer : Stack_Type (1 .. 1000);
+      Stack_Buffer : Stack_Type (1 .. 1000) := (others => Null_Traversal);
    begin
       To_String (Doc, Data, Last, Stack_Buffer);
+      pragma Unreferenced (Stack_Buffer);
    end To_String;
 
 end SXML.Serialize;

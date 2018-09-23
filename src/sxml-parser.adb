@@ -528,7 +528,8 @@ package body SXML.Parser is
       begin
          Name  := Null_Range;
          Match := Match_Invalid;
-         Done := False;
+         Done  := False;
+         Start := Invalid_Index;
 
          if Context_Overflow
          then
@@ -925,7 +926,7 @@ package body SXML.Parser is
          end if;
 
          Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
-         if Content_Range /= Null_Range and then Length (Content_Range) > 0
+         if Match_Content = Match_OK and then Length (Content_Range) > 0
          then
             Context_Put_String (Value  => Data (Content_Range.First .. Content_Range.Last),
                                 Start  => Start,
