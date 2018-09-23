@@ -55,7 +55,7 @@ package body SXML.Serialize is
             when '&' => Put ("&amp;", D, P);
             when '>' => Put ("&gt;", D, P);
             when '<' => Put ("&lt;", D, P);
-            when others => Put ("" & Char, D, P);
+            when others => Put ((1 => Char), D, P);
          end case;
       end Put_Escaped_Char;
 

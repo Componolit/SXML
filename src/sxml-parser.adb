@@ -477,7 +477,7 @@ package body SXML.Parser is
             return;
          end if;
 
-         Match_Until_Set ("" & Separator, "<", Match_Tmp, Attribute_Value);
+         Match_Until_Set ((1 => Separator), "<", Match_Tmp, Attribute_Value);
          if (Match_Tmp /= Match_OK and Match_Tmp /= Match_None) or
            Data_Overflow
          then
