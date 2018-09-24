@@ -142,7 +142,8 @@ package body SXML_Query_Tests is
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "First child not found");
       State.Find_Sibling (Doc, "child2", Result);
-      Assert (State.Name (Doc) = "child2", "Invalid child");
+      Assert (Result = Result_OK, "Second child not found: " & Result'Img);
+      Assert (State.Name (Doc) = "child2", "Invalid child: " & State.Name (Doc));
 	end Test_Query_Find_Sibling_With_Content;
 
    ---------------------------------------------------------------------------
