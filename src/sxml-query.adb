@@ -186,8 +186,22 @@ package body SXML.Query is
    is
       Val : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Value;
+      Tmp_Offset : Offset_Type;
    begin
-      return Get_String (Document, Add (State.Offset, Val));
+      if Overflow (State.Offset, Val)
+      then
+         --  FIXME: Refactor interface to allow proper error reporting
+         return "";
+      end if;
+
+      Tmp_Offset := Add (State.Offset, Val);
+      if Tmp_Offset >= Document'Length
+      then
+         --  FIXME: Refactor interface to allow proper error reporting
+         return "";
+      end if;
+
+      return Get_String (Document, Tmp_Offset);
    end Value;
 
    ----------
