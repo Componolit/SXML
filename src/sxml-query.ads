@@ -106,7 +106,9 @@ package SXML.Query is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Open (Document, State),
-      Post'Class => (Result = Result_OK and Is_Valid (Document, State)) or
+      Post'Class => (Result = Result_OK and
+                     Is_Valid (Document, State) and
+                     Is_Open (Document, State)) or
                     State = State'Old;
 
    ---------------
@@ -122,6 +124,16 @@ package SXML.Query is
       Post'Class => (Result = Result_OK and Is_Valid (Document, State)) or
                     State = State'Old;
 
+   --------------------
+   -- Is_Valid_Value --
+   --------------------
+
+   function Is_Valid_Value (State    : State_Type;
+                            Document : Subtree_Type) return Boolean
+   with
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Attribute (Document, State);
+
    -----------
    -- Value --
    -----------
@@ -129,8 +141,9 @@ package SXML.Query is
    function Value (State    : State_Type;
                    Document : Subtree_Type) return String
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Attribute (Document, State);
+      Pre'Class => Is_Valid (Document, State) and then
+                   Is_Attribute (Document, State) and then
+                   Is_Valid_Value (State, Document);
 
    --------------------
    -- Next_Attribute --
@@ -164,7 +177,15 @@ package SXML.Query is
    procedure Path (State        : in out State_Type;
                    Document     : Subtree_Type;
                    Result       : out Result_Type;
-                   Query_String : String);
+                   Query_String : String)
+   with
+       Pre'Class => Document'Length > 0 and
+                    Query_String'First > 0 and
+                    Query_String'First <= Query_String'Last and
+                    Query_String'Last < Natural'Last and
+                    Query_String'Length > 1 and
+                    (Is_Valid (Document, State) and then
+                     Is_Open (Document, State));
 
 private
 

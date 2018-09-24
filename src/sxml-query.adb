@@ -177,6 +177,15 @@ package body SXML.Query is
       State.Offset := Add (State.Offset, Next);
    end Next_Attribute;
 
+   --------------------
+   -- Is_Valid_Value --
+   --------------------
+
+   function Is_Valid_Value (State    : State_Type;
+                            Document : Subtree_Type) return Boolean
+   is (not Overflow (State.Offset, Document (Add (Document'First, State.Offset)).Value) and then
+       Add (State.Offset, Document (Add (Document'First, State.Offset)).Value) < Document'Length);
+
    -----------
    -- Value --
    -----------
@@ -186,22 +195,8 @@ package body SXML.Query is
    is
       Val : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Value;
-      Tmp_Offset : Offset_Type;
    begin
-      if Overflow (State.Offset, Val)
-      then
-         --  FIXME: Refactor interface to allow proper error reporting
-         return "";
-      end if;
-
-      Tmp_Offset := Add (State.Offset, Val);
-      if Tmp_Offset >= Document'Length
-      then
-         --  FIXME: Refactor interface to allow proper error reporting
-         return "";
-      end if;
-
-      return Get_String (Document, Tmp_Offset);
+      return Get_String (Document, Add (State.Offset, Val));
    end Value;
 
    ----------
@@ -213,7 +208,7 @@ package body SXML.Query is
                    Result       : out Result_Type;
                    Query_String : String)
    is
-      First : Natural := Query_String'First;
+      First : Natural;
       Last  : Natural := Query_String'First - 1;
       Tmp_Result : Result_Type;
    begin
@@ -221,15 +216,27 @@ package body SXML.Query is
       State := Init (Document);
 
       loop
+         exit when Last >= Query_String'Last - 1;
          First := Last + 2;
          Last  := First;
+
+         pragma Loop_Invariant (Is_Valid (Document, State));
+         pragma Loop_Invariant (Is_Open (Document, State));
+         pragma Loop_Invariant (First >= Query_String'First);
+         pragma Loop_Invariant (Last >= Query_String'First);
+         pragma Loop_Invariant (Last <= Query_String'Last);
+
          loop
+            pragma Loop_Invariant (First >= Query_String'First);
+            pragma Loop_Invariant (Last >= Query_String'First);
+            pragma Loop_Invariant (Last <= Query_String'Last);
+
             exit when Last >= Query_String'Last or else
                       Query_String (Last + 1) = '/';
             Last := Last + 1;
          end loop;
 
-         if  First > Last
+         if First > Last
          then
             exit;
          end if;
@@ -252,7 +259,6 @@ package body SXML.Query is
          then
             return;
          end if;
-
       end loop;
 
       Result := Result_OK;
