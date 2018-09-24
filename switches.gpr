@@ -4,7 +4,6 @@ is
    (
       "-gnatA"	 -- Avoid processing gnat.adc, if present file will be ignored
 
-     ,"-gnatA"  -- Aliasing checks on subprogram parameters
      ,"-gnatef" -- Full source path in brief error messages
      ,"-gnateV" -- Validity checks on subprogram parameters
      ,"-gnatf"  -- Full errors. Verbose details, all undefined references

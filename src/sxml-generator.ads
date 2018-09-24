@@ -20,42 +20,58 @@ is
 
    function E (Name       : String;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type;
+               Children   : Subtree_Type) return Subtree_Type
+   with
+      Pre => Valid_String (Name);
 
    function E (Name       : String;
-               Children   : Subtree_Type) return Subtree_Type;
+               Children   : Subtree_Type) return Subtree_Type
+   with
+      Pre => Valid_String (Name);
 
    function E (Name       : String;
-               Attributes : Attributes_Type) return Subtree_Type;
+               Attributes : Attributes_Type) return Subtree_Type
+   with
+      Pre => Valid_String (Name);
 
-   function E (Name       : String) return Subtree_Type;
-
-   -------
-   -- A --
-   -------
-
-   function A (Name  : String;
-               Value : Integer) return Attributes_Type;
+   function E (Name : String) return Subtree_Type
+   with
+      Pre => Valid_String (Name);
 
    -------
    -- A --
    -------
 
    function A (Name  : String;
-               Value : Float) return Attributes_Type;
+               Value : Integer) return Attributes_Type
+   with
+      Pre => Valid_String (Name);
 
    -------
    -- A --
    -------
 
    function A (Name  : String;
-               Value : String) return Attributes_Type;
+               Value : Float) return Attributes_Type
+   with
+      Pre => Valid_String (Name);
+
+   -------
+   -- A --
+   -------
+
+   function A (Name  : String;
+               Value : String) return Attributes_Type
+   with
+      Pre => Valid_String (Name);
 
    -------
    -- C --
    -------
 
-   function C (Value : String) return Subtree_Type;
+   function C (Value : String) return Subtree_Type
+   with
+      Pre => Valid_String (Value);
 
 private
 

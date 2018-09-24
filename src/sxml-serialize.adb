@@ -8,7 +8,9 @@ package body SXML.Serialize is
 
    procedure Put (Value    : String;
                   Data     : in out String;
-                  Position : in out Integer);
+                  Position : in out Integer)
+   with
+      Post => (if Position'Old < 0 then Position < 0);
 
    procedure Put (Value    : String;
                   Data     : in out String;
@@ -16,7 +18,8 @@ package body SXML.Serialize is
    is
    begin
       if Position < 0 or else
-         Data'Last - Position < Value'Length
+         Value'Length > Data'Length - Position or else
+         Data'First > Data'Last - Position - Value'Length
       then
          Position := -1;
          return;
@@ -42,11 +45,11 @@ package body SXML.Serialize is
    is
       procedure Put_Escaped_Char (Char : Character;
                                   D    : in out String;
-                                  P    : in out Natural);
+                                  P    : in out Integer);
 
       procedure Put_Escaped_Char (Char : Character;
                                   D    : in out String;
-                                  P    : in out Natural)
+                                  P    : in out Integer)
       is
       begin
          case Char is

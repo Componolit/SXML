@@ -43,6 +43,22 @@ is
    with
       Pre => Right <= Relative_Index_Type (Index_Type'Last - Left);
 
+   --------------
+   -- Overflow --
+   --------------
+
+   function Overflow (Left  : Offset_Type;
+                      Right : Relative_Index_Type) return Boolean
+   is (Offset_Type (Right) > Offset_Type'Last - Left);
+
+   function Overflow (Left  : Index_Type;
+                      Right : Relative_Index_Type) return Boolean
+   is (Right > Relative_Index_Type (Index_Type'Last - Left));
+
+   function Overflow (Left  : Index_Type;
+                      Right : Offset_Type) return Boolean
+   is (Right > Offset_Type (Index_Type'Last - Left));
+
    ---------
    -- Sub --
    ---------
@@ -93,7 +109,8 @@ is
 
    function Open (Name : String) return Subtree_Type
    with
-      Pre => Valid_String (Name);
+      Pre  => Valid_String (Name),
+      Post => Open'Result'Length > 0;
 
    -----------------
    -- Put_Content --

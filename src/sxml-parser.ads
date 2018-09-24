@@ -33,7 +33,7 @@ package SXML.Parser is
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    with
-      Pre  => Data_Valid (Data);
+      Pre  => Data_Valid (Data) and Context'First > 0;
    --  Parse an XML file
    --
    --  @param Result Result of parsing operation

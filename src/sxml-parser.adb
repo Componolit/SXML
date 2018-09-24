@@ -26,8 +26,9 @@ package body SXML.Parser is
 
       function Length (R : Range_Type) return Natural
       is (R.Last - R.First + 1)
-        with
-          Pre => R /= Null_Range or else R.Last >= R.First;
+      with
+         Pre => (R.Last < Natural'Last and
+                 R.Last >= R.First);
 
       type Set_Type is new String;
       Empty_Set : constant Set_Type := "";
@@ -122,13 +123,12 @@ package body SXML.Parser is
                            Invalid : Set_Type;
                            Match   : out Match_Type;
                            Value   : out Character)
-        with
-          Pre    => Data_Valid (Data) and
-          Offset < Natural'Last,
-          Post   => (if Match = Match_OK then
+      with
+         Pre    => Data_Valid (Data) and
+                   Offset < Natural'Last,
+         Post   => (if Match = Match_OK then
                        (for some E of Valid =>
-                              E = Data (Data'First + Offset - 1) and
-                            E = Value) and
+                             E = Data (Data'First + Offset - 1) and E = Value) and
                            Offset > Offset'Old);
 
       procedure Match_Set (Valid   : Set_Type;
@@ -1085,7 +1085,7 @@ package body SXML.Parser is
       pragma Unreferenced (Unused);
       if Parse_Result = Match_OK
       then
-         Position := 0;
+         Position := Offset;
       else
          Position := Error_Index;
       end if;

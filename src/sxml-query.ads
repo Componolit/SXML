@@ -6,10 +6,44 @@ package SXML.Query is
 
    type State_Type is tagged private;
 
-   function Bound (Document : Subtree_Type;
-                   State    : State_Type) return Boolean
+   --------------
+   -- Is_Valid --
+   --------------
+
+   function Is_Valid (Document : Subtree_Type;
+                      State    : State_Type) return Boolean
    with
       Ghost;
+
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Document : Subtree_Type;
+                     State    : State_Type) return Boolean
+   with
+      Ghost,
+      Pre'Class => Is_Valid (Document, State);
+
+   ----------------
+   -- Is_Content --
+   ----------------
+
+   function Is_Content (Document : Subtree_Type;
+                        State    : State_Type) return Boolean
+   with
+      Ghost,
+      Pre'Class => Is_Valid (Document, State);
+
+   ------------------
+   -- Is_Attribute --
+   ------------------
+
+   function Is_Attribute (Document : Subtree_Type;
+                          State    : State_Type) return Boolean
+   with
+      Ghost,
+      Pre'Class => Is_Valid (Document, State);
 
    ----------
    -- Init --
@@ -17,7 +51,9 @@ package SXML.Query is
 
    function Init (Document : Subtree_Type) return State_Type
    with
-      Post => Bound (Document, Init'Result);
+      Pre'Class => Document'Length > 0,
+      Post      => Is_Valid (Document, Init'Result) and then
+                   Is_Open (Document, Init'Result);
 
    ----------
    -- Name --
@@ -26,7 +62,8 @@ package SXML.Query is
    function Name (State    : State_Type;
                   Document : Subtree_Type) return String
    with
-      Pre'Class => Bound (Document, State);
+      Pre'Class => Is_Valid (Document, State) and then
+                   Is_Open (Document, State);
 
    -----------
    -- Child --
@@ -36,9 +73,11 @@ package SXML.Query is
                     Document : Subtree_Type;
                     Result   : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State) and
-                    (Result = Result_OK or State = State'Old);
+      Pre'Class  => Is_Valid (Document, State),
+      Post'Class => (Result = Result_OK and
+                     (Is_Valid (Document, State) and then
+                      Is_Open (Document, State))) or
+                    State = State'Old;
 
    -------------
    -- Sibling --
@@ -48,9 +87,13 @@ package SXML.Query is
                       Document : Subtree_Type;
                       Result   : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State) and
-                    (Result = Result_OK or State = State'Old);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Open (Document, State),
+      Post'Class => (Result = Result_OK and
+                     (Is_Valid (Document, State) and then
+                        (Is_Open (Document, State) or
+                         Is_Content (Document, State)))) or
+                    State = State'Old;
 
    ------------------
    -- Find_Sibling --
@@ -61,9 +104,10 @@ package SXML.Query is
                            Sibling_Name : String;
                            Result       : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State) and
-                    (Result = Result_OK or State = State'Old);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Open (Document, State),
+      Post'Class => (Result = Result_OK and Is_Valid (Document, State)) or
+                    State = State'Old;
 
    ---------------
    -- Attribute --
@@ -73,9 +117,10 @@ package SXML.Query is
                         Document : Subtree_Type;
                         Result   : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State) and
-                    (Result = Result_OK or State = State'Old);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Open (Document, State),
+      Post'Class => (Result = Result_OK and Is_Valid (Document, State)) or
+                    State = State'Old;
 
    -----------
    -- Value --
@@ -84,7 +129,8 @@ package SXML.Query is
    function Value (State    : State_Type;
                    Document : Subtree_Type) return String
    with
-      Pre'Class  => Bound (Document, State);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Attribute (Document, State);
 
    --------------------
    -- Next_Attribute --
@@ -94,8 +140,9 @@ package SXML.Query is
                              Document : Subtree_Type;
                              Result   : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Attribute (Document, State),
+      Post'Class => Is_Valid (Document, State);
 
    --------------------
    -- Find_Attribute --
@@ -106,8 +153,9 @@ package SXML.Query is
                              Attribute_Name : String;
                              Result         : out Result_Type)
    with
-      Pre'Class  => Bound (Document, State),
-      Post'Class => Bound (Document, State);
+      Pre'Class  => Is_Valid (Document, State) and then
+                    Is_Open (Document, State),
+      Post'Class => Is_Valid (Document, State);
 
    ----------
    -- Path --

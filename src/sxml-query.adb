@@ -1,16 +1,37 @@
 package body SXML.Query is
 
-   -----------
-   -- Bound --
-   -----------
+   --------------
+   -- Is_Valid --
+   --------------
 
-   function Bound (Document : Subtree_Type;
-                   State    : State_Type) return Boolean
-   is
-      pragma Unreferenced (Document, State);
-   begin
-      return True;
-   end Bound;
+   function Is_Valid (Document : Subtree_Type;
+                      State    : State_Type) return Boolean
+   is (Document'Length > 0 and
+       State.Offset < Document'Length);
+
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Document : Subtree_Type;
+                     State    : State_Type) return Boolean
+   is (Document (Add (Document'First, State.Offset)).Kind = Kind_Element_Open);
+
+   ----------------
+   -- Is_Content --
+   ----------------
+
+   function Is_Content (Document : Subtree_Type;
+                        State    : State_Type) return Boolean
+   is (Document (Add (Document'First, State.Offset)).Kind = Kind_Content);
+
+   ------------------
+   -- Is_Attribute --
+   ------------------
+
+   function Is_Attribute (Document : Subtree_Type;
+                          State    : State_Type) return Boolean
+   is (Document (Add (Document'First, State.Offset)).Kind = Kind_Attribute);
 
    ----------
    -- Init --
@@ -29,10 +50,7 @@ package body SXML.Query is
 
    function Name (State    : State_Type;
                   Document : Subtree_Type) return String
-   is
-   begin
-      return Get_String (Document, State.Offset);
-   end Name;
+   is (Get_String (Document, State.Offset));
 
    -----------
    -- Child --
@@ -42,16 +60,33 @@ package body SXML.Query is
                     Document : Subtree_Type;
                     Result   : out Result_Type)
    is
-      Children : constant Relative_Index_Type :=
-        Document (Add (Document'First, State.Offset)).Children;
+      Children_Offset : constant Index_Type := Add (Document'First, State.Offset);
+      Children        : Relative_Index_Type;
+      Tmp_Offset      : Offset_Type;
    begin
+      Result := Result_Invalid;
+      if Document (Children_Offset).Kind /= Kind_Element_Open
+      then
+         return;
+      end if;
+      Children := Document (Children_Offset).Children;
+      if Offset_Type (Children) > Offset_Type'Last - State.Offset
+      then
+         return;
+      end if;
       if Children = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
+      Tmp_Offset := Add (State.Offset, Children);
+      if Tmp_Offset >= Document'Length
+      then
+         return;
+      end if;
+
       Result := Result_OK;
-      State.Offset := Add (State.Offset, Children);
+      State.Offset := Tmp_Offset;
    end Child;
 
    -------------
@@ -62,16 +97,32 @@ package body SXML.Query is
                       Document : Subtree_Type;
                       Result   : out Result_Type)
    is
-      Siblings : constant Relative_Index_Type :=
-        Document (Add (Document'First, State.Offset)).Siblings;
+      Current  : constant Index_Type := Add (Document'First, State.Offset);
+      Siblings : constant Relative_Index_Type := Document (Current).Siblings;
+      Tmp_Index : Index_Type;
    begin
       if Siblings = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
          return;
       end if;
+
+      Result := Result_Invalid;
+      if Overflow (Current, Siblings)
+      then
+         return;
+      end if;
+
+      Tmp_Index := Add (Current, Siblings);
+      if not (Tmp_Index in Document'Range) or else
+        (Document (Tmp_Index).Kind /= Kind_Element_Open and
+         Document (Tmp_Index).Kind /= Kind_Content)
+      then
+         return;
+      end if;
+
+      State.Offset := Sub (Tmp_Index, Document'First);
       Result := Result_OK;
-      State.Offset := Add (State.Offset, Siblings);
    end Sibling;
 
    ---------------
@@ -85,6 +136,12 @@ package body SXML.Query is
       Attributes : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Attributes;
    begin
+      Result := Result_Invalid;
+      if Overflow (State.Offset, Attributes)
+      then
+         return;
+      end if;
+
       if Attributes = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
@@ -105,6 +162,12 @@ package body SXML.Query is
       Next : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Next_Attribute;
    begin
+      Result := Result_Invalid;
+      if Overflow (State.Offset, Next)
+      then
+         return;
+      end if;
+
       if Next = Invalid_Relative_Index
       then
          Result := Result_Not_Found;
