@@ -287,7 +287,7 @@ package body SXML.Query is
             return;
          end if;
          State.Sibling (Document, Result);
-         exit when Result = Result_Not_Found;
+         exit when Result /= Result_OK;
 
       end loop;
    end Find_Sibling;
