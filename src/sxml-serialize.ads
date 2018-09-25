@@ -3,7 +3,7 @@ package SXML.Serialize is
    type Traversal_Type is private;
    Null_Traversal : constant Traversal_Type;
 
-   type Stack_Type is array (Natural range <>) of Traversal_Type;
+   type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type;
 
    ---------------
    -- To_String --
@@ -11,7 +11,9 @@ package SXML.Serialize is
 
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
-                        Last   : out Natural);
+                        Last   : out Natural)
+   with
+      Pre => Doc'Length > 0;
 
    ---------------
    -- To_String --
@@ -23,7 +25,7 @@ package SXML.Serialize is
                         Buffer : in out Stack_Type)
    with
       Pre => Doc'Length > 0 and
-             Buffer'Length > 0;
+             Buffer'Length > 1;
 
 private
 

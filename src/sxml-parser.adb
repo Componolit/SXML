@@ -33,6 +33,11 @@ package body SXML.Parser is
       type Set_Type is new String;
       Empty_Set : constant Set_Type := "";
 
+      function Set_Valid (S : Set_Type) return Boolean
+      is (S'First >= 0 and S'Last < Natural'Last and S'First <= S'Last)
+      with
+         Ghost;
+
       Whitespace : constant Set_Type :=
         Character'Val (16#20#) &
         Character'Val (16#9#)  &
@@ -124,12 +129,14 @@ package body SXML.Parser is
                            Match   : out Match_Type;
                            Value   : out Character)
       with
-         Pre    => Data_Valid (Data) and
-                   Offset < Natural'Last,
-         Post   => (if Match = Match_OK then
-                       (for some E of Valid =>
-                             E = Data (Data'First + Offset - 1) and E = Value) and
-                           Offset > Offset'Old);
+          Pre    => Set_Valid (Valid) and
+                    Data_Valid (Data) and
+                    Offset < Natural'Last,
+          Post   => (if Match = Match_OK
+                     then Offset - 1 <= Data'Length and then
+                          ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
+                            Offset > Offset'Old)
+                     else Offset = Offset'Old);
 
       procedure Match_Set (Valid   : Set_Type;
                            Invalid : Set_Type;
@@ -154,11 +161,14 @@ package body SXML.Parser is
                            Invalid : Set_Type;
                            Match   : out Match_Type)
         with
-          Pre    => Data_Valid (Data) and
-          Offset < Natural'Last,
-          Post   => (if Match = Match_OK then
-                       (for some E of Valid => E = Data (Data'First + Offset - 1)) and
-                         Offset > Offset'Old);
+          Pre    => Set_Valid (Valid) and
+                    Data_Valid (Data) and
+                    Offset < Natural'Last,
+          Post   => (if Match = Match_OK
+                     then Offset - 1 <= Data'Length and then
+                          ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
+                            Offset > Offset'Old)
+                     else Offset = Offset'Old);
 
       procedure Match_Set (Valid   : Set_Type;
                            Invalid : Set_Type;
@@ -228,7 +238,8 @@ package body SXML.Parser is
          Result := False;
          Start  := Invalid_Index;
 
-         if Context_Index > Context'Last - Value'Length
+         if Value'Length > Context'Last or else
+            Context_Index > Context'Last - Value'Length
          then
             return;
          end if;
@@ -237,6 +248,11 @@ package body SXML.Parser is
 
          for V of Value
          loop
+            if not (Context_Index in Context'Range) or
+               Context_Index = Index_Type'Last
+            then
+               return;
+            end if;
             Context (Context_Index) := V;
             Context_Index := Context_Index + 1;
          end loop;
@@ -249,7 +265,10 @@ package body SXML.Parser is
 
       procedure Context_Put_String (Value  : String;
                                     Start  : out Index_Type;
-                                    Result : out Boolean);
+                                    Result : out Boolean)
+      with
+         Pre => Context'Length > 0 and
+                Valid_String (Value);
 
       procedure Context_Put_String (Value  : String;
                                     Start  : out Index_Type;
@@ -260,7 +279,9 @@ package body SXML.Parser is
          Result := False;
          Start  := Invalid_Index;
 
-         if Context_Index > Sub (Context'Last, NE)
+         if (Underflow (Context'Last, NE) or else
+             Context_Index > Sub (Context'Last, NE)) or
+            Underflow (Context_Index, Context'First)
          then
             return;
          end if;
@@ -328,11 +349,13 @@ package body SXML.Parser is
                                  Match       : out Match_Type;
                                  Result      : out Range_Type)
         with
-          Pre  => Data_Valid (Data) and then
-          Data'First <= Data'Last - Offset,
-          Post => (if Match = Match_OK
-                     then Offset = Offset'Old
-                       else In_Range (Result));
+          Pre  => Set_Valid (End_Set) and
+                  (Data_Valid (Data) and then
+                   Data'First <= Data'Last - Offset),
+            Post => (case Match is
+                        when Match_OK   => In_Range (Result),
+                        when Match_None => Result = Null_Range,
+                        when others     => Offset = Offset'Old);
 
       procedure Match_Until_Set (End_Set     : Set_Type;
                                  Invalid_Set : Set_Type;
@@ -343,14 +366,12 @@ package body SXML.Parser is
          First      : constant Natural := Data'First + Offset;
          Last       : Natural;
          Tmp_Match  : Match_Type;
-         Len        : Natural := 0;
       begin
          Match  := Match_Invalid;
          Result := Null_Range;
 
          loop
-            if Data_Overflow or
-              Len = Natural'Last
+            if Data_Overflow
             then
                Restore_Offset (Old_Offset);
                return;
@@ -358,11 +379,10 @@ package body SXML.Parser is
 
             Match_Set (End_Set, Invalid_Set, Tmp_Match);
             exit when Tmp_Match /= Match_None;
-            Len := Len + 1;
          end loop;
 
-         if Tmp_Match = Match_Invalid or
-           Data'First > Data'Last - Offset + 1
+         if Tmp_Match /= Match_OK or
+            Data'First > Data'Last - Offset + 1
          then
             Restore_Offset (Old_Offset);
             return;
@@ -370,8 +390,15 @@ package body SXML.Parser is
 
          Offset := Offset - 1;
          Last   := Data'First + Offset - 1;
-         Result := (First, Last);
-         Match  := (if Len > 0 then Match_OK else Match_None);
+
+         if Old_Offset <= Offset - 1
+         then
+            Result := (First, Last);
+            Match  := Match_OK;
+         else
+            Result := Null_Range;
+            Match  := Match_None;
+         end if;
 
       end Match_Until_Set;
 

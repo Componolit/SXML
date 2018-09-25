@@ -177,13 +177,21 @@ package body SXML.Serialize is
          Serialize_Data (Doc, Current, Data, Position);
          Pos  := N.Attributes;
          Attr := Current;
-         while Pos /= Invalid_Relative_Index
+         while Pos /= Invalid_Relative_Index and
+               not Overflow (Attr, Pos)
          loop
-            Attr  := Add (Attr, Pos);
-            Value := Add (Attr, Doc (Attr).Value);
+            Attr := Add (Attr, Pos);
+            exit when not (Attr in Doc'Range) or else
+                      Doc (Attr).Kind /= Kind_Attribute or else
+                      Overflow (Attr, Doc (Attr).Value);
+
             Put (" ", Data, Position);
             Serialize_Data (Doc, Attr, Data, Position);
+
             Put ("=""", Data, Position);
+            Value := Add (Attr, Doc (Attr).Value);
+            exit when not (Value in Doc'Range);
+
             Serialize_Data (Doc, Value, Data, Position);
             Put ("""", Data, Position);
             Pos := Doc (Attr).Next_Attribute;
@@ -232,6 +240,11 @@ package body SXML.Serialize is
          pragma Loop_Invariant (Position >= 0);
 
          S.Pop (Current);
+         if not (Current.Index in Doc'Range)
+         then
+            return;
+         end if;
+
          Handle (Doc, Current.Index, Current.Mode, Data, Position);
          if Position < 0
          then

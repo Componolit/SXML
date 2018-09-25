@@ -13,6 +13,10 @@ is
    type Offset_Type is new Natural range 0 .. Natural'Last;
    Null_Offset : constant Offset_Type := Offset_Type'First;
 
+   subtype Natural_Without_Last is Natural range Natural'First .. Natural'Last - 1;
+   --  Natural subtype that is useful for arrays, as we can use 'Length without
+   --  having to show that 'Last is < Natural'Last.
+
    ------------------
    -- Valid_String --
    ------------------
@@ -80,6 +84,20 @@ is
    is (Index_Type (Offset_Type (Left) - Right))
    with
       Pre => Offset_Type (Left) > Right;
+
+   ---------------
+   -- Underflow --
+   ---------------
+
+   function Underflow (Left  : Index_Type;
+                       Right : Offset_Type) return Boolean
+   is (Right >= Offset_Type (Left));
+
+   function Underflow (Left  : Index_Type;
+                       Right : Index_Type) return Boolean
+   is (Right > Left);
+
+   -----------------------------------------------------------------------------
 
    type Node_Type is private;
    Null_Node : constant Node_Type;
