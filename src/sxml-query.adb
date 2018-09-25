@@ -213,7 +213,12 @@ package body SXML.Query is
       Tmp_Result : Result_Type;
    begin
       Result := Result_Not_Found;
-      State := Init (Document);
+      State  := Init (Document);
+
+      if not Is_Open (Document, State)
+      then
+         return;
+      end if;
 
       loop
          exit when Last >= Query_String'Last - 1;
@@ -280,6 +285,9 @@ package body SXML.Query is
 
       while Tmp_Result = Result_OK
       loop
+         pragma Loop_Invariant (Is_Valid (Document, State));
+         pragma Loop_Invariant (Is_Attribute (Document, State));
+
          if State.Name (Document) = Attribute_Name
          then
             Result := Result_OK;
@@ -299,17 +307,23 @@ package body SXML.Query is
                            Sibling_Name : String;
                            Result       : out Result_Type)
    is
+      Old_State : constant State_Type := State;
    begin
       loop
-         if State.Name (Document) = Sibling_Name
+         pragma Loop_Invariant (Is_Valid (Document, State) and then
+                                  (Is_Open (Document, State) or
+                                   Is_Content (Document, State)));
+
+         if Is_Open (Document, State) and then
+            State.Name (Document) = Sibling_Name
          then
             Result := Result_OK;
             return;
          end if;
          State.Sibling (Document, Result);
          exit when Result /= Result_OK;
-
       end loop;
+      State := Old_State;
    end Find_Sibling;
 
 end SXML.Query;
