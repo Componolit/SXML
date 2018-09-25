@@ -36,7 +36,9 @@ package body SXML.Serialize is
    procedure Put_Escaped (Doc      : Subtree_Type;
                           Start    : Index_Type;
                           Data     : in out String;
-                          Position : in out Integer);
+                          Position : in out Integer)
+   with
+      Pre => Start in Doc'Range;
 
    procedure Put_Escaped (Doc      : Subtree_Type;
                           Start    : Index_Type;
@@ -67,6 +69,7 @@ package body SXML.Serialize is
    begin
 
       loop
+         pragma Loop_Invariant (Pos in Doc'Range);
          N := Doc (Pos);
          for C of N.Data (1 .. Natural (N.Length))
          loop
@@ -76,8 +79,13 @@ package body SXML.Serialize is
                return;
             end if;
          end loop;
-         exit when N.Next = Invalid_Relative_Index;
+
+         exit when
+           N.Next = Invalid_Relative_Index or
+           Overflow (Pos, N.Next);
+
          Pos := Add (Pos, N.Next);
+         exit when not (Pos in Doc'Range);
       end loop;
    end Put_Escaped;
 
@@ -88,7 +96,9 @@ package body SXML.Serialize is
    procedure Serialize_Data (Doc      : Subtree_Type;
                              Start    : Index_Type;
                              Data     : in out String;
-                             Position : in out Integer);
+                             Position : in out Integer)
+   with
+      Pre => Start in Doc'Range;
 
    procedure Serialize_Data (Doc      : Subtree_Type;
                              Start    : Index_Type;
@@ -100,14 +110,19 @@ package body SXML.Serialize is
    begin
 
       loop
+         pragma Loop_Invariant (Pos in Doc'Range);
          N := Doc (Pos);
          Put (N.Data (1 .. Natural (N.Length)), Data, Position);
          if Position < 0
          then
             return;
          end if;
-         exit when N.Next = Invalid_Relative_Index;
+         exit when
+           N.Next = Invalid_Relative_Index or
+           Overflow (Pos, N.Next);
+
          Pos := Add (Pos, N.Next);
+         exit when not (Pos in Doc'Range);
       end loop;
    end Serialize_Data;
 
@@ -119,13 +134,15 @@ package body SXML.Serialize is
                      Current  : Index_Type;
                      Mode     : Mode_Type;
                      Data     : in out String;
-                     Position : in out Natural);
+                     Position : in out Integer)
+   with
+      Pre => Current in Doc'Range;
 
    procedure Handle (Doc      : Subtree_Type;
                      Current  : Index_Type;
                      Mode     : Mode_Type;
                      Data     : in out String;
-                     Position : in out Natural)
+                     Position : in out Integer)
    is
       Attr  : Index_Type;
       Value : Index_Type;
@@ -137,6 +154,13 @@ package body SXML.Serialize is
          Mode = Mode_Open
       then
          Put_Escaped (Doc, Current, Data, Position);
+         return;
+      end if;
+
+      if N.Kind /= Kind_Element_Open and
+         N.Kind /= Kind_Content
+      then
+         Position := -1;
          return;
       end if;
 
@@ -205,6 +229,8 @@ package body SXML.Serialize is
 
       while not S.Is_Empty
       loop
+         pragma Loop_Invariant (Position >= 0);
+
          S.Pop (Current);
          Handle (Doc, Current.Index, Current.Mode, Data, Position);
          if Position < 0
@@ -219,12 +245,26 @@ package body SXML.Serialize is
                return;
             end if;
             S.Push ((Current.Index, Mode_Close));
+
             Element := Current.Index;
-            Child   := Doc (Element).Children;
+            if not (Element in Doc'Range) or else
+              (Doc (Element).Kind /= Kind_Element_Open and
+               Doc (Element).Kind /= Kind_Content)
+            then
+               return;
+            end if;
+
+            Child := Doc (Element).Children;
             loop
-               exit when Child = Invalid_Relative_Index;
+               exit when
+                 Child = Invalid_Relative_Index or
+                 Overflow (Element, Child);
+
                Element := Add (Element, Child);
-               if Rev.Is_Full
+               if (Rev.Is_Full or
+                   not (Element in Doc'Range)) or else
+                  (Doc (Element).Kind /= Kind_Element_Open and
+                   Doc (Element).Kind /= Kind_Content)
                then
                   return;
                end if;
