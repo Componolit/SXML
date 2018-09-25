@@ -238,6 +238,9 @@ package body SXML.Serialize is
       while not S.Is_Empty
       loop
          pragma Loop_Invariant (Position >= 0);
+         pragma Loop_Invariant (S.Is_Valid);
+         pragma Loop_Invariant (not S.Is_Empty);
+         pragma Loop_Invariant (Rev.Is_Valid);
 
          S.Pop (Current);
          if not (Current.Index in Doc'Range)
@@ -281,11 +284,21 @@ package body SXML.Serialize is
                then
                   return;
                end if;
+
+               pragma Loop_Invariant (Rev.Is_Valid);
+               pragma Loop_Invariant (not Rev.Is_Full);
+               pragma Loop_Invariant (Element in Doc'Range);
+               pragma Loop_Invariant (Doc (Element).Kind = Kind_Element_Open or
+                                      Doc (Element).Kind = Kind_Content);
+
                Rev.Push ((Element, Mode_Open));
                Child := Doc (Element).Siblings;
             end loop;
             while not Rev.Is_Empty
             loop
+               pragma Loop_Invariant (S.Is_Valid);
+               pragma Loop_Invariant (Rev.Is_Valid);
+               pragma Loop_Invariant (not Rev.Is_Empty);
                Rev.Pop (Tmp);
                if S.Is_Full
                then

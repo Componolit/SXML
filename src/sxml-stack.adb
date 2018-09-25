@@ -36,6 +36,7 @@ package body SXML.Stack is
    is
    begin
       S := (others => Null_Element);
+      Index := S'First;
    end Init;
 
 end SXML.Stack;

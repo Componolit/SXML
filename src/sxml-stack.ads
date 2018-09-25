@@ -17,22 +17,27 @@ package SXML.Stack is
 
    procedure Push (E : Element_Type)
    with
-      Pre => Is_Valid and not Is_Full;
+      Pre  => Is_Valid and not Is_Full,
+      Post => Is_Valid and not Is_Empty;
    --  Push element onto stack
 
    procedure Pop (E : out Element_Type)
    with
-      Pre => Is_Valid and not Is_Empty;
+      Pre  => Is_Valid and not Is_Empty,
+      Post => Is_Valid and not Is_Full;
 
    procedure Drop
    with
-      Pre => Is_Valid and not Is_Empty;
+      Pre  => Is_Valid and not Is_Empty,
+      Post => Is_Valid and not Is_Full;
 
    procedure Reset
    with
-      Post => Is_Empty;
+      Post => Is_Valid and Is_Empty and not Is_Full;
 
-   procedure Init;
+   procedure Init
+   with
+      Post => Is_Valid and Is_Empty and not Is_Full;
 
 private
 
