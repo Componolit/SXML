@@ -3,7 +3,10 @@ package SXML.Serialize is
    type Traversal_Type is private;
    Null_Traversal : constant Traversal_Type;
 
-   type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type;
+   type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type
+   with
+      Predicate => Stack_Type'First <= Stack_Type'Last and then
+                   Stack_Type'Length > 1;
 
    ---------------
    -- To_String --

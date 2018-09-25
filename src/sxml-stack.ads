@@ -5,6 +5,10 @@ generic
    Null_Element : Element_Type;
 package SXML.Stack is
 
+   function Is_Valid return Boolean
+   with
+      Ghost;
+
    function Is_Empty return Boolean;
    --  Stack is empty
 
@@ -13,25 +17,29 @@ package SXML.Stack is
 
    procedure Push (E : Element_Type)
    with
-      Pre => not Is_Full;
+      Pre => Is_Valid and not Is_Full;
    --  Push element onto stack
 
    procedure Pop (E : out Element_Type)
    with
-      Pre => not Is_Empty;
+      Pre => Is_Valid and not Is_Empty;
 
    procedure Drop
    with
-      Pre => not Is_Empty;
+      Pre => Is_Valid and not Is_Empty;
 
    procedure Reset
    with
-      Post => not Is_Full and Is_Empty;
+      Post => Is_Empty;
 
    procedure Init;
 
 private
 
+   --  subtype Stack_Index_Type is SXML.Natural_Without_Last range S'First .. S'Last;
    Index : Natural := S'First;
+
+   function Is_Valid return Boolean
+   is (Index >= S'First and Index <= S'Last);
 
 end SXML.Stack;

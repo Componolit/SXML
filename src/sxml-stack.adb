@@ -9,15 +9,15 @@ package body SXML.Stack is
    procedure Push (E : Element_Type)
    is
    begin
-      Index := Index + 1;
       S (Index) := E;
+      Index := Index + 1;
    end Push;
 
    procedure Pop (E : out Element_Type)
    is
    begin
-      E := S (Index);
       Index := Index - 1;
+      E := S (Index);
    end Pop;
 
    procedure Drop
