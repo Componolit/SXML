@@ -14,6 +14,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 with SXML.Parser;
 with SXML_Utils; use SXML_Utils;
 with GNAT.OS_Lib;
+with Ada.Text_IO;
 
 package body SXML_Bulk_Tests is
 
@@ -21,6 +22,7 @@ package body SXML_Bulk_Tests is
    is
       URL : constant String := T.Routine_Name.all;
    begin
+      Ada.Text_IO.Put_Line ("Testing " & URL);
       Parse_Document ("obj/document/" & URL (9..URL'Last), 10000000);
 	end Test_URL;
 
