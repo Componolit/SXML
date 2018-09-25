@@ -1,1 +1,2 @@
 pragma SPARK_Mode (On);
+pragma Warnings (Off, "no contextual analysis of");
