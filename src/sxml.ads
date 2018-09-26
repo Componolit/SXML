@@ -5,11 +5,17 @@ is
    Get_String_Depth : constant := 100;
    Chunk_Length     : constant := 8;
 
+   --  FIXME: Rename
    subtype Content_Type is String
    with
       Predicate => Content_Type'First <= Content_Type'Last and then
                    Content_Type'Last <= Natural'Last - Chunk_Length and then
-                   Content_Type'Length > 0;
+                   Content_Type'Length >= 0;
+
+   --  FIXME: Rename
+   subtype Attr_Data_Type is String
+   with
+      Predicate => Attr_Data_Type'Last <= Natural'Last - Chunk_Length;
 
    type Index_Type is range 1 .. Natural'Last;
    Invalid_Index : constant Index_Type := Index_Type'Last;
@@ -150,14 +156,14 @@ is
    ---------------
 
    procedure Attribute (Name   : Content_Type;
-                        Data   : Content_Type;
+                        Data   : Attr_Data_Type;
                         Offset : in out Offset_Type;
                         Output : in out Subtree_Type)
    with
-      Pre => Offset <= Output'Length - Num_Elements (Name) - Num_Elements (Data) and then
-             Offset + Num_Elements (Name) + Num_Elements (Data) < Output'Length and then
-             Num_Elements (Data) <= Offset_Type (Index_Type'Last -
-                                                 Add (Add (Output'First, Offset), Num_Elements (Name)));
+      Pre => Offset <= Output'Length - Num_Elements (Name) - Num_Attr_Elements (Data) and then
+             Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Output'Length and then
+             Num_Attr_Elements (Data) <= Offset_Type (Index_Type'Last -
+                                                      Add (Add (Output'First, Offset), Num_Elements (Name)));
 
    ----------------
    -- Get_String --
@@ -176,6 +182,10 @@ is
    function Num_Elements (D : Content_Type) return Offset_Type
    with
       Post => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
+
+   function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
+   with
+      Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
 
    ---------------
    -- Same_Kind --
@@ -196,12 +206,13 @@ is
 
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
-                         Name    : Content_Type)
+                         Name    : Attr_Data_Type)
    with
-      Pre  => Offset < Offset_Type (Index_Type'Last) and then
-              Num_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-              Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Name)) and then
-              Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Elements (Name)),
+      Pre  => Offset < Subtree'Length and then
+              Offset < Offset_Type (Index_Type'Last) and then
+              Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
+              Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
+              Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)),
       Post => Same_Kind (Subtree, Subtree'Old, Offset);
 
 private

@@ -535,13 +535,31 @@ package body SXML.Parser is
 
          Start := Context_Index;
          Off := Sub (Context_Index, Context'First);
+
+         if Off > Context'Length -
+                  Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) -
+                  Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) or else
+            Off + Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) +
+               Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) >= Context'Length
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+
          SXML.Attribute
            (Name   => Data (Attribute_Name.First .. Attribute_Name.Last),
             Data   => Data (Attribute_Value.First .. Attribute_Value.Last),
             Offset => Off,
             Output => Context);
-         Context_Index := Add (Context'First, Off);
 
+         if Off > Offset_Type (Index_Type'Last - Context'First) or
+            Off >= Context'Length
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+
+         Context_Index := Add (Context'First, Off);
          Match := Match_OK;
 
       end Parse_Attribute;

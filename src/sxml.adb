@@ -40,17 +40,20 @@ is
    function Num_Elements (D : Content_Type) return Offset_Type
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
+   function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
+   is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
+
    ----------------
    -- Put_String --
    ----------------
 
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
-                         Name    : Content_Type)
+                         Name    : Attr_Data_Type)
    is
       Position : Natural := 0;
       Len      : Natural;
-      NE       : constant Offset_Type := Num_Elements (Name);
+      NE       : constant Offset_Type := Num_Attr_Elements (Name);
    begin
       if NE = 0
       then
@@ -109,12 +112,12 @@ is
    ---------------
 
    procedure Attribute (Name   : Content_Type;
-                        Data   : Content_Type;
+                        Data   : Attr_Data_Type;
                         Offset : in out Offset_Type;
                         Output : in out Subtree_Type)
    is
       Name_Elements : constant Offset_Type := Num_Elements (Name);
-      Data_Elements : constant Offset_Type := Num_Elements (Data);
+      Data_Elements : constant Offset_Type := Num_Attr_Elements (Data);
       Start         : constant Index_Type  := Add (Output'First, Offset);
       Last_Element  : constant Index_Type  := Add (Add (Start, Name_Elements), Data_Elements) - 1;
    begin
