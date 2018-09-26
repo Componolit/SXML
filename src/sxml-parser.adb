@@ -762,8 +762,8 @@ package body SXML.Parser is
                                 End_Tag   : String;
                                 Result    : out Range_Type)
       is
-         Old_Offset   : Natural;
-         Tmp_Result   : Match_Type;
+         Old_Offset : Natural;
+         Tmp_Result : Match_Type;
       begin
          Result := Null_Range;
          loop
@@ -913,7 +913,10 @@ package body SXML.Parser is
          Start  := Invalid_Index;
 
          Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
-         if Tmp_Result /= Null_Range and then Length (Tmp_Result) > 0
+         if Tmp_Result /= Null_Range and then
+            Length (Tmp_Result) > 0 and then
+            Tmp_Result.First >= Data'First and then
+            Tmp_Result.Last <= Data'Last
          then
             Context_Put_String (Value  => Data (Tmp_Result.First .. Tmp_Result.Last),
                                 Start  => Tmp_Start,
