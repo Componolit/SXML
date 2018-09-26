@@ -25,7 +25,10 @@ package body SXML.Parser is
          record
             First : Natural;
             Last  : Natural;
-         end record;
+         end record
+      with
+         Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last) or
+                      (Range_Type.First = Natural'Last and Range_Type.Last = 0);
       Null_Range : constant Range_Type := (Natural'Last, 0);
 
       function Is_Valid (R : Range_Type) return Boolean
@@ -332,30 +335,27 @@ package body SXML.Parser is
          Old_Offset : constant Natural := Offset;
          First      : constant Natural := Data'First + Offset;
          Result     : Match_Type;
-         Len        : Natural := 0;
       begin
          Text := Null_Range;
 
          loop
             if Data_Overflow or
-              Len = Natural'Last
+              Offset = Natural'Last
             then
                Restore_Offset (Old_Offset);
                return;
             end if;
 
             pragma Loop_Invariant (Data'First <= Natural'Last - Offset);
-            pragma Loop_Invariant (Len < Natural'Last);
+            pragma Loop_Invariant (Offset < Natural'Last);
 
             Match_String (End_String, Result);
             exit when Result = Match_OK;
             Offset := Offset + 1;
-            Len := Len + 1;
          end loop;
 
-         if Len = 0 or
-           (Data'First > Natural'Last - Offset or else
-            Data'First + Offset - End_String'Length <= 0)
+         if Old_Offset > Offset - End_String'Length - 1 or
+            Data'First > Natural'Last - Offset
          then
             Restore_Offset (Old_Offset);
             return;
@@ -1093,7 +1093,8 @@ package body SXML.Parser is
       is
       begin
          --  Too little space for BOM
-         if Data'First > Data'Last - Offset - 3
+         if Offset > Data'Length - 3 or else
+            Data'First > Data'Last - Offset - 3
          then
             return;
          end if;
