@@ -24,11 +24,13 @@ package body SXML.Parser is
          end record;
       Null_Range : constant Range_Type := (Natural'Last, 0);
 
+      function Is_Valid (R : Range_Type) return Boolean
+      is (R.Last < Natural'Last and R.Last >= R.First);
+
       function Length (R : Range_Type) return Natural
       is (R.Last - R.First + 1)
       with
-         Pre => (R.Last < Natural'Last and
-                 R.Last >= R.First);
+         Pre => Is_Valid (R);
 
       type Set_Type is new String
       with
@@ -96,25 +98,36 @@ package body SXML.Parser is
 
       function Match_Set (Valid   : Set_Type;
                           Invalid : Set_Type;
-                          Value   : Character) return Match_Type;
+                          Value   : Character) return Match_Type
+      with
+         Pre  => Offset < Data'Length,
+         Post => (case Match_Set'Result is
+                     when Match_OK      => (for some E of Valid   => E = Value) and
+                                           (for all E of Invalid  => E /= Value),
+                     when Match_Invalid => (for some E of Invalid => E = Value),
+                     when Match_None    => (for all E of Invalid  => E /= Value) and
+                                           (for all E of Valid    => E /= Value),
+                     when others        => False);
 
       function Match_Set (Valid   : Set_Type;
                           Invalid : Set_Type;
                           Value   : Character) return Match_Type
       is
       begin
-         for I of Invalid
+         for I in Invalid'Range
          loop
-            if I = Value then
+            if Invalid (I) = Value then
                return Match_Invalid;
             end if;
+            pragma Loop_Invariant ((for all E of Invalid (Invalid'First .. I) => E /= Value));
          end loop;
 
-         for V of Valid
+         for V in Valid'Range
          loop
-            if V = Value then
+            if Valid (V) = Value then
                return Match_OK;
             end if;
+            pragma Loop_Invariant ((for all E of Valid (Valid'First .. V) => E /= Value));
          end loop;
          return Match_None;
       end Match_Set;
@@ -128,12 +141,17 @@ package body SXML.Parser is
                            Match   : out Match_Type;
                            Value   : out Character)
       with
-          Pre    => Offset < Natural'Last,
-          Post   => (if Match = Match_OK
-                     then Offset - 1 <= Data'Length and then
-                          ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
-                            Offset > Offset'Old)
-                     else Offset = Offset'Old);
+         Pre  => Offset < Data'Length,
+         Post => (case Match is
+                     when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old)) and
+                                           (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
+                                           (for all E of Valid    => E /= Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when others        => False);
 
       procedure Match_Set (Valid   : Set_Type;
                            Invalid : Set_Type;
@@ -149,21 +167,32 @@ package body SXML.Parser is
             return;
          end if;
 
-         Match  := Match_Set (Valid, Invalid, Data (Data'First + Offset));
-         Value  := Data (Data'First + Offset);
+         Match := Match_Set (Valid, Invalid, Data (Data'First + Offset));
+
+         if Match = Match_OK
+         then
+            Value  := Data (Data'First + Offset);
+         end if;
+
          Offset := Offset + 1;
+
       end Match_Set;
 
       procedure Match_Set (Valid   : Set_Type;
                            Invalid : Set_Type;
                            Match   : out Match_Type)
-        with
-          Pre    => Offset < Natural'Last,
-          Post   => (if Match = Match_OK
-                     then Offset - 1 <= Data'Length and then
-                          ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
-                            Offset > Offset'Old)
-                     else Offset = Offset'Old);
+      with
+         Pre    => Offset < Data'Length,
+         Post => (case Match is
+                     when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old)) and
+                                           (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
+                                           (for all E of Valid    => E /= Data (Data'First + Offset'Old)) and
+                                           Offset > Offset'Old,
+                     when others        => False);
 
       procedure Match_Set (Valid   : Set_Type;
                            Invalid : Set_Type;

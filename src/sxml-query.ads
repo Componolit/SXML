@@ -50,8 +50,7 @@ package SXML.Query is
 
    function Init (Document : Subtree_Type) return State_Type
    with
-      Pre'Class => Document'Length > 0,
-      Post      => Is_Valid (Document, Init'Result);
+      Post => Is_Valid (Document, Init'Result);
 
    ----------
    -- Name --
