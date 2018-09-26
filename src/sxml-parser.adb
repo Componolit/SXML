@@ -1000,7 +1000,17 @@ package body SXML.Parser is
 
       procedure Link_Child (Child    : Index_Type;
                             Parent   : Index_Type;
-                            Previous : in out Index_Type);
+                            Previous : in out Index_Type)
+      with
+         Pre => (if Previous = Invalid_Index
+                 then Parent in Context'Range and then
+                      Child > Parent and then
+                      (Context (Parent).Kind = Kind_Element_Open or
+                       Context (Parent).Kind = Kind_Content)
+                 else Previous in Context'Range and then
+                      Child > Previous and then
+                      (Context (Previous).Kind = Kind_Element_Open or
+                       Context (Previous).Kind = Kind_Content));
 
       procedure Link_Child (Child    : Index_Type;
                             Parent   : Index_Type;
