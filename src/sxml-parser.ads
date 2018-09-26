@@ -23,9 +23,7 @@ package SXML.Parser is
    procedure Parse (Data         : Content_Type;
                     Context      : in out Subtree_Type;
                     Parse_Result : out Match_Type;
-                    Position     : out Natural)
-   with
-      Pre => Context'First > 0;
+                    Position     : out Natural);
    --  Parse an XML file
    --
    --  @param Result Result of parsing operation

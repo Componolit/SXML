@@ -13,7 +13,11 @@ package body SXML.Parser is
 
       Parse_Internal_Depth : constant := 100;
 
-      Context_Index : Index_Type := Context'First;
+      subtype Context_Index_Type is Index_Type
+      with Predicate => Context_Index_Type >= Context'First and
+                        Context_Index_Type <= Context'Last;
+
+      Context_Index : Context_Index_Type := Context'First;
       Offset        : Natural    := 0;
       Error_Index   : Natural    := 0;
 
@@ -67,11 +71,11 @@ package body SXML.Parser is
       -- Restore_Context --
       ---------------------
 
-      procedure Restore_Context (Old_Context : Index_Type)
+      procedure Restore_Context (Old_Context : Context_Index_Type)
         with
           Post => Context_Index = Old_Context;
 
-      procedure Restore_Context (Old_Context : Index_Type)
+      procedure Restore_Context (Old_Context : Context_Index_Type)
       is
       begin
          Context_Index := Old_Context;
@@ -272,12 +276,12 @@ package body SXML.Parser is
 
          for V of Value
          loop
+            Context (Context_Index) := V;
             if not (Context_Index in Context'Range) or
-               Context_Index = Index_Type'Last
+               Context_Index = Context'Last
             then
                return;
             end if;
-            Context (Context_Index) := V;
             Context_Index := Context_Index + 1;
          end loop;
          Result := True;
