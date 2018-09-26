@@ -80,7 +80,9 @@ package body SXML.Query is
          return;
       end if;
       Tmp_Offset := Add (State.Offset, Children);
-      if Tmp_Offset >= Document'Length
+      if Tmp_Offset >= Document'Length or else
+         (Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Element_Open and
+          Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Content)
       then
          return;
       end if;
@@ -133,6 +135,7 @@ package body SXML.Query is
                         Document : Subtree_Type;
                         Result   : out Result_Type)
    is
+      Tmp_State  : Offset_Type;
       Attributes : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Attributes;
    begin
@@ -147,8 +150,16 @@ package body SXML.Query is
          Result := Result_Not_Found;
          return;
       end if;
+
+      Tmp_State := Add (State.Offset, Attributes);
+      if Tmp_State >= Document'Length or else
+         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
+      then
+         return;
+      end if;
+
+      State.Offset := Tmp_State;
       Result := Result_OK;
-      State.Offset := Add (State.Offset, Attributes);
    end Attribute;
 
    --------------------
@@ -159,7 +170,8 @@ package body SXML.Query is
                              Document : Subtree_Type;
                              Result   : out Result_Type)
    is
-      Next : constant Relative_Index_Type :=
+      Tmp_State : Offset_Type;
+      Next      : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Next_Attribute;
    begin
       Result := Result_Invalid;
@@ -173,8 +185,16 @@ package body SXML.Query is
          Result := Result_Not_Found;
          return;
       end if;
+
+      Tmp_State := Add (State.Offset, Next);
+      if Tmp_State >= Document'Length or else
+         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
+      then
+         return;
+      end if;
+
       Result := Result_OK;
-      State.Offset := Add (State.Offset, Next);
+      State.Offset := Tmp_State;
    end Next_Attribute;
 
    --------------------
@@ -226,7 +246,8 @@ package body SXML.Query is
          Last  := First;
 
          pragma Loop_Invariant (Is_Valid (Document, State));
-         pragma Loop_Invariant (Is_Open (Document, State));
+         pragma Loop_Invariant (Is_Open (Document, State) or
+                                Is_Content (Document, State));
          pragma Loop_Invariant (First >= Query_String'First);
          pragma Loop_Invariant (Last >= Query_String'First);
          pragma Loop_Invariant (Last <= Query_String'Last);

@@ -8,6 +8,7 @@ is
    subtype Content_Type is String
    with
       Predicate => Content_Type'First <= Content_Type'Last and then
+                   Content_Type'Last <= Natural'Last - Chunk_Length and then
                    Content_Type'Length > 0;
 
    type Index_Type is range 1 .. Natural'Last;
@@ -174,7 +175,7 @@ is
 
    function Num_Elements (D : Content_Type) return Offset_Type
    with
-      Post => Num_Elements'Result = (D'Length + Chunk_Length - 1) / Chunk_Length;
+      Post => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
 
    ---------------
    -- Same_Kind --

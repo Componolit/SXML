@@ -73,10 +73,11 @@ package SXML.Query is
                     Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                      Is_Open (Document, State))) or
-                    State = State'Old;
+      Post'Class => (if Result = Result_OK
+                     then (Is_Valid (Document, State) and then
+                           (Is_Open (Document, State) or
+                            Is_Content (Document, State)))
+                     else State = State'Old);
 
    -------------
    -- Sibling --
@@ -105,7 +106,8 @@ package SXML.Query is
                            Result       : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Open (Document, State),
+                     (Is_Open (Document, State) or
+                      Is_Content (Document, State)),
       Post'Class => (Result = Result_OK and
                      (Is_Valid (Document, State) and then
                       Is_Open (Document, State))) or
@@ -121,10 +123,10 @@ package SXML.Query is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Open (Document, State),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                      Is_Attribute (Document, State))) or
-                    State = State'Old;
+      Post'Class => (if Result = Result_OK
+                     then (Is_Valid (Document, State) and then
+                          Is_Attribute (Document, State))
+                     else State = State'Old);
 
    --------------------
    -- Is_Valid_Value --
