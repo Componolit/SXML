@@ -3,6 +3,7 @@ with
    SPARK_Mode
 is
    Get_String_Depth : constant := 100;
+   Chunk_Length     : constant := 8;
 
    subtype Content_Type is String
    with
@@ -152,7 +153,7 @@ is
                         Offset : in out Offset_Type;
                         Output : in out Subtree_Type)
    with
-      Pre => Output'Length <= Offset_Type'Last - Offset - Num_Elements (Name) - Num_Elements (Data) and then
+      Pre => Offset <= Output'Length - Num_Elements (Name) - Num_Elements (Data) and then
              Offset + Num_Elements (Name) + Num_Elements (Data) < Output'Length and then
              Num_Elements (Data) <= Offset_Type (Index_Type'Last -
                                                  Add (Add (Output'First, Offset), Num_Elements (Name)));
@@ -173,7 +174,7 @@ is
 
    function Num_Elements (D : Content_Type) return Offset_Type
    with
-      Post => Num_Elements'Result > 0;
+      Post => Num_Elements'Result = (D'Length + Chunk_Length - 1) / Chunk_Length;
 
    ---------------
    -- Same_Kind --
@@ -204,7 +205,7 @@ is
 
 private
 
-   type Length_Type is range 0 .. 8 with Size => 8;
+   type Length_Type is range 0 .. Chunk_Length with Size => 8;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
 

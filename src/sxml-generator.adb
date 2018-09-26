@@ -96,10 +96,12 @@ package body SXML.Generator is
       Result : Subtree_Type (1 .. Add (Add (1, Num_Elements (Name)), Num_Elements (Value)));
       Offset : Offset_Type := 0;
    begin
+      Result := (others => Null_Node);
       SXML.Attribute (Name   => Name,
                       Data   => Value,
                       Offset => Offset,
                       Output => Result);
+      pragma Unreferenced (Offset);
       return Attributes_Type (Result);
    end A;
 
@@ -109,7 +111,8 @@ package body SXML.Generator is
 
    function C (Value : Content_Type) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value) - 1));
+      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value) - 1)) :=
+         (others => Null_Node);
    begin
       Put_Content (Result, 0, Value);
       return Result;
@@ -123,6 +126,7 @@ package body SXML.Generator is
    is
       Result : Subtree_Type := Left * Right;
       I      : Relative_Index_Type := 0;
+      N      : Index_Type;
    begin
       if Right'Length = 0
       then
@@ -131,11 +135,30 @@ package body SXML.Generator is
 
       --  Find last element
       loop
-         exit when Left (Add (Left'First, I)).Siblings = Invalid_Relative_Index;
-         I := I + Left (Add (Left'First, I)).Siblings;
+         if Overflow (Left'First, I)
+         then
+            return Result;
+         end if;
+
+         N :=  Add (Left'First, I);
+         if not (N in Left'Range) or else
+            (Left (N).Kind /= Kind_Content and
+             Left (N).Kind /= Kind_Element_Open)
+         then
+            return Result;
+         end if;
+
+         exit when Left (N).Siblings = Invalid_Relative_Index;
+
+         if Left (N).Siblings > Relative_Index_Type'Last - I
+         then
+            return Result;
+         end if;
+
+         I := I + Left (N).Siblings;
       end loop;
 
-      Result (Add (Result'First, I)).Siblings := Left'Length - I;
+      Result (N).Siblings := Left'Length - I;
       return Result;
    end "+";
 
@@ -147,14 +170,34 @@ package body SXML.Generator is
    is
       Result : Attributes_Type := Left * Right;
       I      : Relative_Index_Type := 0;
+      N      : Index_Type;
    begin
+
       --  Find last attibute
       loop
-         exit when Left (Add (Left'First, I)).Next_Attribute = Invalid_Relative_Index;
-         I := I + Left (Add (Left'First, I)).Next_Attribute;
+         if Overflow (Left'First, I)
+         then
+            return Result;
+         end if;
+
+         N :=  Add (Left'First, I);
+         if not (N in Left'Range) or else
+            Left (N).Kind /= Kind_Attribute
+         then
+            return Result;
+         end if;
+
+         exit when Left (N).Next_Attribute = Invalid_Relative_Index;
+
+         if Left (N).Next_Attribute > Relative_Index_Type'Last - I
+         then
+            return Result;
+         end if;
+
+         I := I + Left (N).Next_Attribute;
       end loop;
 
-      Result (Add (Result'First, I)).Next_Attribute := Left'Length - I;
+      Result (N).Next_Attribute := Left'Length - I;
       return Result;
    end "+";
 
