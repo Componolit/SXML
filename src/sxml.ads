@@ -4,6 +4,11 @@ with
 is
    Get_String_Depth : constant := 100;
 
+   subtype Content_Type is String
+   with
+      Predicate => Content_Type'First <= Content_Type'Last and then
+                   Content_Type'Length > 0;
+
    type Index_Type is range 1 .. Natural'Last;
    Invalid_Index : constant Index_Type := Index_Type'Last;
 
@@ -16,14 +21,6 @@ is
    subtype Natural_Without_Last is Natural range Natural'First .. Natural'Last - 1;
    --  Natural subtype that is useful for arrays, as we can use 'Length without
    --  having to show that 'Last is < Natural'Last.
-
-   ------------------
-   -- Valid_String --
-   ------------------
-
-   function Valid_String (Data : String) return Boolean
-   with
-       Ghost;
 
    ---------
    -- Add --
@@ -102,7 +99,9 @@ is
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
-   type Subtree_Type is array (Index_Type range <>) of Node_Type;
+   type Subtree_Type is array (Index_Type range <>) of Node_Type
+   with
+      Predicate => Subtree_Type'First > 0 and Subtree_Type'Length > 0;
    Null_Tree : constant Subtree_Type;
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
@@ -125,9 +124,8 @@ is
    -- Open --
    ----------
 
-   function Open (Name : String) return Subtree_Type
+   function Open (Name : Content_Type) return Subtree_Type
    with
-      Pre  => Valid_String (Name),
       Post => Open'Result'Length > 0;
 
    -----------------
@@ -136,10 +134,9 @@ is
 
    procedure Put_Content (Subtree : in out Subtree_Type;
                           Offset  : Offset_Type;
-                          Value   : String)
+                          Value   : Content_Type)
    with
-      Pre => Valid_String (Value) and then
-             Offset < Offset_Type (Index_Type'Last) and then
+      Pre => Offset < Offset_Type (Index_Type'Last) and then
              Subtree'First <= Sub (Index_Type'Last, Offset) and then
              Natural (Num_Elements (Value)) <= Subtree'Length - Natural (Offset) and then
              Add (Subtree'First, Offset) <= Subtree'Last and then
@@ -150,13 +147,12 @@ is
    -- Attribute --
    ---------------
 
-   procedure Attribute (Name   : String;
-                        Data   : String;
+   procedure Attribute (Name   : Content_Type;
+                        Data   : Content_Type;
                         Offset : in out Offset_Type;
                         Output : in out Subtree_Type)
    with
-      Pre => (Valid_String (Name) and Valid_String (Data)) and then
-             Output'Length <= Offset_Type'Last - Offset - Num_Elements (Name) - Num_Elements (Data) and then
+      Pre => Output'Length <= Offset_Type'Last - Offset - Num_Elements (Name) - Num_Elements (Data) and then
              Offset + Num_Elements (Name) + Num_Elements (Data) < Output'Length and then
              Num_Elements (Data) <= Offset_Type (Index_Type'Last -
                                                  Add (Add (Output'First, Offset), Num_Elements (Name)));
@@ -175,9 +171,8 @@ is
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (D : String) return Offset_Type
+   function Num_Elements (D : Content_Type) return Offset_Type
    with
-      Pre  => Valid_String (D),
       Post => Num_Elements'Result > 0;
 
    ---------------
@@ -199,10 +194,9 @@ is
 
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
-                         Name    : String)
+                         Name    : Content_Type)
    with
-      Pre  => Valid_String (Name) and then
-              Offset < Offset_Type (Index_Type'Last) and then
+      Pre  => Offset < Offset_Type (Index_Type'Last) and then
               Num_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
               Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Name)) and then
               Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Elements (Name)),
@@ -213,11 +207,6 @@ private
    type Length_Type is range 0 .. 8 with Size => 8;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
-
-   function Valid_String (Data : String) return Boolean
-   is (Data'Length > 0 and
-       Data'Length < Natural'Last - Data_Type'Length and
-       Data'First <= Natural'Last - Data'Length);
 
    type Kind_Type is (Kind_Invalid,
                       Kind_Element_Open,

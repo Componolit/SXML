@@ -37,7 +37,7 @@ is
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (D : String) return Offset_Type
+   function Num_Elements (D : Content_Type) return Offset_Type
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
    ----------------
@@ -46,7 +46,7 @@ is
 
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
-                         Name    : String)
+                         Name    : Content_Type)
    is
       Position : Natural := 0;
       Len      : Natural;
@@ -79,7 +79,7 @@ is
    -- Open --
    ----------
 
-   function Open (Name : String) return Subtree_Type
+   function Open (Name : Content_Type) return Subtree_Type
    is
       Result : Subtree_Type (1 .. Add (1, Num_Elements (Name))) :=
         (1      => Null_Open_Element,
@@ -95,7 +95,7 @@ is
 
    procedure Put_Content (Subtree : in out Subtree_Type;
                           Offset  : Offset_Type;
-                          Value   : String)
+                          Value   : Content_Type)
    is
       Start : constant Index_Type := Add (Subtree'First, Offset);
    begin
@@ -108,8 +108,8 @@ is
    -- Attribute --
    ---------------
 
-   procedure Attribute (Name   : String;
-                        Data   : String;
+   procedure Attribute (Name   : Content_Type;
+                        Data   : Content_Type;
                         Offset : in out Offset_Type;
                         Output : in out Subtree_Type)
    is

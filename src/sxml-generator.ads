@@ -18,72 +18,56 @@ is
    -- E --
    -------
 
-   function E (Name       : String;
+   function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type
-   with
-      Pre => Valid_String (Name);
+               Children   : Subtree_Type) return Subtree_Type;
 
-   function E (Name       : String;
-               Children   : Subtree_Type) return Subtree_Type
-   with
-      Pre => Valid_String (Name);
+   function E (Name       : Content_Type;
+               Children   : Subtree_Type) return Subtree_Type;
 
-   function E (Name       : String;
-               Attributes : Attributes_Type) return Subtree_Type
-   with
-      Pre => Valid_String (Name);
+   function E (Name       : Content_Type;
+               Attributes : Attributes_Type) return Subtree_Type;
 
-   function E (Name : String) return Subtree_Type
-   with
-      Pre => Valid_String (Name);
+   function E (Name : Content_Type) return Subtree_Type;
 
    -------
    -- A --
    -------
 
-   function A (Name  : String;
-               Value : Integer) return Attributes_Type
-   with
-      Pre => Valid_String (Name);
+   function A (Name  : Content_Type;
+               Value : Integer) return Attributes_Type;
 
    -------
    -- A --
    -------
 
-   function A (Name  : String;
-               Value : Float) return Attributes_Type
-   with
-      Pre => Valid_String (Name);
+   function A (Name  : Content_Type;
+               Value : Float) return Attributes_Type;
 
    -------
    -- A --
    -------
 
-   function A (Name  : String;
-               Value : String) return Attributes_Type
-   with
-      Pre => Valid_String (Name);
+   function A (Name  : Content_Type;
+               Value : Content_Type) return Attributes_Type;
 
    -------
    -- C --
    -------
 
-   function C (Value : String) return Subtree_Type
-   with
-      Pre => Valid_String (Value);
+   function C (Value : Content_Type) return Subtree_Type;
 
 private
 
    type Attributes_Type is new Subtree_Type;
    Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
 
-   function To_String (Value : Float) return String
+   function To_String (Value : Float) return Content_Type
    with
        Post     => To_String'Result'Length < 12,
        Annotate => (GNATprove, Terminating);
 
-   function To_String (Value : Integer) return String
+   function To_String (Value : Integer) return Content_Type
    with
       Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);

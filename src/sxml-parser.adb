@@ -4,7 +4,7 @@ package body SXML.Parser is
    -- Parse --
    -----------
 
-   procedure Parse (Data         : String;
+   procedure Parse (Data         : Content_Type;
                     Context      : in out Subtree_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
@@ -30,13 +30,12 @@ package body SXML.Parser is
          Pre => (R.Last < Natural'Last and
                  R.Last >= R.First);
 
-      type Set_Type is new String;
-      Empty_Set : constant Set_Type := "";
-
-      function Set_Valid (S : Set_Type) return Boolean
-      is (S'First >= 0 and S'Last < Natural'Last and S'First <= S'Last)
+      type Set_Type is new String
       with
-         Ghost;
+         Predicate => Set_Type'First >= 0 and
+                      Set_Type'Last < Natural'Last and
+                      Set_Type'First <= Set_Type'Last;
+      Empty_Set : constant Set_Type := "";
 
       Whitespace : constant Set_Type :=
         Character'Val (16#20#) &
@@ -129,9 +128,7 @@ package body SXML.Parser is
                            Match   : out Match_Type;
                            Value   : out Character)
       with
-          Pre    => Set_Valid (Valid) and
-                    Data_Valid (Data) and
-                    Offset < Natural'Last,
+          Pre    => Offset < Natural'Last,
           Post   => (if Match = Match_OK
                      then Offset - 1 <= Data'Length and then
                           ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
@@ -161,9 +158,7 @@ package body SXML.Parser is
                            Invalid : Set_Type;
                            Match   : out Match_Type)
         with
-          Pre    => Set_Valid (Valid) and
-                    Data_Valid (Data) and
-                    Offset < Natural'Last,
+          Pre    => Offset < Natural'Last,
           Post   => (if Match = Match_OK
                      then Offset - 1 <= Data'Length and then
                           ((for some E of Valid => E = Data (Data'First + Offset - 1)) and
@@ -263,14 +258,11 @@ package body SXML.Parser is
       -- Context_Put_String --
       ------------------------
 
-      procedure Context_Put_String (Value  : String;
+      procedure Context_Put_String (Value  : Content_Type;
                                     Start  : out Index_Type;
-                                    Result : out Boolean)
-      with
-         Pre => Context'Length > 0 and
-                Valid_String (Value);
+                                    Result : out Boolean);
 
-      procedure Context_Put_String (Value  : String;
+      procedure Context_Put_String (Value  : Content_Type;
                                     Start  : out Index_Type;
                                     Result : out Boolean)
       is
@@ -349,10 +341,8 @@ package body SXML.Parser is
                                  Match       : out Match_Type;
                                  Result      : out Range_Type)
         with
-          Pre  => Set_Valid (End_Set) and
-                  (Data_Valid (Data) and then
-                   Data'First <= Data'Last - Offset),
-            Post => (case Match is
+           Pre  => Data'First <= Data'Last - Offset,
+           Post => (case Match is
                         when Match_OK   => In_Range (Result),
                         when Match_None => Result = Null_Range,
                         when others     => Offset = Offset'Old);
@@ -406,9 +396,7 @@ package body SXML.Parser is
       -- Skip --
       ----------
 
-      procedure Skip (Skip_Set : Set_Type)
-        with
-          Pre => Data_Valid (Data);
+      procedure Skip (Skip_Set : Set_Type);
 
       procedure Skip (Skip_Set : Set_Type)
       is
@@ -437,7 +425,6 @@ package body SXML.Parser is
       procedure Parse_Attribute (Start : out Index_Type;
                                  Match : out Match_Type)
         with
-          Pre  => Data_Valid (Data),
           Post => (if Match /= Match_OK then Offset = Offset'Old);
 
       procedure Parse_Attribute (Start : out Index_Type;
@@ -535,7 +522,6 @@ package body SXML.Parser is
                                    Start : out Index_Type;
                                    Done  : out Boolean)
         with
-          Pre  => Data_Valid (Data),
           Post => (if Match /= Match_OK
                      then Offset = Offset'Old
                        else In_Range (Name));
@@ -644,7 +630,6 @@ package body SXML.Parser is
       procedure Parse_Closing_Tag (Name  : String;
                                    Match : out Match_Type)
         with
-          Pre  => Data_Valid (Data),
           Post => (if Match /= Match_OK then Offset = Offset'Old);
 
       procedure Parse_Closing_Tag (Name  : String;
@@ -720,9 +705,7 @@ package body SXML.Parser is
 
       procedure Parse_Sections (Start_Tag : String;
                                 End_Tag   : String;
-                                Result    : out Range_Type)
-        with
-          Pre => Data_Valid (Data);
+                                Result    : out Range_Type);
 
       procedure Parse_Sections (Start_Tag : String;
                                 End_Tag   : String;
@@ -762,9 +745,7 @@ package body SXML.Parser is
       -- Parse_Comment --
       -------------------
 
-      procedure Parse_Comment (Result : out Match_Type)
-        with
-          Pre => Data_Valid (Data);
+      procedure Parse_Comment (Result : out Match_Type);
 
       procedure Parse_Comment (Result : out Match_Type)
       is
@@ -778,9 +759,7 @@ package body SXML.Parser is
       -- Parse_Processing_Information --
       ----------------------------------
 
-      procedure Parse_Processing_Information (Result : out Match_Type)
-        with
-          Pre => Data_Valid (Data);
+      procedure Parse_Processing_Information (Result : out Match_Type);
 
       procedure Parse_Processing_Information (Result : out Match_Type)
       is
@@ -794,9 +773,7 @@ package body SXML.Parser is
       -- Parse_Doctype --
       -------------------
 
-      procedure Parse_Doctype (Result : out Match_Type)
-        with
-          Pre => Data_Valid (Data);
+      procedure Parse_Doctype (Result : out Match_Type);
 
       procedure Parse_Doctype (Result : out Match_Type)
       is
@@ -840,9 +817,7 @@ package body SXML.Parser is
       -- Parse_Section --
       -------------------
 
-      procedure Parse_Sections
-        with
-          Pre => Data_Valid (Data);
+      procedure Parse_Sections;
 
       procedure Parse_Sections
       is
@@ -867,7 +842,6 @@ package body SXML.Parser is
                                 Start  : out Index_Type;
                                 Level  : Natural := Parse_Internal_Depth)
         with
-          Pre  => Data_Valid (Data),
           Post => (if Match /= Match_OK then Offset = Offset'Old);
 
       -----------------
@@ -875,9 +849,7 @@ package body SXML.Parser is
       -----------------
 
       procedure Parse_CDATA (Result : out Match_Type;
-                             Start  : out Index_Type)
-        with
-          Pre => Data_Valid (Data);
+                             Start  : out Index_Type);
 
       procedure Parse_CDATA (Result : out Match_Type;
                              Start  : out Index_Type)
@@ -911,9 +883,7 @@ package body SXML.Parser is
       -------------------
 
       procedure Parse_Content (Match : out Match_Type;
-                               Start : out Index_Type)
-        with
-          Pre => Data_Valid (Data);
+                               Start : out Index_Type);
 
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)

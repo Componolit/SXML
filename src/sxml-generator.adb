@@ -4,7 +4,7 @@ package body SXML.Generator is
    -- To_String --
    ---------------
 
-   function To_String (Value : Float) return String
+   function To_String (Value : Float) return Content_Type
    with
       SPARK_Mode => Off
    is
@@ -23,7 +23,7 @@ package body SXML.Generator is
    -- To_String --
    ---------------
 
-   function To_String (Value : Integer) return String
+   function To_String (Value : Integer) return Content_Type
    with
       SPARK_Mode => Off
    is
@@ -40,7 +40,7 @@ package body SXML.Generator is
    -- E --
    -------
 
-   function E (Name       : String;
+   function E (Name       : Content_Type;
                Attributes : Attributes_Type;
                Children   : Subtree_Type) return Subtree_Type
    is
@@ -53,22 +53,22 @@ package body SXML.Generator is
       return O * Subtree_Type (Attributes) * Children;
    end E;
 
-   function E (Name       : String;
+   function E (Name       : Content_Type;
                Attributes : Attributes_Type) return Subtree_Type
    is (E (Name, Attributes, Null_Tree));
 
-   function E (Name     : String;
+   function E (Name     : Content_Type;
                Children : Subtree_Type) return Subtree_Type
    is (E (Name, Null_Attributes, Children));
 
-   function E (Name : String) return Subtree_Type
+   function E (Name : Content_Type) return Subtree_Type
    is (E (Name, Null_Attributes, Null_Tree));
 
    -------
    -- A --
    -------
 
-   function A (Name  : String;
+   function A (Name  : Content_Type;
                Value : Integer) return Attributes_Type
    is
    begin
@@ -79,7 +79,7 @@ package body SXML.Generator is
    -- A --
    -------
 
-   function A (Name  : String;
+   function A (Name  : Content_Type;
                Value : Float) return Attributes_Type
    is
    begin
@@ -90,8 +90,8 @@ package body SXML.Generator is
    -- A --
    -------
 
-   function A (Name  : String;
-               Value : String) return Attributes_Type
+   function A (Name  : Content_Type;
+               Value : Content_Type) return Attributes_Type
    is
       Result : Subtree_Type (1 .. Add (Add (1, Num_Elements (Name)), Num_Elements (Value)));
       Offset : Offset_Type := 0;
@@ -107,7 +107,7 @@ package body SXML.Generator is
    -- C --
    -------
 
-   function C (Value : String) return Subtree_Type
+   function C (Value : Content_Type) return Subtree_Type
    is
       Result : Subtree_Type (1 .. Add (1, Num_Elements (Value) - 1));
    begin

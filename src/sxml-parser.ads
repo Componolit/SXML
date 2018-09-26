@@ -16,24 +16,16 @@ package SXML.Parser is
    --                              instanciating package
    --  @value Match_Depth_Limit    Recursion depth exceeded
 
-   function Data_Valid (Data : String) return Boolean
-   is
-      (Data'First >= 0 and
-       Data'Last < Natural'Last and
-       Data'First <= Data'Last)
-   with
-      Ghost;
-
    -----------
    -- Parse --
    -----------
 
-   procedure Parse (Data         : String;
+   procedure Parse (Data         : Content_Type;
                     Context      : in out Subtree_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    with
-      Pre  => Data_Valid (Data) and Context'First > 0;
+      Pre => Context'First > 0;
    --  Parse an XML file
    --
    --  @param Result Result of parsing operation
