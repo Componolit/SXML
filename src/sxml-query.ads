@@ -72,11 +72,11 @@ package SXML.Query is
                     Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State),
-      Post'Class => (if Result = Result_OK
-                     then (Is_Valid (Document, State) and then
-                           (Is_Open (Document, State) or
-                            Is_Content (Document, State)))
-                     else State = State'Old);
+      Post'Class => ((Result = Result_OK and
+                      (Is_Valid (Document, State) and then
+                        (Is_Open (Document, State) or
+                        Is_Content (Document, State)))) or
+                     State = State'Old);
 
    -------------
    -- Sibling --
