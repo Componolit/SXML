@@ -1,6 +1,8 @@
 with SXML.Generator;
+with SXML.Serialize;
 use SXML;
 use SXML.Generator;
+use SXML.Serialize;
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Simple

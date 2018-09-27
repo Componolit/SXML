@@ -1,35 +1,40 @@
 with SXML.Generator;
+with SXML.Serialize;
+with Ada.Text_IO; use Ada.Text_IO;
+
 use SXML;
 use SXML.Generator;
+use SXML.Serialize;
 
-function Exec return String
+procedure Exec
 with
    SPARK_Mode
 is
-   type Argument_Type is new String (1..100);
-   subtype Argument_Index is Index_Type range  1 .. Index_Type'Last / 3;
-   type Arguments_Type is array (Argument_Index range <>) of Argument_Type;
+   type Arg_Type is new String (1..100);
+   type Args_Type is array (Index_Type range <>) of Arg_Type;
 
-   function To_Subtree (Arguments : Arguments_Type) return Subtree_Type
-   with
-      Pre  => Arguments'First < Arguments'Last,
-      Post => To_Subtree'Result'Length < Index_Type'Last - 1000;
-
-   function To_Subtree (Arguments : Arguments_Type) return Subtree_Type
+   function To_Subtree (Arguments : Args_Type) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. 3 * Arguments'Length) := (others => Null_Node);
+      Dummy   : constant Arg_Type := (others => 'x');
+      Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
+      Result  : Subtree_Type (1 .. Index_Type (Arg_Len * Arguments'Length));
    begin
-      for I in 0 .. Index_Type'(Arguments'Length) - 1
+      for I in Relative_Index_Type range 0 .. Arguments'Length - 1
       loop
-         Result (Result'First + 3 * I .. Result'First + 3 * I + 2) :=
-            E ("arg", A ("value", String (Arguments (Arguments'First + I))));
+         declare
+            Argument : constant Arg_Type := Arguments (Add (Arguments'First, I));
+            Arg : constant Subtree_Type := E ("arg", A ("value", String (Argument)));
+         begin
+            Result (Add (Result'First, Relative_Index_Type (Arg_Len) * I) ..
+                    Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I), Relative_Index_Type (Arg_Len) - 1)) := Arg;
+         end;
       end loop;
       return Result;
    end To_Subtree;
 
    function "+" (Value : String) return Arg_Type
    is
-      Result : Argument_Type := (others => Character'Val (0));
+      Result : Arg_Type := (others => Character'Val (0));
    begin
       for I in Value'Range
       loop
@@ -80,13 +85,8 @@ is
    -- 	</start>
    -- </config>
 
-   function Execute (Program   : String;
-                     Arguments : Arguments_Type) return String
-   with
-      Pre => Arguments'First < Arguments'Last;
-
-   function Execute (Program   : String;
-                     Arguments : Arguments_Type) return String
+   procedure Execute (Program   : String;
+                      Arguments : Args_Type)
    is
       Doc : Subtree_Type :=
        E ("config",
@@ -105,12 +105,13 @@ is
            E ("service", A ("name", "Report"))
          ) +
          E ("start",
-            A ("name", Program) + A ("caps", 500),
+            A ("name", Program) +
+            A ("caps", 500),
             E ("binary",
                A ("name", Program)) +
             E ("resource",
-               A ("name", "RAM") + A ("quantum", "16MB")
-            ) +
+               A ("name", "RAM") +
+               A ("quantum", "16MB")) +
             E ("config",
                E ("argv",
                   A ("progname", Program),
@@ -125,7 +126,9 @@ is
                   E ("fs")
                ) +
                E ("libc",
-                  A ("stdout", "/dev/log") + A ("stderr", "/dev/log") + A ("rtc", "/dev/rtc")
+                  A ("stdout", "/dev/log") +
+                  A ("stderr", "/dev/log") +
+                  A ("rtc", "/dev/rtc")
                )
             ) +
             E ("route",
@@ -135,11 +138,14 @@ is
             )
          )
        );
+      Data   : String (1 .. 5000);
+      Offset : Natural := 0;
    begin
-      return To_String (Doc);
+      To_String (Doc, Data, Offset);
+      Put_Line (Data (1 .. Offset));
    end Execute;
 
    A : constant Args_Type := (+"foo", +"bar", +"baz");
 begin
-   return (Execute ("foo", A));
+   Execute ("foo", A);
 end Exec;

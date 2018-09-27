@@ -33,14 +33,14 @@ is
    is
       Input   : access String := Read_File (File);
       Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. Input'Length);
-      package Parser is new SXML.Parser (Input.all, Context.all);
-      use SXML;
-      use Parser;
+      use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
    begin
-      Parser.Parse (Match    => Result,
-                    Position => Position);
+      Parse (Data         => Input.all,
+             Context      => Context.all,
+             Parse_Result => Result,
+             Position     => Position);
       if Result /= Match_OK
       then
          Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
