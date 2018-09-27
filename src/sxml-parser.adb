@@ -994,6 +994,28 @@ package body SXML.Parser is
 
       end Parse_Content;
 
+      -------------------
+      -- Is_Valid_Link --
+      -------------------
+
+      function Is_Valid_Link (Child    : Index_Type;
+                              Parent   : Index_Type;
+                              Previous : Index_Type) return Boolean;
+
+      function Is_Valid_Link (Child    : Index_Type;
+                              Parent   : Index_Type;
+                              Previous : Index_Type) return Boolean
+      is ((if Child /= Invalid_Index and then
+              Previous = Invalid_Index
+           then Parent in Context'Range and then
+                Child > Parent and then
+                (Context (Parent).Kind = Kind_Element_Open or
+                 Context (Parent).Kind = Kind_Content)
+           else Previous in Context'Range and then
+                Child > Previous and then
+                (Context (Previous).Kind = Kind_Element_Open or
+                 Context (Previous).Kind = Kind_Content)));
+
       ----------------
       -- Link_Child --
       ----------------
@@ -1002,15 +1024,8 @@ package body SXML.Parser is
                             Parent   : Index_Type;
                             Previous : in out Index_Type)
       with
-         Pre => (if Previous = Invalid_Index
-                 then Parent in Context'Range and then
-                      Child > Parent and then
-                      (Context (Parent).Kind = Kind_Element_Open or
-                       Context (Parent).Kind = Kind_Content)
-                 else Previous in Context'Range and then
-                      Child > Previous and then
-                      (Context (Previous).Kind = Kind_Element_Open or
-                       Context (Previous).Kind = Kind_Content));
+         Pre  => Is_Valid_Link (Child, Parent, Previous),
+         Post => (if Child /= Invalid_Index then Previous = Child);
 
       procedure Link_Child (Child    : Index_Type;
                             Parent   : Index_Type;
@@ -1099,6 +1114,12 @@ package body SXML.Parser is
          loop
             Parse_Internal (Sub_Match, Child_Start, Level - 1);
             exit when Sub_Match /= Match_OK;
+
+            if not Is_Valid_Link (Child_Start, Parent, Previous_Child)
+            then
+               return;
+            end if;
+
             Link_Child (Child_Start, Parent, Previous_Child);
          end loop;
 
