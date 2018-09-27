@@ -1,6 +1,7 @@
 with SXML.Stack;
 
-package body SXML.Serialize is
+package body SXML.Serialize
+is
 
    ---------
    -- Put --

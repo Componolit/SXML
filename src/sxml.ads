@@ -1,6 +1,4 @@
 package SXML
-with
-   SPARK_Mode
 is
    Get_String_Depth : constant := 100;
    Chunk_Length     : constant := 8;

@@ -1,5 +1,4 @@
 package body SXML
-   with SPARK_Mode
 is
    Null_Open_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Element_Open,

@@ -1,5 +1,5 @@
-package SXML.Serialize is
-
+package SXML.Serialize
+is
    type Traversal_Type is private;
    Null_Traversal : constant Traversal_Type;
 

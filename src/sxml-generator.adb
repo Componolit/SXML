@@ -1,4 +1,5 @@
-package body SXML.Generator is
+package body SXML.Generator
+is
 
    ---------------
    -- To_String --

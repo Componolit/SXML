@@ -1,4 +1,5 @@
-package body SXML.Stack is
+package body SXML.Stack
+is
 
    function Is_Empty return Boolean
    is (Index = S'First);

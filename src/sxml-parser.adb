@@ -1,4 +1,5 @@
-package body SXML.Parser is
+package body SXML.Parser
+is
 
    -----------
    -- Parse --

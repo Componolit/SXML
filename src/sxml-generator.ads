@@ -1,8 +1,5 @@
 package SXML.Generator
-with
-   SPARK_Mode
 is
-
    type Attributes_Type (<>) is private;
    Null_Attributes : constant Attributes_Type;
 
@@ -96,11 +93,13 @@ private
 
    function To_String (Value : Float) return Content_Type
    with
-       Post     => To_String'Result'Length < 12,
-       Annotate => (GNATprove, Terminating);
+      SPARK_Mode,
+      Post     => To_String'Result'Length < 12,
+      Annotate => (GNATprove, Terminating);
 
    function To_String (Value : Integer) return Content_Type
    with
+      SPARK_Mode,
       Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);
 

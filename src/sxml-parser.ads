@@ -1,5 +1,5 @@
-package SXML.Parser is
-
+package SXML.Parser
+is
    type Match_Type is (Match_OK,
                        Match_None,
                        Match_Invalid,

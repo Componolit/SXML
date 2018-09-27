@@ -1,5 +1,5 @@
-package SXML.Query is
-
+package SXML.Query
+is
    type Result_Type is (Result_Invalid,
                         Result_Not_Found,
                         Result_OK);

@@ -41,7 +41,6 @@ package SXML.Stack is
 
 private
 
-   --  subtype Stack_Index_Type is SXML.Natural_Without_Last range S'First .. S'Last;
    Index : Natural := S'First;
 
    function Is_Valid return Boolean

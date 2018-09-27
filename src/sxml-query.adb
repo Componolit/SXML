@@ -1,4 +1,5 @@
-package body SXML.Query is
+package body SXML.Query
+is
 
    --------------
    -- Is_Valid --
