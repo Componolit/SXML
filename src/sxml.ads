@@ -140,7 +140,7 @@ is
 
    function Open (Name : Content_Type) return Subtree_Type
    with
-      Post => Open'Result'Length = 1 and then
+      Post => Open'Result'Length = 1 + Num_Elements (Name) and then
               Is_Open (Open'Result (Open'Result'First));
 
    -----------------
