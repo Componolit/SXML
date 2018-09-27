@@ -128,13 +128,20 @@ is
    with Pre => False;
    pragma Warnings (On, "precondition is statically False");
 
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Node : Node_Type) return Boolean;
+
    ----------
    -- Open --
    ----------
 
    function Open (Name : Content_Type) return Subtree_Type
    with
-      Post => Open'Result'Length > 0;
+      Post => Open'Result'Length = 1 and then
+              Is_Open (Open'Result (Open'Result'First));
 
    -----------------
    -- Put_Content --
@@ -251,7 +258,7 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Tree : constant Subtree_Type (1 .. 0) := (others => Null_Node);
+   Null_Tree : constant Subtree_Type := (1 => Null_Node);
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
@@ -262,5 +269,12 @@ private
                        Offset  : Offset_Type) return Boolean
    is
       (Current (Add (Current'First, Offset)).Kind = Old (Add (Old'First, Offset)).Kind);
+
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Node : Node_Type) return Boolean
+   is (Node.Kind = Kind_Element_Open);
 
 end SXML;
