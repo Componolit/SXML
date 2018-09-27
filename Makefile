@@ -13,19 +13,23 @@ test: SXML.gpr
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
+benchmark:
+	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
+	@obj/benchmark tests/data/orders.xml 100 100
+
 testonly: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@obj/tests
+	@time obj/tests
 
 testbulk: export SXML_BULK_TESTS ?= 1
 testbulk: SXML.gpr bulkdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@obj/tests
+	@time obj/tests
 
 testinsane: export SXML_INSANE_TESTS ?= 1
 testinsane: SXML.gpr insanedata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@obj/tests
+	@time obj/tests
 
 check:
 	@gnatcheck -P SXML

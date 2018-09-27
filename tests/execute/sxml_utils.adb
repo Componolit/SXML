@@ -11,6 +11,7 @@
 
 with AUnit.Assertions; use AUnit.Assertions;
 with Ada.Directories;
+with Ada.Unchecked_Deallocation;
 with Ada.Text_IO.Text_Streams;
 with SXML.Generator; use SXML.Generator;
 with SXML.Serialize; use SXML.Serialize;
@@ -20,6 +21,9 @@ with Text_IO;
 package body SXML_Utils
 is
    Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 150000000);
+
+   type String_Access is access all String;
+   procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
 
    -------------------
    -- Check_Invalid --
@@ -81,16 +85,18 @@ is
       Data : access String := new String (1 .. 2 * Input'Length);
       Last : Natural := 1;
       Stack : access Stack_Type;
+
    begin
       Parser.Parse (Data         => Input.all,
                     Context      => Context.all,
                     Parse_Result => Result,
                     Position     => Position);
+      Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-
       Stack := new Stack_Type (1 .. Stack_Size);
       To_String (Context.all, Data.all, Last, Stack.All);
+      Free (Data);
       Assert (Last > 0, File & ": Serialization error");
    end Parse_Document;
 
@@ -126,6 +132,7 @@ is
          "Invalid result at" & Position'Img &
          ": (" & XML.all (1 .. Last) & "), expected: (" & (if Output = "INPUT" then Input else Output) &
          "), Last=" & Last'Img);
+      Free (XML);
    end Check_Document;
 
    -------------------------
