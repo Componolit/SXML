@@ -1,5 +1,7 @@
 package body SXML
 is
+   pragma Annotate (GNATprove, Terminating, SXML);
+
    Null_Open_Element : constant Node_Type :=
      Node_Type'(Kind           => Kind_Element_Open,
                 Length         => 0,

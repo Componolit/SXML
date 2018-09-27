@@ -1,5 +1,6 @@
 package body SXML.Stack
 is
+   pragma Annotate (GNATprove, Terminating, SXML.Stack);
 
    function Is_Empty return Boolean
    is (Index = S'First);

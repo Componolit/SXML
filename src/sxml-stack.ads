@@ -5,6 +5,8 @@ generic
    Null_Element : Element_Type;
 package SXML.Stack is
 
+   function Level return Natural;
+
    function Is_Valid return Boolean
    with
       Ghost;
@@ -42,6 +44,9 @@ package SXML.Stack is
 private
 
    Index : Natural := S'First;
+
+   function Level return Natural
+   is (Index);
 
    function Is_Valid return Boolean
    is (Index >= S'First and Index <= S'Last);

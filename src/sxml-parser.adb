@@ -1,5 +1,6 @@
 package body SXML.Parser
 is
+   pragma Annotate (GNATprove, Terminating, SXML.Parser);
 
    -----------
    -- Parse --

@@ -1,5 +1,7 @@
 package body SXML.Generator
 is
+   pragma Annotate (GNATprove, Terminating, SXML.Generator);
+
    ------------------
    -- Num_Elements --
    ------------------

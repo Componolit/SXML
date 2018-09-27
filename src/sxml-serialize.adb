@@ -2,6 +2,7 @@ with SXML.Stack;
 
 package body SXML.Serialize
 is
+   pragma Annotate (GNATprove, Terminating, SXML.Serialize);
 
    ---------
    -- Put --
@@ -71,6 +72,7 @@ is
 
       loop
          pragma Loop_Invariant (Pos in Doc'Range);
+         pragma Loop_Variant (Increases => Pos);
          N := Doc (Pos);
          for C of N.Data (1 .. Natural (N.Length))
          loop
@@ -240,6 +242,7 @@ is
 
       while not S.Is_Empty
       loop
+         pragma Loop_Variant (Increases => Position);
          pragma Loop_Invariant (Position >= 0);
          pragma Loop_Invariant (S.Is_Valid);
          pragma Loop_Invariant (not S.Is_Empty);
@@ -289,6 +292,7 @@ is
                   return;
                end if;
 
+               pragma Loop_Variant (Increases => Element);
                pragma Loop_Invariant (Rev.Is_Valid);
                pragma Loop_Invariant (not Rev.Is_Full);
                pragma Loop_Invariant (Element in Doc'Range);
