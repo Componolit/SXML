@@ -109,7 +109,7 @@ is
 
    type Subtree_Type is array (Index_Type range <>) of Node_Type
    with
-      Predicate => Subtree_Type'First > 0 and Subtree_Type'Length > 0;
+      Dynamic_Predicate => Subtree_Type'First > 0 and Subtree_Type'Length > 0;
    Null_Tree : constant Subtree_Type;
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean

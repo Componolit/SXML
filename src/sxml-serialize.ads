@@ -5,8 +5,8 @@ package SXML.Serialize is
 
    type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type
    with
-      Predicate => Stack_Type'First <= Stack_Type'Last and
-                   Stack_Type'Length > 3;
+      Dynamic_Predicate => Stack_Type'First <= Stack_Type'Last and
+                           Stack_Type'Length > 3;
 
    ---------------
    -- To_String --
