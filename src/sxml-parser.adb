@@ -44,7 +44,7 @@ package body SXML.Parser is
          Predicate => Set_Type'First >= 0 and
                       Set_Type'Last < Natural'Last and
                       Set_Type'First <= Set_Type'Last;
-      Empty_Set : constant Set_Type := "";
+      Empty_Set : constant Set_Type := (1 => Character'Val (0));
 
       Whitespace : constant Set_Type :=
         Character'Val (16#20#) &
