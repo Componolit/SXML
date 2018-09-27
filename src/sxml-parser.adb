@@ -259,7 +259,9 @@ package body SXML.Parser is
 
       procedure Context_Put (Value  : Subtree_Type;
                              Start  : out Index_Type;
-                             Result : out Boolean);
+                             Result : out Boolean)
+      with
+         Post => (if Result then Start in Context'Range);
 
       procedure Context_Put (Value  : Subtree_Type;
                              Start  : out Index_Type;
@@ -564,6 +566,54 @@ package body SXML.Parser is
 
       end Parse_Attribute;
 
+      -----------------------------
+      -- Is_Valid_Attribute_Link --
+      -----------------------------
+
+      function Is_Valid_Attribute_Link (Next     : Index_Type;
+                                        Parent   : Index_Type;
+                                        Previous : Index_Type) return Boolean;
+
+      function Is_Valid_Attribute_Link (Next     : Index_Type;
+                                        Parent   : Index_Type;
+                                        Previous : Index_Type) return Boolean
+      is ((if Next /= Invalid_Index and then
+              Previous = Invalid_Index
+           then Parent in Context'Range and then
+                Next > Parent and then
+                (Context (Parent).Kind = Kind_Element_Open)
+           else Previous in Context'Range and then
+                Next > Previous and then
+                (Context (Previous).Kind = Kind_Attribute)));
+
+      --------------------
+      -- Link_Attribute --
+      --------------------
+
+      procedure Link_Attribute (Next     : Index_Type;
+                                Parent   : Index_Type;
+                                Previous : in out Index_Type)
+      with
+         Pre  => Is_Valid_Attribute_Link (Next, Parent, Previous),
+         Post => (if Next /= Invalid_Index then Previous = Next);
+
+      procedure Link_Attribute (Next     : Index_Type;
+                                Parent   : Index_Type;
+                                Previous : in out Index_Type)
+      is
+      begin
+         if Next /= Invalid_Index
+         then
+            if Previous = Invalid_Index
+            then
+               Context (Parent).Attributes := Sub (Next, Parent);
+            else
+               Context (Previous).Next_Attribute := Sub (Next, Previous);
+            end if;
+            Previous := Next;
+         end if;
+      end Link_Attribute;
+
       -----------------------
       -- Parse_Opening_Tag --
       -----------------------
@@ -637,13 +687,14 @@ package body SXML.Parser is
          loop
             Parse_Attribute (Attribute_Start, Match_Attr);
             exit when Match_Attr /= Match_OK;
-            if Previous_Attribute = Invalid_Index
+
+            if not Is_Valid_Attribute_Link (Attribute_Start, Start, Previous_Attribute)
             then
-               Context (Start).Attributes := Sub (Attribute_Start, Start);
-            else
-               Context (Previous_Attribute).Next_Attribute := Sub (Attribute_Start, Previous_Attribute);
+               Restore_Offset (Old_Offset);
+               return;
             end if;
-            Previous_Attribute := Attribute_Start;
+
+            Link_Attribute (Attribute_Start, Start, Previous_Attribute);
          end loop;
 
          --  Short form node?
@@ -843,8 +894,13 @@ package body SXML.Parser is
          end if;
 
          Match_Until_Set ("[", ">", Tmp_Result, Unused_Range);
-         if Tmp_Result = Match_OK or Data_Overflow
+         if Tmp_Result = Match_OK
          then
+            if Data_Overflow
+            then
+               Restore_Offset (Old_Offset);
+               return;
+            end if;
             Match_Until_Set ("]", Empty_Set, Tmp_Result, Unused_Range);
             if Tmp_Result /= Match_OK or Data_Overflow
             then
@@ -855,6 +911,12 @@ package body SXML.Parser is
          pragma Unreferenced (Unused_Range);
 
          Skip (Whitespace);
+         if Data_Overflow
+         then
+            Restore_Offset (Old_Offset);
+            return;
+         end if;
+
          Match_Until_String (">", Text);
          if Text = Null_Range
          then
@@ -976,6 +1038,10 @@ package body SXML.Parser is
             return;
          end if;
 
+         if Data_Overflow
+         then
+            return;
+         end if;
          Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
          if Match_Content = Match_OK and then Length (Content_Range) > 0
          then
