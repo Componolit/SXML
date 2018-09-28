@@ -40,6 +40,12 @@ fuzz: MODE=debug
 fuzz: obj/fuzzdriver
 	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/fuzzdriver @@
 
+stack: COMMON_OPTS += -Xcallgraph=su_da
+stack: CALLGRAPH = su_da
+stack: SXML.gpr
+	@gprbuild $(COMMON_OPTS) -PSXML
+	@gnatstack -PSXML
+
 bulkdata:
 	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
 

@@ -12,3 +12,5 @@ gnatinspect.db
 tests-loc.xml
 *.cswi
 *.cgpr
+*.ciu
+*.vcg
