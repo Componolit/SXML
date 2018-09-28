@@ -35,6 +35,7 @@ is
       Result   : Match_Type;
       Position : Natural;
    begin
+      Context.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
              Context      => Context.all,
              Parse_Result => Result,
