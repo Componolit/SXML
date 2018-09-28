@@ -1,7 +1,13 @@
 package SXML
 is
-   Get_String_Depth : constant := 100;
-   Chunk_Length     : constant := 8;
+   Get_String_Depth      : constant := 128;
+   Chunk_Length          : constant := 8;
+   Scratch_Buffer_Length : constant := 1024;
+
+   type Result_Type is (Result_OK,
+                        Result_Overflow,
+                        Result_Invalid,
+                        Result_Not_Found);
 
    --  FIXME: Rename
    subtype Content_Type is String
@@ -174,8 +180,11 @@ is
    -- Get_String --
    ----------------
 
-   function Get_String (Doc   : Subtree_Type;
-                        Start : Offset_Type) return String
+   procedure Get_String (Doc    : Subtree_Type;
+                         Start  : Offset_Type;
+                         Result : out Result_Type;
+                         Data   : in out Content_Type;
+                         Last   : out Natural)
    with
       Pre      => Start < Doc'Length,
       Annotate => (Gnatprove, Terminating);

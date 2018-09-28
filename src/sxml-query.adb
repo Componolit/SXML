@@ -1,5 +1,7 @@
 package body SXML.Query
 is
+   --  Scratch buffer for queries. This will be the largest attribute size you can search for.
+   Scratch_Buffer : String (1 .. SXML.Scratch_Buffer_Length);
 
    --------------
    -- Is_Valid --
@@ -49,9 +51,15 @@ is
    -- Name --
    ----------
 
-   function Name (State    : State_Type;
-                  Document : Subtree_Type) return String
-   is (Get_String (Document, State.Offset));
+   procedure Name (State    : State_Type;
+                   Document : Subtree_Type;
+                   Result   : out Result_Type;
+                   Data     : in out Content_Type;
+                   Last     : out Natural)
+   is
+   begin
+      Get_String (Document, State.Offset, Result, Data, Last);
+   end Name;
 
    -----------
    -- Child --
@@ -211,13 +219,16 @@ is
    -- Value --
    -----------
 
-   function Value (State    : State_Type;
-                   Document : Subtree_Type) return String
+   procedure Value (State    : State_Type;
+                    Document : Subtree_Type;
+                    Result   : out Result_Type;
+                    Data     : in out Content_Type;
+                    Last     : out Natural)
    is
       Val : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Value;
    begin
-      return Get_String (Document, Add (State.Offset, Val));
+      Get_String (Document, Add (State.Offset, Val), Result, Data, Last);
    end Value;
 
    ----------
@@ -263,7 +274,8 @@ is
             Last := Last + 1;
          end loop;
 
-         if First > Last
+         if First > Last or
+            Last > Natural'Last - Chunk_Length
          then
             exit;
          end if;
@@ -297,12 +309,20 @@ is
 
    procedure Find_Attribute (State          : in out State_Type;
                              Document       : Subtree_Type;
-                             Attribute_Name : String;
+                             Attribute_Name : Content_Type;
                              Result         : out Result_Type)
    is
       Tmp_Result : Result_Type;
+      Tmp_Last   : Natural;
    begin
       Result := Result_Not_Found;
+
+      if Attribute_Name'Length > Scratch_Buffer'Length
+      then
+         Result := Result_Overflow;
+         return;
+      end if;
+
       State.Attribute (Document, Tmp_Result);
 
       while Tmp_Result = Result_OK
@@ -310,7 +330,10 @@ is
          pragma Loop_Invariant (Is_Valid (Document, State));
          pragma Loop_Invariant (Is_Attribute (Document, State));
 
-         if State.Name (Document) = Attribute_Name
+         State.Name (Document, Tmp_Result, Scratch_Buffer (1 .. Attribute_Name'Length), Tmp_Last);
+         if Tmp_Result = Result_OK and then
+            Tmp_Last = Attribute_Name'Length and then
+            Scratch_Buffer (1 .. Tmp_Last) = Attribute_Name
          then
             Result := Result_OK;
             return;
@@ -326,21 +349,32 @@ is
 
    procedure Find_Sibling (State        : in out State_Type;
                            Document     : Subtree_Type;
-                           Sibling_Name : String;
+                           Sibling_Name : Content_Type;
                            Result       : out Result_Type)
    is
       Old_State : constant State_Type := State;
+      Tmp_Last  : Natural;
    begin
+      if Sibling_Name'Length >= Scratch_Buffer'Length
+      then
+         Result := Result_Overflow;
+         return;
+      end if;
+
       loop
          pragma Loop_Invariant (Is_Valid (Document, State) and then
                                   (Is_Open (Document, State) or
                                    Is_Content (Document, State)));
 
-         if Is_Open (Document, State) and then
-            State.Name (Document) = Sibling_Name
+         if Is_Open (Document, State)
          then
-            Result := Result_OK;
-            return;
+            State.Name (Document, Result, Scratch_Buffer (1 .. Sibling_Name'Length), Tmp_Last);
+            if Result = Result_OK and then
+               Tmp_Last = Sibling_Name'Length and then
+               Scratch_Buffer (1 .. Tmp_Last) = Sibling_Name
+            then
+               return;
+            end if;
          end if;
          State.Sibling (Document, Result);
          exit when Result /= Result_OK;

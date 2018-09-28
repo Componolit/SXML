@@ -14,13 +14,46 @@ with SXML.Generator; use SXML.Generator;
 with SXML.Query; use SXML.Query;
 with SXML.Parser;
 with SXML_Utils; use SXML_Utils;
+use SXML;
 
 package body SXML_Query_Tests is
+
+   Scratch : String (1 .. 1000);
+
+   function Name (State : State_Type;
+                  Doc   : Subtree_Type) return String
+   is
+      Result : Result_Type;
+      Last   : Natural;
+   begin
+      State.Name (Doc, Result, Scratch, Last);
+      if Result = Result_OK
+      then
+         return Scratch (1 .. Last);
+      else
+         return "<<Invalid Name>>";
+      end if;
+   end Name;
+
+   function Value (State : State_Type;
+                   Doc   : Subtree_Type) return String
+   is
+      Result : Result_Type;
+      Last   : Natural;
+   begin
+      State.Value (Doc, Result, Scratch, Last);
+      if Result = Result_OK
+      then
+         return Scratch (1 .. Last);
+      else
+         return "<<Invalid Value>>";
+      end if;
+   end Value;
 
    procedure Path_Query (Context      : in out SXML.Subtree_Type;
                          Input_File   : String;
                          Query_String : String;
-                         Result       : out Result_Type;
+                         Result       : out SXML.Result_Type;
                          Position     : out Natural;
                          State        : out State_Type)
    is
@@ -49,9 +82,9 @@ package body SXML_Query_Tests is
       use SXML.Query;
       Doc   : Subtree_Type := E ("config");
       State : State_Type   := Init (Doc);
-      Name  : String       := State.Name (Doc);
+      N     : String       := Name (State, Doc);
    begin
-      Assert (Name = "config", "Unexpected name: """ & Name & """ (expected ""config"")");
+      Assert (N = "config", "Unexpected name: """ & N & """ (expected ""config"")");
 	end Test_Query_Node_Name;
 
    ---------------------------------------------------------------------------
@@ -67,7 +100,7 @@ package body SXML_Query_Tests is
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "Expected child");
       declare
-         Child_Name : constant String := State.Name (Doc);
+         Child_Name : constant String := Name (State, Doc);
       begin
          Assert (Child_Name = "child", "Unexpected name: """ & Child_Name & """ (expected ""config"")");
       end;
@@ -99,13 +132,13 @@ package body SXML_Query_Tests is
    begin
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "First child not found");
-      Assert (State.Name (Doc) = "child1", "Invalid first child");
+      Assert (Name (State, Doc) = "child1", "Invalid first child");
       State.Sibling (Doc, Result);
       Assert (Result = Result_OK, "Second child not found");
-      Assert (State.Name (Doc) = "child2", "Invalid second child");
+      Assert (Name (State, Doc) = "child2", "Invalid second child");
       State.Sibling (Doc, Result);
       Assert (Result = Result_OK, "Third child not found");
-      Assert (State.Name (Doc) = "child3", "Invalid third child");
+      Assert (Name (State, Doc) = "child3", "Invalid third child");
       State.Sibling (Doc, Result);
       Assert (Result = Result_Not_Found, "Expected no more children");
 	end Test_Query_All_Children;
@@ -123,7 +156,7 @@ package body SXML_Query_Tests is
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "First child not found");
       State.Find_Sibling (Doc, "child2", Result);
-      Assert (State.Name (Doc) = "child2", "Invalid child");
+      Assert (Name (State, Doc) = "child2", "Invalid child");
 	end Test_Query_Find_Sibling;
 
    ---------------------------------------------------------------------------
@@ -143,7 +176,7 @@ package body SXML_Query_Tests is
       Assert (Result = Result_OK, "First child not found");
       State.Find_Sibling (Doc, "child2", Result);
       Assert (Result = Result_OK, "Second child not found: " & Result'Img);
-      Assert (State.Name (Doc) = "child2", "Invalid child: " & State.Name (Doc));
+      Assert (Name (State, Doc) = "child2", "Invalid child: " & Name (State, Doc));
 	end Test_Query_Find_Sibling_With_Content;
 
    ---------------------------------------------------------------------------
@@ -159,7 +192,7 @@ package body SXML_Query_Tests is
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "First child not found");
       State.Find_Sibling (Doc, "child1", Result);
-      Assert (State.Name (Doc) = "child1", "Invalid child");
+      Assert (Name (State, Doc) = "child1", "Invalid child");
 	end Test_Query_Find_First_Sibling;
 
    ---------------------------------------------------------------------------
@@ -175,11 +208,11 @@ package body SXML_Query_Tests is
       State.Attribute (Doc, Result);
       Assert (Result = Result_OK, "Invalid attribute");
       declare
-         Name  : String := State.Name (Doc);
-         Value : String := State.Value (Doc);
+         N : String := Name (State, Doc);
+         V : String := Value (State, Doc);
       begin
-         Assert (Name = "attribute1", "Unexpected name: """ & Name & """ (expected ""attribute1"")");
-         Assert (Value = "value1", "Unexpected value: """ & Value & """ (expected ""value1"")");
+         Assert (N = "attribute1", "Unexpected name: """ & N & """ (expected ""attribute1"")");
+         Assert (V = "value1", "Unexpected value: """ & V & """ (expected ""value1"")");
       end;
 	end Test_Query_Attribute;
 
@@ -199,20 +232,20 @@ package body SXML_Query_Tests is
    begin
       State.Attribute (Doc, Result);
       Assert (Result = Result_OK, "Invalid attribute");
-      Assert (State.Name (Doc) = "attribute1", "Unexpected name");
-      Assert (State.Value (Doc) = "value1", "Unexpected name");
+      Assert (Name (State, Doc) = "attribute1", "Unexpected name");
+      Assert (Value (State, Doc) = "value1", "Unexpected name");
       State.Next_Attribute (Doc, Result);
       Assert (Result = Result_OK, "Invalid attribute");
-      Assert (State.Name (Doc) = "attribute2", "Unexpected name");
-      Assert (State.Value (Doc) = "value2", "Unexpected name");
+      Assert (Name (State, Doc) = "attribute2", "Unexpected name");
+      Assert (Value (State, Doc) = "value2", "Unexpected name");
       State.Next_Attribute (Doc, Result);
       Assert (Result = Result_OK, "Invalid attribute");
-      Assert (State.Name (Doc) = "attribute3", "Unexpected name");
-      Assert (State.Value (Doc) = "value3", "Unexpected name");
+      Assert (Name (State, Doc) = "attribute3", "Unexpected name");
+      Assert (Value (State, Doc) = "value3", "Unexpected name");
       State.Next_Attribute (Doc, Result);
       Assert (Result = Result_OK, "Invalid attribute");
-      Assert (State.Name (Doc) = "attribute4", "Unexpected name");
-      Assert (State.Value (Doc) = "value4", "Unexpected name");
+      Assert (Name (State, Doc) = "attribute4", "Unexpected name");
+      Assert (Value (State, Doc) = "value4", "Unexpected name");
       State.Next_Attribute (Doc, Result);
       Assert (Result = Result_Not_Found, "Expected end of attributes");
    end Test_Query_Multiple_Attributes;
@@ -233,7 +266,7 @@ package body SXML_Query_Tests is
    begin
       State.Find_Attribute (Doc, "attribute2", Result);
       Assert (Result = Result_OK, "Attribute not found");
-      Assert (State.Value (Doc) = "value2", "Unexpected value");
+      Assert (Value (State, Doc) = "value2", "Unexpected value");
    end Test_Query_Find_Attribute;
 
    ---------------------------------------------------------------------------
@@ -270,10 +303,10 @@ package body SXML_Query_Tests is
    begin
       State.Child (Doc, Result);
       Assert (Result = Result_OK, "Expected child");
-      Assert (State.Name (Doc) = "sub", "Unexpected name");
+      Assert (Name (State, Doc) = "sub", "Unexpected name");
       State.Find_Attribute (Doc, "attribute2", Result);
       Assert (Result = Result_OK, "Attribute not found");
-      Assert (State.Value (Doc) = "value2", "Unexpected value");
+      Assert (Value (State, Doc) = "value2", "Unexpected value");
    end Test_Query_Find_Sub_Attribute;
 
    ---------------------------------------------------------------------------
@@ -287,7 +320,7 @@ package body SXML_Query_Tests is
    begin
       Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/ClinicalDocument", Result, Position, State);
       Assert (Result = Result_OK, "Invalid result: " & Result'Img & " at" & Position'Img);
-      Assert (State.Name (Context.all) = "ClinicalDocument", "Invalid name");
+      Assert (Name (State, Context.all) = "ClinicalDocument", "Invalid name");
 	end Test_Path_Query_Simple;
 
    ---------------------------------------------------------------------------
@@ -317,10 +350,10 @@ package body SXML_Query_Tests is
                   "/ClinicalDocument/recordTarget/patientRole/id",
                   Result, Position, State);
       Assert (Result = Result_OK, "Invalid result: " & Result'Img & " at" & Position'Img);
-      Assert (State.Name (Context.all) = "id", "Invalid node name: " & State.Name (Context.all));
+      Assert (Name (State, Context.all) = "id", "Invalid node name: " & Name (State, Context.all));
       State.Find_Attribute (Context.all, "root", Result);
       Assert (Result = Result_OK, "Invalid attribute: " & Result'Img);
-      Assert (State.Value (Context.all) = "2.16.840.1.113883.3.140.1.0.6.4", "Invalid value");
+      Assert (Value (State, Context.all) = "2.16.840.1.113883.3.140.1.0.6.4", "Invalid value");
 	end Test_Path_Query_Long;
 
    ---------------------------------------------------------------------------

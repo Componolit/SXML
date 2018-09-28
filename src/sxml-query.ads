@@ -1,9 +1,5 @@
 package SXML.Query
 is
-   type Result_Type is (Result_Invalid,
-                        Result_Not_Found,
-                        Result_OK);
-
    type State_Type is tagged private;
 
    --------------
@@ -56,12 +52,14 @@ is
    -- Name --
    ----------
 
-   function Name (State    : State_Type;
-                  Document : Subtree_Type) return String
+   procedure Name (State    : State_Type;
+                   Document : Subtree_Type;
+                   Result   : out Result_Type;
+                   Data     : in out Content_Type;
+                   Last     : out Natural)
    with
-      Pre'Class => Is_Valid (Document, State) and then
-                   (Is_Open (Document, State) or
-                    Is_Attribute (Document, State));
+      Pre'Class => (Is_Valid (Document, State) and then
+                    (Is_Open (Document, State) or Is_Attribute (Document, State)));
 
    -----------
    -- Child --
@@ -101,7 +99,7 @@ is
 
    procedure Find_Sibling (State        : in out State_Type;
                            Document     : Subtree_Type;
-                           Sibling_Name : String;
+                           Sibling_Name : Content_Type;
                            Result       : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then
@@ -141,8 +139,11 @@ is
    -- Value --
    -----------
 
-   function Value (State    : State_Type;
-                   Document : Subtree_Type) return String
+   procedure Value (State    : State_Type;
+                    Document : Subtree_Type;
+                    Result   : out Result_Type;
+                    Data     : in out Content_Type;
+                    Last     : out Natural)
    with
       Pre'Class => Is_Valid (Document, State) and then
                    Is_Attribute (Document, State) and then
@@ -169,7 +170,7 @@ is
 
    procedure Find_Attribute (State          : in out State_Type;
                              Document       : Subtree_Type;
-                             Attribute_Name : String;
+                             Attribute_Name : Content_Type;
                              Result         : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then

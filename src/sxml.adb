@@ -134,8 +134,11 @@ is
    -- Get_String --
    ----------------
 
-   function Get_String (Doc   : Subtree_Type;
-                        Start : Offset_Type) return String
+   procedure Get_String (Doc    : Subtree_Type;
+                         Start  : Offset_Type;
+                         Result : out Result_Type;
+                         Data   : in out Content_Type;
+                         Last   : out Natural)
    is
       function String_Length (Document : Subtree_Type;
                               Offset   : Offset_Type) return Natural
@@ -171,24 +174,35 @@ is
       N      : Node_Type  := Doc (Pos);
 
    begin
+      for D of Data
+      loop
+         D := Character'Val (0);
+      end loop;
 
-      return Result : String (1 .. Length) := (others => Character'Val (0))
-      do
-         loop
-            pragma Loop_Variant (Decreases => Doc'Last - Pos);
+      if Length > Data'Length
+      then
+         Last   := 0;
+         Result := Result_Overflow;
+         return;
+      end if;
 
-            --  FIXME: We can assume this already by the way we caluculated Length.
-            exit when Natural (N.Length) > Result'Length - Offset or
-                      Offset > Natural'Last - Result'First - Natural (N.Length);
-            Result (Result'First + Offset .. Result'First + Offset + Natural (N.Length) - 1) :=
-              N.Data (N.Data'First .. N.Data'First + Natural (N.Length) - 1);
-            Offset := Offset + Natural (N.Length);
-            exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
-            Pos := Add (Pos, N.Next);
-            exit when not (Pos in Doc'Range);
-            N := Doc (Pos);
-         end loop;
-      end return;
+      loop
+         pragma Loop_Variant (Decreases => Doc'Last - Pos);
+
+         --  FIXME: We can assume this already by the way we caluculated Length.
+         exit when Natural (N.Length) > Data'Length - Offset or
+            Offset > Natural'Last - Data'First - Natural (N.Length);
+         Data (Data'First + Offset .. Data'First + Offset + Natural (N.Length) - 1) :=
+            N.Data (N.Data'First .. N.Data'First + Natural (N.Length) - 1);
+         Offset := Offset + Natural (N.Length);
+         exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
+         Pos := Add (Pos, N.Next);
+         exit when not (Pos in Doc'Range);
+         N := Doc (Pos);
+      end loop;
+
+      Last   := Data'First + Offset - 1;
+      Result := Result_OK;
    end Get_String;
 
    overriding
