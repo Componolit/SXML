@@ -122,10 +122,10 @@ is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Open (Document, State),
-      Post'Class => (if Result = Result_OK
-                     then (Is_Valid (Document, State) and then
-                          Is_Attribute (Document, State))
-                     else State = State'Old);
+      Post'Class => (Result = Result_OK and
+                     (Is_Valid (Document, State) and then
+                      Is_Attribute (Document, State))) or
+                    (Result /= Result_OK and State = State'Old);
 
    --------------------
    -- Is_Valid_Value --
