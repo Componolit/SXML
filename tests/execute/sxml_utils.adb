@@ -25,6 +25,9 @@ is
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
 
+   type Stack_Access is access all Stack_Type;
+   procedure Free is new Ada.Unchecked_Deallocation (Stack_Type, Stack_Access);
+
    -------------------
    -- Check_Invalid --
    -------------------
@@ -87,6 +90,7 @@ is
       Stack : access Stack_Type;
 
    begin
+      Context.all (Context.all'First) := Null_Node;
       Parser.Parse (Data         => Input.all,
                     Context      => Context.all,
                     Parse_Result => Result,
@@ -97,6 +101,7 @@ is
       Stack := new Stack_Type (1 .. Stack_Size);
       To_String (Context.all, Data.all, Last, Stack.All);
       Free (Data);
+      Free (Stack);
       Assert (Last > 0, File & ": Serialization error");
    end Parse_Document;
 
