@@ -11,11 +11,6 @@ is
                       Right : Attributes_Type) return Boolean
    with Ghost;
 
-   function Is_Valid (Name       : Content_Type;
-                      Attributes : Attributes_Type;
-                      Children   : Subtree_Type) return Boolean
-   with Ghost;
-
    ---------
    -- "+" --
    ---------
@@ -34,23 +29,15 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type
-   with
-      Pre => Is_Valid (Name, Attributes, Children);
+               Children   : Subtree_Type) return Subtree_Type;
 
    function E (Name       : Content_Type;
-               Children   : Subtree_Type) return Subtree_Type
-   with
-      Pre => Is_Valid (Name, Null_Attributes, Children);
+               Children   : Subtree_Type) return Subtree_Type;
 
    function E (Name       : Content_Type;
-               Attributes : Attributes_Type) return Subtree_Type
-   with
-      Pre => Is_Valid (Name, Attributes, Null_Tree);
+               Attributes : Attributes_Type) return Subtree_Type;
 
-   function E (Name : Content_Type) return Subtree_Type
-   with
-      Pre => Is_Valid (Name, Null_Attributes, Null_Tree);
+   function E (Name : Content_Type) return Subtree_Type;
 
    -------
    -- A --
@@ -111,11 +98,5 @@ private
    function Is_Valid (Left  : Attributes_Type;
                       Right : Attributes_Type) return Boolean
    is (Is_Valid (Subtree_Type (Left), Subtree_Type (Right)));
-
-   function Is_Valid (Name       : Content_Type;
-                      Attributes : Attributes_Type;
-                      Children   : Subtree_Type) return Boolean
-   is (Is_Valid (Open (Name), Subtree_Type (Attributes)) and then
-       Is_Valid (Open (Name) * Subtree_Type (Attributes), Children));
 
 end SXML.Generator;
