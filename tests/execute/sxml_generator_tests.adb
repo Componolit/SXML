@@ -18,13 +18,15 @@ package body SXML_Generator_Tests is
    procedure Expect (Doc      : SXML.Subtree_Type;
                      Expected : String)
    is
+      use SXML;
       XML    : access String := new String (1 .. 2 * Expected'Length);
       Offset : Natural := 0;
       Last   : Natural;
+      Result : Result_Type;
    begin
-      To_String (Doc, XML.all, Offset);
+      To_String (Doc, XML.all, Offset, Result);
       Last := XML.all'First + Offset - 1;
-      Assert (Last > 0, "Error serializing");
+      Assert (Result = Result_OK, "Error serializing: " & Result'Img);
       Assert (XML.all (1 .. Last) = Expected,
          "Unexpected document: (" & XML.all (1 .. Last) & ") len:" & Last'Img &
          ", expected (" & Expected & ") len:" & Expected'Length'Img);

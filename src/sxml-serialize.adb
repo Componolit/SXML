@@ -212,6 +212,7 @@ is
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
                         Last   : out Natural;
+                        Result : out Result_Type;
                         Buffer : in out Stack_Type)
    is
       Child    : Relative_Index_Type;
@@ -230,6 +231,7 @@ is
                                      Buffer (Buffer'First + Buffer'Length / 2 .. Buffer'Last),
                                      Null_Traversal);
    begin
+      Result := Result_Invalid;
       Last := 0;
       S.Reset;
       Rev.Reset;
@@ -246,6 +248,7 @@ is
          S.Pop (Current);
          if not (Current.Index in Doc'Range)
          then
+            Result := Result_Overflow;
             return;
          end if;
 
@@ -311,6 +314,7 @@ is
 
       end loop;
 
+      Result := Result_OK;
       Last := Position;
    end To_String;
 
@@ -320,11 +324,12 @@ is
 
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
-                        Last   : out Natural)
+                        Last   : out Natural;
+                        Result : out Result_Type)
    is
       Stack_Buffer : Stack_Type (1 .. 1000) := (others => Null_Traversal);
    begin
-      To_String (Doc, Data, Last, Stack_Buffer);
+      To_String (Doc, Data, Last, Result, Stack_Buffer);
       pragma Unreferenced (Stack_Buffer);
    end To_String;
 

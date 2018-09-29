@@ -85,9 +85,10 @@ is
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
-      Data : access String := new String (1 .. 2 * Input'Length);
+      Data : access String := new String (1 .. 3 * Input'Length);
       Last : Natural := 1;
       Stack : access Stack_Type;
+      Serialize_Result : Result_Type;
 
    begin
       Context.all (Context.all'First) := Null_Node;
@@ -99,10 +100,10 @@ is
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
       Stack := new Stack_Type (1 .. Stack_Size);
-      To_String (Context.all, Data.all, Last, Stack.All);
+      To_String (Context.all, Data.all, Last, Serialize_Result, Stack.All);
       Free (Data);
       Free (Stack);
-      Assert (Last > 0, File & ": Serialization error");
+      Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
    end Parse_Document;
 
    --------------------
@@ -119,6 +120,7 @@ is
       Position : Natural;
       XML      : access String := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
+      Serialize_Result : Result_Type;
    begin
       Context.all (1) := Null_Node;
       Parser.Parse (Data         => Input,
@@ -127,8 +129,8 @@ is
                     Position     => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
 
-      To_String (Context.all, XML.all, Last);
-      Assert (Last >= 0, "Error serializing");
+      To_String (Context.all, XML.all, Last, Serialize_Result);
+      Assert (Serialize_Result = Result_OK, "Error serializing: " & Serialize_Result'Img);
       Assert (XML.all (1 .. Last) = (if Output = "INPUT" then
                                         (if Ignore_Final_Newline then
                                             Input (Input'First .. Input'Last - 1)

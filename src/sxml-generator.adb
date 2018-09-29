@@ -45,11 +45,18 @@ is
                Attributes : Attributes_Type;
                Children   : Subtree_Type) return Subtree_Type
    is
-      O : Subtree_Type := Open (Name);
+      O : Subtree_Type (1 .. Add (1, Num_Elements (Name)))
+         := (others => Null_Node);
+
+      Position : Index_Type := O'First;
+      Start    : Index_Type;
    begin
-      O (O'First).Attributes :=
+      Open (Name, O, Position, Start);
+      pragma Unreferenced (Position);
+
+      O (Start).Attributes :=
         (if Attributes = Null_Attributes then Invalid_Relative_Index else O'Length);
-      O (O'First).Children :=
+      O (Start).Children :=
         (if Children = Null_Tree then Invalid_Relative_Index else O'Length + Attributes'Length);
       return O * Subtree_Type (Attributes) * Children;
    end E;

@@ -14,7 +14,8 @@ is
 
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
-                        Last   : out Natural)
+                        Last   : out Natural;
+                        Result : out Result_Type)
    with
       Pre => Doc'Length > 0;
 
@@ -25,6 +26,7 @@ is
    procedure To_String (Doc    : Subtree_Type;
                         Data   : out String;
                         Last   : out Natural;
+                        Result : out Result_Type;
                         Buffer : in out Stack_Type)
    with
       Pre => Doc'Length > 0 and

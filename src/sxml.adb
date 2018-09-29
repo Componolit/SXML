@@ -81,14 +81,16 @@ is
    -- Open --
    ----------
 
-   function Open (Name : Content_Type) return Subtree_Type
+   procedure Open (Name     : Content_Type;
+                   Output   : in out Subtree_Type;
+                   Position : in out Index_Type;
+                   Start    : out Index_Type)
    is
-      Result : Subtree_Type (1 .. Add (1, Num_Elements (Name))) :=
-        (1      => Null_Open_Element,
-         others => Null_Data_Element);
    begin
-      Put_String (Result, 0, Name);
-      return Result;
+      Start := Position;
+      Output (Start) := Null_Open_Element;
+      Put_String (Output, Sub (Start, Output'First), Name);
+      Position := Add (Position, Num_Elements (Name));
    end Open;
 
    -----------------

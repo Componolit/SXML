@@ -140,9 +140,15 @@ is
        );
       Data   : String (1 .. 5000);
       Offset : Natural := 0;
+      Result : Result_Type;
    begin
-      To_String (Doc, Data, Offset);
-      Put_Line (Data (1 .. Offset));
+      To_String (Doc, Data, Offset, Result);
+      if Result = Result_OK
+      then
+         Put_Line (Data (1 .. Offset));
+      else
+         Put_Line ("Error: " & Result'Img);
+      end if;
    end Execute;
 
    A : constant Args_Type := (+"foo", +"bar", +"baz");

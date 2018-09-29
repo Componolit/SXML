@@ -247,51 +247,13 @@ is
 
          Match := Match_OK;
       end Match_String;
+
       ----------------------
       -- Context_Overflow --
       ----------------------
 
       function Context_Overflow return Boolean is
         (Context_Index >= Context'Last);
-
-      -----------------
-      -- Context_Put --
-      -----------------
-
-      procedure Context_Put (Value  : Subtree_Type;
-                             Start  : out Index_Type;
-                             Result : out Boolean)
-      with
-         Post => (if Result then Start in Context'Range);
-
-      procedure Context_Put (Value  : Subtree_Type;
-                             Start  : out Index_Type;
-                             Result : out Boolean)
-      is
-      begin
-         Result := False;
-         Start  := Invalid_Index;
-
-         if Value'Length > Context'Last or else
-            Context_Index > Context'Last - Value'Length
-         then
-            return;
-         end if;
-
-         Start := Context_Index;
-
-         for V of Value
-         loop
-            Context (Context_Index) := V;
-            if not (Context_Index in Context'Range) or
-               Context_Index = Context'Last
-            then
-               return;
-            end if;
-            Context_Index := Context_Index + 1;
-         end loop;
-         Result := True;
-      end Context_Put;
 
       ------------------------
       -- Context_Put_String --
@@ -637,7 +599,6 @@ is
          Old_Offset         : constant Natural := Offset;
          Match_Attr         : Match_Type;
          Match_Tmp          : Match_Type;
-         Valid              : Boolean;
          Attribute_Start    : Index_Type;
          Previous_Attribute : Index_Type := Invalid_Index;
       begin
@@ -670,16 +631,18 @@ is
 
          --  Match tag name
          Match_Until_Set (Whitespace & ">/", Empty_Set, Match_Tmp, Name);
-         if Match_Tmp /= Match_OK
+         if Match_Tmp /= Match_OK --  or
+            --  Overflow (Start, Num_Elements (Data (Name.First .. Name.Last)))
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
-         Context_Put (Value  => Open (Data (Name.First .. Name.Last)),
-                      Start  => Start,
-                      Result => Valid);
-         if not Valid
+         Open (Name     => Data (Name.First .. Name.Last),
+               Output   => Context,
+               Position => Context_Index,
+               Start    => Start);
+         if Start = Invalid_Index
          then
             Restore_Offset (Old_Offset);
             return;

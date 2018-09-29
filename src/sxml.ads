@@ -138,15 +138,6 @@ is
 
    function Is_Open (Node : Node_Type) return Boolean;
 
-   ----------
-   -- Open --
-   ----------
-
-   function Open (Name : Content_Type) return Subtree_Type
-   with
-      Post => Open'Result'Length = 1 + Num_Elements (Name) and then
-              Is_Open (Open'Result (Open'Result'First));
-
    -----------------
    -- Put_Content --
    -----------------
@@ -228,6 +219,19 @@ is
               Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
               Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)),
       Post => Same_Kind (Subtree, Subtree'Old, Offset);
+
+   ----------
+   -- Open --
+   ----------
+
+   procedure Open (Name     : Content_Type;
+                   Output   : in out Subtree_Type;
+                   Position : in out Index_Type;
+                   Start    : out Index_Type)
+   with
+      Pre  => Position in Output'Range,
+      Post => Start in Output'Range and
+              Is_Open (Output (Start));
 
 private
 
