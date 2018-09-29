@@ -148,24 +148,24 @@ is
       Attr  : Index_Type;
       Value : Index_Type;
       Pos   : Relative_Index_Type;
-      N     : constant Node_Type := Doc (Current);
    begin
 
-      if N.Kind = Kind_Content and
+      if Doc (Current).Kind = Kind_Content and
          Mode = Mode_Open
       then
          Put_Escaped (Doc, Current, Data, Position);
          return;
       end if;
 
-      if N.Kind /= Kind_Element_Open and
-         N.Kind /= Kind_Content
+      if Doc (Current).Kind /= Kind_Element_Open and
+         Doc (Current).Kind /= Kind_Content
       then
          Position := -1;
          return;
       end if;
 
-      if Mode = Mode_Close and N.Children /= Invalid_Relative_Index
+      if Mode = Mode_Close and
+         Doc (Current).Children /= Invalid_Relative_Index
       then
          Put ("</", Data, Position);
          Serialize_Data (Doc, Current, Data, Position);
@@ -176,7 +176,7 @@ is
       then
          Put ("<", Data, Position);
          Serialize_Data (Doc, Current, Data, Position);
-         Pos  := N.Attributes;
+         Pos  := Doc (Current).Attributes;
          Attr := Current;
          while Pos /= Invalid_Relative_Index and
                not Overflow (Attr, Pos)
@@ -197,7 +197,7 @@ is
             Put ("""", Data, Position);
             Pos := Doc (Attr).Next_Attribute;
          end loop;
-         if N.Children = Invalid_Relative_Index
+         if Doc (Current).Children = Invalid_Relative_Index
          then
             Put ("/", Data, Position);
          end if;
