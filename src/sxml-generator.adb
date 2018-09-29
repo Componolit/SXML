@@ -9,14 +9,13 @@ is
    with
       SPARK_Mode => Off
    is
-      Value_Img : constant String := Value'Img;
    begin
       if Value >= 0.0
       then
          --  Remove leading space
-         return Value_Img (2 .. Value_Img'Last);
+         return Value'Img (2 .. Value'Img'Last);
       else
-         return Value_Img;
+         return Value'Img;
       end if;
    end To_String;
 
