@@ -2,25 +2,17 @@ with "switches";
 
 project SXML
 is
-   type Mode_Type is ("strict", "sloppy", "debug");
+   type Mode_Type is ("strict", "sloppy", "debug", "stack");
    Mode : Mode_Type := external ("Mode", "strict");
 
-   type Callgraph_Type is ("none", "su", "su_da");
-   Callgraph : Callgraph_Type := external ("callgraph", "none");
-
-   Callgraph_Switches := ();
-   case Callgraph is
-      when "none" =>
-         Callgraph_Switches := ();
-
-      when "su" =>
-         Callgraph_Switches := ("-fcallgraph-info=su");
-
-      when "su_da" =>
-         Callgraph_Switches := ("-fcallgraph-info=su,da");
+   case Mode is
+      when "strict" | "stack" =>
+         for Source_Dirs use ("src");
+      when "debug" =>
+         for Source_Dirs use ("src", "tests/debug");
+      when others => null;
    end case;
 
-   for Source_Dirs use ("src", "tests/debug");
    for Object_Dir use "obj";
 
    for Library_Name use "sxml";
@@ -29,7 +21,7 @@ is
 
    package Builder is
       case Mode is
-         when "strict" =>
+         when "strict" | "stack" =>
             for Global_Configuration_Pragmas use "default.adc";
          when "debug" =>
             for Global_Configuration_Pragmas use "debug.adc";
@@ -41,9 +33,11 @@ is
    package Compiler is
       case Mode is
          when "strict" =>
-            for Default_Switches ("Ada") use Switches.Compiler_Switches & Callgraph_Switches;
+            for Default_Switches ("Ada") use Switches.Compiler_Switches;
+         when "stack" =>
+            for Default_Switches ("Ada") use Switches.Compiler_Switches & "-fcallgraph-info=su,da";
          when "debug" =>
-            for Default_Switches ("Ada") use Switches.Compiler_Switches & Switches.Compiler_Debug_Switches & Callgraph_Switches;
+            for Default_Switches ("Ada") use Switches.Compiler_Switches & Switches.Compiler_Debug_Switches;
          when others =>
             null;
       end case;
@@ -54,7 +48,8 @@ is
    end Check;
 
    package Stack is
-      for Switches use ("-Wa", "-a", "-p");
+      --  The stack depth of external functions (-u) must be validated
+      for Switches use ("-Wa", "-a", "-p", "-ca", "-x", "-u64");
    end Stack;
 
 end SXML;
