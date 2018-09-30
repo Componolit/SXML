@@ -62,7 +62,8 @@ is
    ----------
 
    procedure Dump (Context : Subtree_Type;
-                   Message : String := "Dumping context")
+                   Short   : Boolean := False;
+                   Message : String  := "Dumping context")
    is
       use Ada.Text_IO;
    begin
@@ -71,7 +72,7 @@ is
       loop
          Put (I'Img (I'Img'First + 1 .. I'Img'Last) & ":");
          Put_Line ("   " & Repr (I, Context (I)));
-         exit when Context (I) = Null_Node;
+         exit when Short and Context (I) = Null_Node;
       end loop;
    end Dump;
 
