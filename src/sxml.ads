@@ -120,11 +120,6 @@ is
    with
       Ghost;
 
-   function "*" (Left, Right : Subtree_Type) return Subtree_Type
-   is (Left & Right)
-   with
-     Pre => Is_Valid (Left, Right);
-
    --  This operator must not be used, as subtrees have to be
    --  linked together. This is done by the * operator above.
    pragma Warnings (Off, "precondition is statically False");

@@ -44,20 +44,27 @@ is
                Attributes : Attributes_Type;
                Children   : Subtree_Type) return Subtree_Type
    is
-      O : Subtree_Type (1 .. Add (1, Num_Elements (Name)))
-         := (others => Null_Node);
+      Len : constant Index_Type :=
+         Index_Type (Num_Elements (Name) + Attributes'Length + Children'Length + 1);
 
-      Position : Index_Type := O'First;
+      Result   : Subtree_Type (1 .. Len) := (others => Null_Node);
+      Position : Index_Type := Result'First;
       Start    : Index_Type;
    begin
-      Open (Name, O, Position, Start);
-      pragma Unreferenced (Position);
+      Open (Name, Result, Position, Start);
 
-      O (Start).Attributes :=
-        (if Attributes = Null_Attributes then Invalid_Relative_Index else O'Length);
-      O (Start).Children :=
-        (if Children = Null_Tree then Invalid_Relative_Index else O'Length + Attributes'Length);
-      return O * Subtree_Type (Attributes) * Children;
+      Result (Start).Attributes :=
+         (if Attributes = Null_Attributes
+          then Invalid_Relative_Index
+          else Relative_Index_Type (Num_Elements (Name)));
+      Result (Start).Children :=
+         (if Children = Null_Tree
+          then Invalid_Relative_Index
+          else Relative_Index_Type (Num_Elements (Name)) + Attributes'Length);
+
+      Result (Position .. Position + Attributes'Length - 1) := Subtree_Type (Attributes);
+      Result (Position + Attributes'Length .. Position + Attributes'Length + Children'Length - 1) := Children;
+      return Result;
    end E;
 
    function E (Name       : Content_Type;
@@ -131,7 +138,7 @@ is
 
    function "+" (Left, Right : Subtree_Type) return Subtree_Type
    is
-      Result : Subtree_Type := Left * Right;
+      Result : Subtree_Type (1 .. Left'Length + Right'Length) := (others => Null_Node);
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
@@ -139,6 +146,9 @@ is
       then
          return Left;
       end if;
+
+      Result (1 .. Left'Length) := Left;
+      Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 
       --  Find last element
       loop
@@ -175,10 +185,13 @@ is
 
    function "+" (Left, Right : Attributes_Type) return Attributes_Type
    is
-      Result : Attributes_Type := Left * Right;
+      Result : Attributes_Type (1 .. Left'Length + Right'Length);
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
+
+      Result (1 .. Left'Length) := Left;
+      Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 
       --  Find last attibute
       loop

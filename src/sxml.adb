@@ -207,6 +207,10 @@ is
       Result := Result_OK;
    end Get_String;
 
+   -------
+   -- & --
+   -------
+
    overriding
    function "&" (Left, Right : Subtree_Type) return Subtree_Type
    is
