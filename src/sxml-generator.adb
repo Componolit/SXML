@@ -1,5 +1,12 @@
 package body SXML.Generator
 is
+   ------------------
+   -- Num_Elements --
+   ------------------
+
+   overriding
+   function Num_Elements (Attributes : Attributes_Type) return Offset_Type
+   is ((if Attributes = Null_Attributes then 0 else Attributes'Length));
 
    ---------------
    -- To_String --
@@ -45,14 +52,13 @@ is
                Children   : Subtree_Type) return Subtree_Type
    is
       Len : constant Index_Type :=
-         Index_Type (Num_Elements (Name) + Attributes'Length + Children'Length + 1);
+         Index_Type (Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children));
 
       Result   : Subtree_Type (1 .. Len) := (others => Null_Node);
       Position : Index_Type := Result'First;
       Start    : Index_Type;
    begin
       Open (Name, Result, Position, Start);
-
       Result (Start).Attributes :=
          (if Attributes = Null_Attributes
           then Invalid_Relative_Index
@@ -60,23 +66,25 @@ is
       Result (Start).Children :=
          (if Children = Null_Tree
           then Invalid_Relative_Index
-          else Relative_Index_Type (Num_Elements (Name)) + Attributes'Length);
+          else Relative_Index_Type (Num_Elements (Name) + Num_Elements (Attributes)));
 
-      Result (Position .. Position + Attributes'Length - 1) := Subtree_Type (Attributes);
-      Result (Position + Attributes'Length .. Position + Attributes'Length + Children'Length - 1) := Children;
+      if Attributes = Null_Attributes
+      then
+         if Children /= Null_Tree
+         then
+            Result (Position .. Add (Position, Num_Elements (Children)) - 1) := Children;
+         end if;
+      else
+         Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Subtree_Type (Attributes);
+         if Children /= Null_Tree
+         then
+            Result (Add (Position, Num_Elements (Attributes)) ..
+                    Add (Add (Position, Num_Elements (Attributes)), Num_Elements (Children)) - 1) := Children;
+         end if;
+      end if;
+
       return Result;
    end E;
-
-   function E (Name       : Content_Type;
-               Attributes : Attributes_Type) return Subtree_Type
-   is (E (Name, Attributes, Null_Tree));
-
-   function E (Name     : Content_Type;
-               Children : Subtree_Type) return Subtree_Type
-   is (E (Name, Null_Attributes, Children));
-
-   function E (Name : Content_Type) return Subtree_Type
-   is (E (Name, Null_Attributes, Null_Tree));
 
    -------
    -- A --
@@ -138,7 +146,7 @@ is
 
    function "+" (Left, Right : Subtree_Type) return Subtree_Type
    is
-      Result : Subtree_Type (1 .. Left'Length + Right'Length) := (others => Null_Node);
+      Result : Subtree_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
@@ -189,7 +197,7 @@ is
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
-
+      --  Result := (Result'Range => Null_Node);
       Result (1 .. Left'Length) := Left;
       Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 

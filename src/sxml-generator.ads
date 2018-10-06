@@ -3,6 +3,12 @@ is
    type Attributes_Type (<>) is private;
    Null_Attributes : constant Attributes_Type;
 
+   ------------------
+   -- Num_Elements --
+   ------------------
+
+   function Num_Elements (Attributes : Attributes_Type) return Offset_Type;
+
    --------------
    -- Is_Valid --
    --------------
@@ -29,15 +35,30 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type;
+               Children   : Subtree_Type) return Subtree_Type
+   with
+      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
+      Post => E'Result'Length = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children);
 
    function E (Name       : Content_Type;
-               Children   : Subtree_Type) return Subtree_Type;
+               Children   : Subtree_Type) return Subtree_Type
+   is (E (Name, Null_Attributes, Children))
+   with
+      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
+      Post => E'Result'Length = Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Children);
 
    function E (Name       : Content_Type;
-               Attributes : Attributes_Type) return Subtree_Type;
+               Attributes : Attributes_Type) return Subtree_Type
+   is (E (Name, Attributes, Null_Tree))
+   with
+      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Tree),
+      Post => E'Result'Length = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Null_Tree);
 
-   function E (Name : Content_Type) return Subtree_Type;
+   function E (Name : Content_Type) return Subtree_Type
+   is (E (Name, Null_Attributes, Null_Tree))
+   with
+      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Tree),
+      Post => E'Result'Length = Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Null_Tree);
 
    -------
    -- A --

@@ -42,6 +42,9 @@ is
    function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
+   function Num_Elements (Subtree : Subtree_Type) return Offset_Type
+   is ((if Subtree = Null_Tree then 0 else Offset_Type (Subtree'Length)));
+
    ----------------
    -- Put_String --
    ----------------
@@ -87,7 +90,7 @@ is
                    Start    : out Index_Type)
    is
    begin
-      Start := Position;
+      Start          := Position;
       Output (Start) := Null_Open_Element;
       Put_String (Output, Sub (Start, Output'First), Name);
       Position := Add (Position, Num_Elements (Name));
@@ -151,26 +154,26 @@ is
       function String_Length (Document : Subtree_Type;
                               Offset   : Offset_Type) return Natural
       is
-         Pos    : Index_Type := Add (Document'First, Offset);
-         N      : Node_Type  := Document (Pos);
-         Length : Natural := 0;
+         Pos : Index_Type := Add (Document'First, Offset);
+         N   : Node_Type  := Document (Pos);
+         Len : Natural := 0;
       begin
          loop
             pragma Loop_Variant (Decreases => Document'Last - Pos);
-            if Length > Natural'Last - Natural (N.Length)
+            if Len > Natural'Last - Natural (N.Length)
             then
                return 0;
             end if;
-            Length := Length + Natural (N.Length);
+            Len := Len + Natural (N.Length);
             exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
             Pos := Add (Pos, N.Next);
             exit when not (Pos in Document'Range);
             N := Document (Pos);
          end loop;
-         return Length;
+         return Len;
       end String_Length;
 
-      Length : constant Natural := String_Length (Doc, Start);
+      Len    : constant Natural := String_Length (Doc, Start);
       Offset : Natural := 0;
       Pos    : Index_Type := Add (Doc'First, Start);
       N      : Node_Type  := Doc (Pos);
@@ -181,7 +184,7 @@ is
          D := Character'Val (0);
       end loop;
 
-      if Length > Data'Length
+      if Len > Data'Length
       then
          Last   := 0;
          Result := Result_Overflow;
@@ -190,6 +193,7 @@ is
 
       loop
          pragma Loop_Variant (Decreases => Doc'Last - Pos);
+         pragma Loop_Invariant (Data'First <= Natural (Index_Type'Last) - Offset);
 
          --  FIXME: We can assume this already by the way we caluculated Length.
          exit when Natural (N.Length) > Data'Length - Offset or
@@ -205,6 +209,7 @@ is
 
       Last   := Data'First + Offset - 1;
       Result := Result_OK;
+
    end Get_String;
 
    -------

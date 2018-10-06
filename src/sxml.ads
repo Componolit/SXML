@@ -187,6 +187,8 @@ is
    with
       Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
 
+   function Num_Elements (Subtree : Subtree_Type) return Offset_Type;
+
    ---------------
    -- Same_Kind --
    ---------------
@@ -200,6 +202,19 @@ is
              Offset < Current'Length,
       Ghost;
 
+   ---------------
+   -- Has_Space --
+   ---------------
+
+   function Has_Space (Subtree : Subtree_Type;
+                       Offset  : Offset_Type;
+                       Name    : Attr_Data_Type) return Boolean
+   is (Offset < Subtree'Length and then
+       Offset < Offset_Type (Index_Type'Last) and then
+       Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
+       Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
+       Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
+
    ----------------
    -- Put_String --
    ----------------
@@ -208,11 +223,7 @@ is
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
    with
-      Pre  => Offset < Subtree'Length and then
-              Offset < Offset_Type (Index_Type'Last) and then
-              Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-              Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
-              Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)),
+      Pre  => Has_Space (Subtree, Offset, Name),
       Post => Same_Kind (Subtree, Subtree'Old, Offset);
 
    ----------
@@ -224,13 +235,16 @@ is
                    Position : in out Index_Type;
                    Start    : out Index_Type)
    with
-      Pre  => Position in Output'Range,
+      Pre  => (Position in Output'Range and
+               Position < Index_Type'Last) and then
+              Has_Space (Output, Sub (Position, Output'First), Name),
       Post => Start in Output'Range and
-              Is_Open (Output (Start));
+              Is_Open (Output (Start)) and
+              Position = Add (Position'Old, Num_Elements (Name));
 
 private
 
-   type Length_Type is range 0 .. Chunk_Length with Size => 8;
+   type Length_Type is range 0 .. Chunk_Length;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
 

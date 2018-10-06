@@ -15,8 +15,7 @@ is
       Parse_Internal_Depth : constant := 100;
 
       subtype Context_Index_Type is Index_Type
-      with Predicate => Context_Index_Type >= Context'First and
-                        Context_Index_Type <= Context'Last;
+      with Predicate => Context_Index_Type in Context'Range;
 
       Context_Index : Context_Index_Type := Context'First;
       Offset        : Natural    := 0;
@@ -631,8 +630,9 @@ is
 
          --  Match tag name
          Match_Until_Set (Whitespace & ">/", Empty_Set, Match_Tmp, Name);
-         if Match_Tmp /= Match_OK --  or
-            --  Overflow (Start, Num_Elements (Data (Name.First .. Name.Last)))
+         if Match_Tmp /= Match_OK or else
+            not (Context_Index in Context'Range) or else
+            not Has_Space (Context, Offset_Type (Context_Index) + 1, Data (Name.First .. Name.Last))
          then
             Restore_Offset (Old_Offset);
             return;
@@ -642,11 +642,6 @@ is
                Output   => Context,
                Position => Context_Index,
                Start    => Start);
-         if Start = Invalid_Index
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
 
          loop
             Parse_Attribute (Attribute_Start, Match_Attr);
