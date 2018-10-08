@@ -9,7 +9,6 @@ services:
   - docker
 
 env:
-  - TEST_SUITE=gnat-6.3
   - TEST_SUITE=gnat-community-2018
   - TEST_SUITE=gnat-community-2018-insane
 
@@ -20,6 +19,5 @@ before_install:
   - git submodule update --init --recursive --depth=1
 
 script:
-  - if [ "$TEST_SUITE" = "gnat-6.3" ]; then docker run -v $PWD:/app -w /app debian:stretch /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gcc gnat gprbuild make libaunit3.7.2-dev time && make testbulk"; fi
   - if [ "$TEST_SUITE" = "gnat-community-2018" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget time && make testbulk"; fi
   - if [ "$TEST_SUITE" = "gnat-community-2018-insane" ]; then docker run -v $PWD:/app -w /app jklmnn/gnat:gpl.2018.slim /bin/sh -c "apt-get update && apt-get install -y --no-install-recommends ca-certificates wget time && make testinsane"; fi
