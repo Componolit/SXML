@@ -85,7 +85,7 @@ is
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
-      Data : access String := new String (1 .. 3 * Input'Length);
+      Data : access String := new String (1 .. 4 * Input'Length);
       Last : Natural := 1;
       Stack : access Stack_Type;
       Serialize_Result : Result_Type;
