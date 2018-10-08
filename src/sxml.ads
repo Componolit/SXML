@@ -199,8 +199,7 @@ is
    with
       Pre => Current'First = Old'First and
              Current'Last = Old'Last and
-             Offset < Current'Length,
-      Ghost;
+             Offset < Current'Length;
 
    ---------------
    -- Has_Space --
@@ -219,12 +218,17 @@ is
    -- Put_String --
    ----------------
 
+   --  Executing the postcondition results in STORAGE_ERROR on large objects, ignore it.
+   pragma Assertion_Policy (Post => Ignore);
+
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
    with
       Pre  => Has_Space (Subtree, Offset, Name),
       Post => Same_Kind (Subtree, Subtree'Old, Offset);
+
+   pragma Assertion_Policy (Post => Check);
 
    ----------
    -- Open --
