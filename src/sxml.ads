@@ -193,13 +193,8 @@ is
    -- Same_Kind --
    ---------------
 
-   function Same_Kind (Current : Subtree_Type;
-                       Old     : Subtree_Type;
-                       Offset  : Offset_Type) return Boolean
-   with
-      Pre => Current'First = Old'First and
-             Current'Last = Old'Last and
-             Offset < Current'Length;
+   function Same_Kind (Current : Node_Type;
+                       Old     : Node_Type) return Boolean;
 
    ---------------
    -- Has_Space --
@@ -218,17 +213,13 @@ is
    -- Put_String --
    ----------------
 
-   --  Executing the postcondition results in STORAGE_ERROR on large objects, ignore it.
-   pragma Assertion_Policy (Post => Ignore);
-
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
    with
       Pre  => Has_Space (Subtree, Offset, Name),
-      Post => Same_Kind (Subtree, Subtree'Old, Offset);
-
-   pragma Assertion_Policy (Post => Check);
+      Post => Same_Kind (Subtree (Add (Subtree'First, Offset)),
+                         Subtree (Add (Subtree'First, Offset))'Old);
 
    ----------
    -- Open --
@@ -288,11 +279,9 @@ private
    is
       (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
 
-   function Same_Kind (Current : Subtree_Type;
-                       Old     : Subtree_Type;
-                       Offset  : Offset_Type) return Boolean
-   is
-      (Current (Add (Current'First, Offset)).Kind = Old (Add (Old'First, Offset)).Kind);
+   function Same_Kind (Current : Node_Type;
+                       Old     : Node_Type) return Boolean
+   is (Current.Kind = Old.Kind);
 
    -------------
    -- Is_Open --
