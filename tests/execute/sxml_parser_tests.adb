@@ -519,6 +519,14 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure CDATA_Angle_Brackets (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Parse_Document ("tests/data/cdata_angle_brackets.xml");
+   end CDATA_Angle_Brackets;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -572,6 +580,7 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Many_Attributes'Access, "Many attributes");
       Register_Routine (T, Simple_Content'Access, "Simple content");
       Register_Routine (T, Content_After_Child'Access, "Content after child");
+      Register_Routine (T, CDATA_Angle_Brackets'Access, "CDATA with angle brackets");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
