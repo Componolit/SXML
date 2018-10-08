@@ -1,6 +1,6 @@
 with SXML.Parser;
 
-procedure Document
+procedure Doc
 with SPARK_Mode
 is
    use SXML;
@@ -22,4 +22,4 @@ begin
           Context      => Context,
           Parse_Result => Result,
           Position     => Position); 
-end Document;
+end Doc;
