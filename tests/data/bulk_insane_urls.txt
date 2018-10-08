@@ -3,7 +3,6 @@ https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/courses/wsu
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/dblp/dblp.xml
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/mondial/mondial-3.0.xml
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/nasa/nasa.xml
-https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/pir/psd7003.xml
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/SwissProt/SwissProt.xml
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/customer.xml
 https://aiweb.cs.washington.edu/research/projects/xmltk/xmldata/data/tpc-h/lineitem.xml
