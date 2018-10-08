@@ -68,19 +68,16 @@ is
           then Invalid_Relative_Index
           else Relative_Index_Type (Num_Elements (Name) + Num_Elements (Attributes)));
 
-      if Attributes = Null_Attributes
+      if Attributes /= Null_Attributes
       then
-         if Children /= Null_Tree
-         then
-            Result (Position .. Add (Position, Num_Elements (Children)) - 1) := Children;
-         end if;
-      else
          Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Subtree_Type (Attributes);
-         if Children /= Null_Tree
-         then
-            Result (Add (Position, Num_Elements (Attributes)) ..
-                    Add (Add (Position, Num_Elements (Attributes)), Num_Elements (Children)) - 1) := Children;
-         end if;
+      end if;
+
+      if Children /= Null_Tree
+      then
+         pragma Assert (Children'Length = Num_Elements (Children));
+         Result (Add (Position, Num_Elements (Attributes)) ..
+                 Add (Add (Position, Num_Elements (Attributes)), Num_Elements (Children)) - 1) := Children;
       end if;
 
       return Result;
@@ -197,6 +194,7 @@ is
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
+      --  This yields a SPARK bug box (cf. RA06-002)
       --  Result := (Result'Range => Null_Node);
       Result (1 .. Left'Length) := Left;
       Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;

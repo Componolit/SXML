@@ -187,7 +187,9 @@ is
    with
       Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
 
-   function Num_Elements (Subtree : Subtree_Type) return Offset_Type;
+   function Num_Elements (Subtree : Subtree_Type) return Offset_Type
+   with
+      Post => Num_Elements'Result = (if Subtree = Null_Tree then 0 else Subtree'Length);
 
    ---------------
    -- Same_Kind --
@@ -277,7 +279,10 @@ private
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
-      (Left'First = 1 and Left'Length <= Index_Type'Last - Right'Length);
+      (Left'First = 1 and
+       Num_Elements (Left) > 0 and
+       Num_Elements (Right) > 0 and
+       Left'Length <= Index_Type'Last - Right'Length);
 
    function Same_Kind (Current : Node_Type;
                        Old     : Node_Type) return Boolean
