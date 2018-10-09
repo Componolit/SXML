@@ -1,4 +1,5 @@
 with SXML.Parser;
+with SXML.Serialize;
 with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams;
@@ -32,20 +33,28 @@ is
    procedure Parse_Document (File : String)
    is
       Input   : access String := Read_File (File);
+      Output  : access String := new String (1 .. 3 * Input'Length);
       Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. Input'Length);
+      use SXML;
       use SXML.Parser;
-      Result   : Match_Type;
+      Match    : Match_Type;
+      Result   : Result_Type;
       Position : Natural;
    begin
       Context.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
              Context      => Context.all,
-             Parse_Result => Result,
+             Parse_Result => Match,
              Position     => Position);
-      if Result /= Match_OK
+      if Match /= Match_OK
       then
-         Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
+         Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
       else
+         SXML.Serialize.To_String (Context.all, Output.all, Position, Result);
+         if Result /= Result_OK
+         then
+            Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Position'Img);
+         end if;
          Ada.Text_IO.Put_Line (File & ": OK");
       end if;
    end Parse_Document;

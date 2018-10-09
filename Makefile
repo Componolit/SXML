@@ -36,9 +36,9 @@ check:
 
 fuzz: GPRBUILD_OPTS += --compiler-subst=Ada,afl-gcc
 fuzz: export AFL_SKIP_CPUFREQ=1
-fuzz: MODE=debug
+fuzz: MODE=fuzz
 fuzz: obj/fuzzdriver
-	@afl-fuzz -m 1024 -i tests/afl-data -o obj/fuzz ./obj/fuzzdriver @@
+	@afl-fuzz -t 200 -m 1024 -i tests/afl-data -o obj/fuzz ./obj/fuzzdriver @@
 
 stack: MODE=stack
 stack: SXML.gpr

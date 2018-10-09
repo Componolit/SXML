@@ -1,3 +1,3 @@
 pragma SPARK_Mode (On);
-pragma Assertion_Policy (Pre => Check, Post => Check);
+pragma Assertion_Policy (Pre => Check, Post => Check, Ghost => Check);
 pragma Initialize_Scalars;
