@@ -1191,8 +1191,14 @@ is
       Skip_Byte_Order_Mark;
       Parse_Internal (Parse_Result, Unused);
       pragma Unreferenced (Unused);
+      Skip (Whitespace);
+
       if Parse_Result = Match_OK
       then
+         if Offset < Data'Length
+         then
+            Parse_Result := Match_Trailing_Data;
+         end if;
          Position := Offset;
       else
          Position := Error_Index;

@@ -32,7 +32,7 @@ is
    -- Check_Invalid --
    -------------------
  
-   procedure Check_Invalid (Input : in out String)
+   procedure Check_Invalid (Input : String)
    is
       use SXML;
       use SXML.Parser;
@@ -110,7 +110,7 @@ is
    -- Check_Document --
    --------------------
 
-   procedure Check_Document (Input                : in out String;
+   procedure Check_Document (Input                : String;
                              Output               : String := "INPUT";
                              Ignore_Final_Newline : Boolean := False)
    is

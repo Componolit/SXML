@@ -527,6 +527,22 @@ package body SXML_Parser_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Trailing_Data (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Invalid ("<valid>Some content</valid> Trailing data");
+   end Trailing_Data;
+
+   ---------------------------------------------------------------------------
+
+   procedure Trailing_Whitespace (T : in out Test_Cases.Test_Case'Class)
+   is
+   begin
+      Check_Document ("<valid>Some content</valid>   ", "<valid>Some content</valid>");
+   end Trailing_Whitespace;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -581,6 +597,8 @@ package body SXML_Parser_Tests is
       Register_Routine (T, Simple_Content'Access, "Simple content");
       Register_Routine (T, Content_After_Child'Access, "Content after child");
       Register_Routine (T, CDATA_Angle_Brackets'Access, "CDATA with angle brackets");
+      Register_Routine (T, Trailing_Data'Access, "Trailing data");
+      Register_Routine (T, Trailing_Whitespace'Access, "Trailing whitespace");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
