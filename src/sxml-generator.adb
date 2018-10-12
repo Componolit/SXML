@@ -6,7 +6,7 @@ is
 
    overriding
    function Num_Elements (Attributes : Attributes_Type) return Offset_Type
-   is ((if Attributes = Null_Attributes then 0 else Attributes'Length));
+   is (Attributes'Length);
 
    ---------------
    -- To_String --
@@ -157,27 +157,30 @@ is
 
       --  Find last element
       loop
-         if Overflow (Left'First, I)
+         pragma Loop_Variant (Increases => I);
+
+         if Overflow (Result'First, I)
          then
             return Result;
          end if;
 
-         N :=  Add (Left'First, I);
-         if not (N in Left'Range) or else
-            (Left (N).Kind /= Kind_Content and
-             Left (N).Kind /= Kind_Element_Open)
+         N :=  Add (Result'First, I);
+         if (N - Result'First) > Left'Length or
+            (not (N in Result'Range) or else
+             (Result (N).Kind /= Kind_Content and
+              Result (N).Kind /= Kind_Element_Open))
          then
             return Result;
          end if;
 
-         exit when Left (N).Siblings = Invalid_Relative_Index;
+         exit when Result (N).Siblings = Invalid_Relative_Index;
 
-         if Left (N).Siblings > Relative_Index_Type'Last - I
+         if Result (N).Siblings > Relative_Index_Type'Last - I
          then
             return Result;
          end if;
 
-         I := I + Left (N).Siblings;
+         I := I + Result (N).Siblings;
       end loop;
 
       Result (N).Siblings := Left'Length - I;
@@ -196,31 +199,40 @@ is
    begin
       --  This yields a SPARK bug box (cf. RA06-002)
       --  Result := (Result'Range => Null_Node);
+
       Result (1 .. Left'Length) := Left;
       Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 
+      pragma Assert (Num_Elements (Result) = Num_Elements (Left) + Num_Elements (Right));
+
       --  Find last attibute
       loop
-         if Overflow (Left'First, I)
+         if Overflow (Result'First, I)
          then
             return Result;
          end if;
 
-         N :=  Add (Left'First, I);
-         if not (N in Left'Range) or else
-            Left (N).Kind /= Kind_Attribute
+         N :=  Add (Result'First, I);
+         if I > Left'Length or
+            (not (N in Result'Range) or else
+             Result (N).Kind /= Kind_Attribute)
          then
             return Result;
          end if;
 
-         exit when Left (N).Next_Attribute = Invalid_Relative_Index;
+         pragma Loop_Variant (Increases => I);
+         pragma Loop_Invariant (N in Result'Range);
+         pragma Loop_Invariant (Result (N).Kind = Kind_Attribute);
+         pragma Loop_Invariant (I <= Left'Length);
 
-         if Left (N).Next_Attribute > Relative_Index_Type'Last - I
+         exit when Result (N).Next_Attribute = Invalid_Relative_Index;
+
+         if Result (N).Next_Attribute > Relative_Index_Type'Last - I
          then
             return Result;
          end if;
 
-         I := I + Left (N).Next_Attribute;
+         I := I + Result (N).Next_Attribute;
       end loop;
 
       Result (N).Next_Attribute := Left'Length - I;

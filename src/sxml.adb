@@ -43,7 +43,7 @@ is
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
    function Num_Elements (Subtree : Subtree_Type) return Offset_Type
-   is ((if Subtree = Null_Tree then 0 else Offset_Type (Subtree'Length)));
+   is (Offset_Type (Subtree'Length));
 
    ----------------
    -- Put_String --

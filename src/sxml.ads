@@ -42,19 +42,22 @@ is
                  Right : Relative_Index_Type) return Offset_Type
    is (Left + Offset_Type (Right))
    with
-      Pre => Offset_Type (Right) <= Offset_Type'Last - Left;
+      Pre      => Offset_Type (Right) <= Offset_Type'Last - Left,
+      Annotate => (GNATprove, Terminating);
 
    function Add (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
    is (Index_Type (Natural (Left) + Natural (Right)))
    with
-      Pre => Right <= Offset_Type (Index_Type'Last - Left);
+      Pre      => Right <= Offset_Type (Index_Type'Last - Left),
+      Annotate => (GNATprove, Terminating);
 
    function Add (Left  : Index_Type;
                  Right : Relative_Index_Type) return Index_Type
    is (Index_Type (Natural (Left) + Natural (Right)))
    with
-      Pre => Right <= Relative_Index_Type (Index_Type'Last - Left);
+      Pre      => Right <= Relative_Index_Type (Index_Type'Last - Left),
+      Annotate => (GNATprove, Terminating);
 
    --------------
    -- Overflow --
@@ -80,19 +83,22 @@ is
                  Right : Index_Type) return Relative_Index_Type
    is (Relative_Index_Type (Left - Right))
    with
-      Pre => Left >= Right;
+      Pre      => Left >= Right,
+      Annotate => (GNATprove, Terminating);
 
    function Sub (Left  : Index_Type;
                  Right : Index_Type) return Offset_Type
    is (Offset_Type (Left - Right))
    with
-      Pre => Left >= Right;
+      Pre      => Left >= Right,
+      Annotate => (GNATprove, Terminating);
 
    function Sub (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
    is (Index_Type (Offset_Type (Left) - Right))
    with
-      Pre => Offset_Type (Left) > Right;
+      Pre      => Offset_Type (Left) > Right,
+      Annotate => (GNATprove, Terminating);
 
    ---------------
    -- Underflow --
@@ -181,15 +187,18 @@ is
 
    function Num_Elements (D : Content_Type) return Offset_Type
    with
-      Post => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
+      Post     => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
+      Annotate => (GNATprove, Terminating);
 
    function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
    with
-      Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length;
+      Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
+      Annotate => (GNATprove, Terminating);
 
    function Num_Elements (Subtree : Subtree_Type) return Offset_Type
    with
-      Post => Num_Elements'Result = (if Subtree = Null_Tree then 0 else Subtree'Length);
+      Post     => Num_Elements'Result = (if Subtree = Null_Tree then 0 else Subtree'Length),
+      Annotate => (GNATprove, Terminating);
 
    ---------------
    -- Same_Kind --
@@ -275,13 +284,11 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Tree : constant Subtree_Type := (1 => Null_Node);
+   Null_Tree : constant Subtree_Type := (1 .. 0 => Null_Node);
 
    function Is_Valid (Left, Right : Subtree_Type) return Boolean
    is
-      (Left'First = 1 and
-       Num_Elements (Left) > 0 and
-       Num_Elements (Right) > 0 and
+      ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
        Left'Length <= Index_Type'Last - Right'Length);
 
    function Same_Kind (Current : Node_Type;
