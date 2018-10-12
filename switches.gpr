@@ -4,7 +4,8 @@ is
    (
       "-gnatA"	 -- Avoid processing gnat.adc, if present file will be ignored
 
-     ,"-gnatef" -- Full source path in brief error messages
+     --  ,"-gnatef" -- Full source path in brief error messages
+
      ,"-gnateV" -- Validity checks on subprogram parameters
      ,"-gnatf"  -- Full errors. Verbose details, all undefined references
      ,"-gnatU"  -- Enable unique tag for error messages
