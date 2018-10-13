@@ -12,6 +12,8 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML.Generator; use SXML.Generator;
 with SXML.Serialize; use SXML.Serialize;
+with SXML.Debug; use SXML.Debug;
+with SXML.Generator.Debug; use SXML.Generator.Debug;
 
 package body SXML_Generator_Tests is
 
@@ -193,6 +195,46 @@ package body SXML_Generator_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Context_Length (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+
+      procedure Check_Length (N : String;
+                              L : Offset_Type;
+                              S : Subtree_Type)
+      is
+      begin
+         if Num_Elements (S) /= L
+         then
+            Dump (S);
+            Assert (False, N & ": Expected length" & L'Img & " got " & Num_Elements (S)'Img);
+         end if;
+      end Check_Length;
+
+      procedure Check_Length (N : String;
+                              L : Offset_Type;
+                              A : Attributes_Type)
+      is
+      begin
+         if Num_Elements (A) /= L
+         then
+            Dump (A);
+            Assert (Num_Elements (A) = L, N & ": Expected length" & L'Img & " got" & Num_Elements (A)'Img);
+         end if;
+      end Check_Length;
+   begin
+      Check_Length ("C1", 1, E ("name"));
+      Check_Length ("C2", 2, E ("name") + E ("name"));
+      Check_Length ("C3", 2, E ("name", E ("child")));
+      Check_Length ("C4", 2, A ("attr", "name"));
+      Check_Length ("C5", 5, E ("parent", A ("attr1", "name1") + A ("attr2", "name2")));
+      Check_Length ("C6", 4, E ("parent", A ("attr1", "name1"), C ("test")));
+      Check_Length ("C7", 5, E ("parent", A ("attr1", "name1"), C ("longstringtest")));
+      Check_Length ("C8", 7, E ("parent", A ("attr1", "name1"), E ("child", C ("longstringtest") + C ("short"))));
+   end Test_Context_Length;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -210,6 +252,7 @@ package body SXML_Generator_Tests is
       Register_Routine (T, Test_Generate_Simple_Content'Access, "Simple content");
       Register_Routine (T, Test_Generate_Escape_Content'Access, "Escaped content");
       Register_Routine (T, Test_Generate_Interleaved_Content'Access, "Interleaved content");
+      Register_Routine (T, Test_Context_Length'Access, "Context length");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
