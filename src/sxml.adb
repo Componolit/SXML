@@ -92,6 +92,7 @@ is
    begin
       Start          := Position;
       Output (Start) := Null_Open_Element;
+      Output (Start + 1 .. Add (Start, Num_Elements (Name) - 1)) := (others => Null_Data_Element);
       Put_String (Output, Sub (Start, Output'First), Name);
       Position := Add (Position, Num_Elements (Name));
    end Open;

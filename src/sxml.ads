@@ -139,6 +139,12 @@ is
 
    function Is_Open (Node : Node_Type) return Boolean;
 
+   ----------------
+   -- Is_Invalid --
+   ----------------
+
+   function Is_Invalid (Node : Node_Type) return Boolean;
+
    -----------------
    -- Put_Content --
    -----------------
@@ -294,6 +300,13 @@ private
    function Same_Kind (Current : Node_Type;
                        Old     : Node_Type) return Boolean
    is (Current.Kind = Old.Kind);
+
+   ----------------
+   -- Is_Invalid --
+   ----------------
+
+   function Is_Invalid (Node : Node_Type) return Boolean
+   is (Node.Kind = Kind_Invalid);
 
    -------------
    -- Is_Open --

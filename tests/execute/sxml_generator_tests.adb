@@ -222,6 +222,8 @@ package body SXML_Generator_Tests is
             Assert (Num_Elements (A) = L, N & ": Expected length" & L'Img & " got" & Num_Elements (A)'Img);
          end if;
       end Check_Length;
+
+      Pos : Natural := 1;
    begin
       Check_Length ("C1", 1, E ("name"));
       Check_Length ("C2", 2, E ("name") + E ("name"));
@@ -231,6 +233,12 @@ package body SXML_Generator_Tests is
       Check_Length ("C6", 4, E ("parent", A ("attr1", "name1"), C ("test")));
       Check_Length ("C7", 5, E ("parent", A ("attr1", "name1"), C ("longstringtest")));
       Check_Length ("C8", 7, E ("parent", A ("attr1", "name1"), E ("child", C ("longstringtest") + C ("short"))));
+
+      for X of E ("sub-child")
+      loop
+         Assert (X /= Null_Node and not Is_Invalid (X), "Context contains null nodes at position" & Pos'Img);
+         Pos := Pos + 1;
+      end loop;
    end Test_Context_Length;
 
    ---------------------------------------------------------------------------
