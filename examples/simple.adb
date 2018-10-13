@@ -1,9 +1,9 @@
-with SXML.Generator;
-with SXML.Serialize;
+with SXML.Generator; use SXML.Generator;
+with SXML.Serialize; use SXML.Serialize;
+with SXML.Debug;     use SXML.Debug;
+with Ada.Text_IO;    use Ada.Text_IO;
+
 use SXML;
-use SXML.Generator;
-use SXML.Serialize;
-with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Simple
 is
@@ -69,6 +69,7 @@ is
    Offset : Natural := 0;
    Result : Result_Type;
 begin
+   Debug.Dump (Doc);
    To_String (Doc, Data, Offset, Result);
    if Result = Result_OK
    then
