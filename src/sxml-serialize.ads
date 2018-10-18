@@ -17,7 +17,8 @@ is
                         Last   : out Natural;
                         Result : out Result_Type)
    with
-      Pre => Doc'Length > 0;
+      Pre => Data'Length > 0 and
+             Doc'Length > 0;
 
    ---------------
    -- To_String --
@@ -29,7 +30,8 @@ is
                         Result : out Result_Type;
                         Buffer : in out Stack_Type)
    with
-      Pre => Doc'Length > 0 and
+      Pre => Data'Length > 0 and
+             Doc'Length > 0 and
              Buffer'Length > 1;
 
 private

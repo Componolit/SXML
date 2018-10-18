@@ -259,6 +259,7 @@ is
          First := Last + 2;
          Last  := First;
 
+         pragma Loop_Variant (Increases => State.Offset);
          pragma Loop_Invariant (Is_Valid (Document, State));
          pragma Loop_Invariant (Is_Open (Document, State) or
                                 Is_Content (Document, State));
@@ -267,6 +268,8 @@ is
          pragma Loop_Invariant (Last <= Query_String'Last);
 
          loop
+            pragma Loop_Variant (Increases => Last);
+            pragma Loop_Invariant (State.Offset = State.Offset'Loop_Entry);
             pragma Loop_Invariant (First >= Query_String'First);
             pragma Loop_Invariant (Last >= Query_String'First);
             pragma Loop_Invariant (Last <= Query_String'Last);
@@ -329,6 +332,7 @@ is
 
       while Tmp_Result = Result_OK
       loop
+         pragma Loop_Variant (Increases => State.Offset);
          pragma Loop_Invariant (Is_Valid (Document, State));
          pragma Loop_Invariant (Is_Attribute (Document, State));
 
@@ -364,10 +368,6 @@ is
       end if;
 
       loop
-         pragma Loop_Invariant (Is_Valid (Document, State) and then
-                                  (Is_Open (Document, State) or
-                                   Is_Content (Document, State)));
-
          if Is_Open (Document, State)
          then
             State.Name (Document, Result, Scratch_Buffer (1 .. Sibling_Name'Length), Tmp_Last);
@@ -380,6 +380,12 @@ is
          end if;
          State.Sibling (Document, Result);
          exit when Result /= Result_OK;
+
+         pragma Loop_Variant (Increases => State.Offset);
+         pragma Loop_Invariant (Is_Valid (Document, State) and then
+                                  (Is_Open (Document, State) or
+                                   Is_Content (Document, State)));
+         pragma Loop_Invariant (State.Offset > State.Offset'Loop_Entry);
       end loop;
       State := Old_State;
    end Find_Sibling;

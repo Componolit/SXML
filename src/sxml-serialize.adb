@@ -12,7 +12,9 @@ is
                   Data     : in out String;
                   Position : in out Integer)
    with
-      Post => (if Position'Old < 0 then Position < 0);
+      Pre  => Value'Length > 0,
+      Post => (if Position'Old < 0 then Position < 0) and
+              (if Position >= 0 then Position > Position'Old);
 
    procedure Put (Value    : String;
                   Data     : in out String;
@@ -40,7 +42,10 @@ is
                           Data     : in out String;
                           Position : in out Integer)
    with
-      Pre => Start in Doc'Range;
+      Pre  => Start in Doc'Range,
+      Post => (if Position'Old < 0 then Position < 0) and
+              (if Position >= 0 and Doc (Start).Length > 0
+               then Position > Position'Old);
 
    procedure Put_Escaped (Doc      : Subtree_Type;
                           Start    : Index_Type;
@@ -49,7 +54,10 @@ is
    is
       procedure Put_Escaped_Char (Char : Character;
                                   D    : in out String;
-                                  P    : in out Integer);
+                                  P    : in out Integer)
+      with
+         Post => (if P'Old < 0 then P < 0) and
+                 (if P >= 0 then P > P'Old);
 
       procedure Put_Escaped_Char (Char : Character;
                                   D    : in out String;
@@ -71,9 +79,8 @@ is
    begin
 
       loop
-         pragma Loop_Invariant (Pos in Doc'Range);
-         pragma Loop_Variant (Increases => Pos);
          N := Doc (Pos);
+
          for C of N.Data (1 .. Natural (N.Length))
          loop
             Put_Escaped_Char (C, Data, Position);
@@ -81,14 +88,20 @@ is
             then
                return;
             end if;
+            pragma Loop_Invariant (Position > Position'Loop_Entry);
          end loop;
 
          exit when
+           N.Length = 0 or
            N.Next = Invalid_Relative_Index or
            Overflow (Pos, N.Next);
 
          Pos := Add (Pos, N.Next);
          exit when not (Pos in Doc'Range);
+
+         pragma Loop_Invariant (Pos in Doc'Range);
+         pragma Loop_Invariant (Position > Position'Loop_Entry);
+         pragma Loop_Variant (Increases => Pos);
       end loop;
    end Put_Escaped;
 
@@ -101,7 +114,12 @@ is
                              Data     : in out String;
                              Position : in out Integer)
    with
-      Pre => Start in Doc'Range;
+      Pre  => Start in Doc'Range,
+      Post => (if Position'Old < 0 then Position < 0) and
+              (if Position >= 0 then
+                 (if Doc (Start).Length > 0
+                  then Position > Position'Old
+                  else Position = Position'Old));
 
    procedure Serialize_Data (Doc      : Subtree_Type;
                              Start    : Index_Type;
@@ -113,45 +131,74 @@ is
    begin
 
       loop
-         pragma Loop_Invariant (Pos in Doc'Range);
          N := Doc (Pos);
+         if N.Length = 0
+         then
+            return;
+         end if;
+
          Put (N.Data (1 .. Natural (N.Length)), Data, Position);
          if Position < 0
          then
             return;
          end if;
+
          exit when
            N.Next = Invalid_Relative_Index or
            Overflow (Pos, N.Next);
 
          Pos := Add (Pos, N.Next);
          exit when not (Pos in Doc'Range);
+
+         pragma Loop_Variant (Increases => Pos);
+         pragma Loop_Invariant (Position > Position'Loop_Entry);
+         pragma Loop_Invariant (Pos in Doc'Range);
       end loop;
    end Serialize_Data;
 
-   ------------
-   -- Handle --
-   ------------
+   -------------------
+   -- Valid_Element --
+   -------------------
 
-   procedure Handle (Doc      : Subtree_Type;
-                     Current  : Index_Type;
-                     Mode     : Mode_Type;
-                     Data     : in out String;
-                     Position : in out Integer)
+   function Valid_Element (Doc      : Subtree_Type;
+                           Current  : Index_Type;
+                           Mode     : Mode_Type) return Boolean
+   is ((Mode = Mode_Open and Doc (Current).Kind = Kind_Content) or
+       ((Doc (Current).Kind = Kind_Element_Open or Doc (Current).Kind = Kind_Content) and then
+       ((Mode = Mode_Close and Doc (Current).Children /= Invalid_Relative_Index) or
+       Mode = Mode_Open)))
    with
       Pre => Current in Doc'Range;
 
-   procedure Handle (Doc      : Subtree_Type;
-                     Current  : Index_Type;
-                     Mode     : Mode_Type;
-                     Data     : in out String;
-                     Position : in out Integer)
+   -----------------------
+   -- Serialize_Element --
+   -----------------------
+
+   procedure Serialize_Element (Doc      : Subtree_Type;
+                                Current  : Index_Type;
+                                Mode     : Mode_Type;
+                                Data     : in out String;
+                                Position : in out Integer)
+   with
+      Pre  => Data'Length > 0 and
+              (Current in Doc'Range and then
+               Valid_Element (Doc, Current, Mode)),
+      Post => (if Position'Old < 0 then Position < 0) and
+              (if Position >= 0  and Doc (Current).Length > 0
+               then Position > Position'Old),
+      Annotate => (GNATprove, Terminating);
+
+   procedure Serialize_Element (Doc      : Subtree_Type;
+                                Current  : Index_Type;
+                                Mode     : Mode_Type;
+                                Data     : in out String;
+                                Position : in out Integer)
    is
       Attr  : Index_Type;
       Value : Index_Type;
       Pos   : Relative_Index_Type;
+      Position_Old : constant Integer := Position with Ghost;
    begin
-
       if Doc (Current).Kind = Kind_Content and
          Mode = Mode_Open
       then
@@ -172,14 +219,13 @@ is
          Put ("</", Data, Position);
          Serialize_Data (Doc, Current, Data, Position);
          Put (">", Data, Position);
-      end if;
-
-      if Mode = Mode_Open
+      elsif Mode = Mode_Open
       then
          Put ("<", Data, Position);
          Serialize_Data (Doc, Current, Data, Position);
          Pos  := Doc (Current).Attributes;
          Attr := Current;
+
          while Pos /= Invalid_Relative_Index and
                not Overflow (Attr, Pos)
          loop
@@ -198,14 +244,22 @@ is
             Serialize_Data (Doc, Value, Data, Position);
             Put ("""", Data, Position);
             Pos := Doc (Attr).Next_Attribute;
+
+            pragma Loop_Variant (Increases => Attr);
+            pragma Loop_Invariant (if Position'Loop_Entry < 0 then Position < 0);
+            pragma Loop_Invariant ((if Position >= 0 then
+                                   (if Doc (Current).Length > 0
+                                    then Position > Position_Old
+                                    else Position >= Position_Old)));
          end loop;
+
          if Doc (Current).Children = Invalid_Relative_Index
          then
             Put ("/", Data, Position);
          end if;
          Put (">", Data, Position);
       end if;
-   end Handle;
+   end Serialize_Element;
 
    ---------------
    -- To_String --
@@ -222,6 +276,7 @@ is
       Tmp      : Traversal_Type;
       Current  : Traversal_Type;
       Position : Integer := 0;
+      Count    : Natural := 0;
 
       package S   is new SXML.Stack (Traversal_Type,
                                      Stack_Type,
@@ -242,23 +297,29 @@ is
 
       while not S.Is_Empty
       loop
-         pragma Loop_Variant (Increases => Position);
+         pragma Loop_Variant (Increases => Count);
          pragma Loop_Invariant (Position >= 0);
          pragma Loop_Invariant (S.Is_Valid);
          pragma Loop_Invariant (not S.Is_Empty);
          pragma Loop_Invariant (Rev.Is_Valid);
 
          S.Pop (Current);
-         if not (Current.Index in Doc'Range)
+
+         if Count = Natural'Last or
+            not (Current.Index in Doc'Range)
          then
             Result := Result_Overflow;
             return;
          end if;
+         Count := Count + 1;
 
-         Handle (Doc, Current.Index, Current.Mode, Data, Position);
-         if Position < 0
+         if Valid_Element (Doc, Current.Index, Current.Mode)
          then
-            return;
+            Serialize_Element (Doc, Current.Index, Current.Mode, Data, Position);
+            if Position < 0
+            then
+               return;
+            end if;
          end if;
 
          if Current.Mode = Mode_Open
@@ -304,6 +365,7 @@ is
             end loop;
             while not Rev.Is_Empty
             loop
+               pragma Loop_Variant (Decreases => Rev.Level);
                pragma Loop_Invariant (S.Is_Valid);
                pragma Loop_Invariant (Rev.Is_Valid);
                pragma Loop_Invariant (not Rev.Is_Empty);

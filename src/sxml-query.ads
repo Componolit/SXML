@@ -2,6 +2,14 @@ package SXML.Query
 is
    type State_Type is tagged private;
 
+   ------------
+   -- Offset --
+   ------------
+
+   function Offset (State : State_Type) return Offset_Type
+   with
+      Ghost;
+
    --------------
    -- Is_Valid --
    --------------
@@ -58,7 +66,7 @@ is
                    Data     : in out Content_Type;
                    Last     : out Natural)
    with
-      Pre'Class => (Is_Valid (Document, State) and then
+      Pre'Class  => (Is_Valid (Document, State) and then
                     (Is_Open (Document, State) or Is_Attribute (Document, State)));
 
    -----------
@@ -70,11 +78,12 @@ is
                     Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State),
-      Post'Class => ((Result = Result_OK and
-                      (Is_Valid (Document, State) and then
-                        (Is_Open (Document, State) or
-                        Is_Content (Document, State)))) or
-                     State = State'Old);
+      Post'Class => (if Result = Result_OK
+                     then State.Offset > State'Old.Offset and
+                          (Is_Valid (Document, State) and then
+                           (Is_Open (Document, State) or
+                            Is_Content (Document, State)))
+                     else State = State'Old);
 
    -------------
    -- Sibling --
@@ -87,11 +96,12 @@ is
       Pre'Class  => Is_Valid (Document, State) and then
                     (Is_Open (Document, State) or
                      Is_Content (Document, State)),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                        (Is_Open (Document, State) or
-                         Is_Content (Document, State)))) or
-                    State = State'Old;
+      Post'Class => (if Result = Result_OK
+                     then State.Offset > State'Old.Offset and
+                          (Is_Valid (Document, State) and then
+                             (Is_Open (Document, State) or
+                                      Is_Content (Document, State)))
+                     else State = State'Old);
 
    ------------------
    -- Find_Sibling --
@@ -105,10 +115,11 @@ is
       Pre'Class  => Is_Valid (Document, State) and then
                      (Is_Open (Document, State) or
                       Is_Content (Document, State)),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                      Is_Open (Document, State))) or
-                    State = State'Old;
+      Post'Class => (if Result = Result_OK
+                     then State.Offset >= State'Old.Offset and
+                          (Is_Valid (Document, State) and then
+                           Is_Open (Document, State))
+                     else State = State'Old);
 
    ---------------
    -- Attribute --
@@ -159,10 +170,11 @@ is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Attribute (Document, State),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                      Is_Attribute (Document, State))) or
-                    State = State'Old;
+      Post'Class => (if Result = Result_OK
+                     then State.Offset > State'Old.Offset and
+                          (Is_Valid (Document, State) and then
+                           Is_Attribute (Document, State))
+                     else State = State'Old);
 
    --------------------
    -- Find_Attribute --
@@ -200,5 +212,12 @@ private
    record
       Offset : Offset_Type;
    end record;
+
+   ------------
+   -- Offset --
+   ------------
+
+   function Offset (State : State_Type) return Offset_Type
+   is (State.Offset);
 
 end SXML.Query;
