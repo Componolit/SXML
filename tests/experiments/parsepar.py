@@ -14,6 +14,43 @@ def parse_close (data, offset):
         return (True, offset + 1)
     return (False, offset)
 
+class Snapshot:
+
+    def __init__ (self, stage, found, offset):
+        self.stage  = stage
+        self.found  = found
+        self.offset = offset
+
+def parse_iterative (data, offset = 0):
+
+    result = True
+    stack  = []
+
+    stack.append (Snapshot (stage=0, found=False, offset=offset))
+
+    while stack:
+
+        frame = stack.pop ()
+
+        if frame.stage == 0:
+
+            (frame.found, tmp_offset) = parse_open (data, frame.offset)
+            if not frame.found:
+                result = (False, frame.offset)
+            else:
+                stack.append (Snapshot (stage=1, found=True, offset=tmp_offset))
+
+        elif frame.stage == 1:
+
+            stack.append (Snapshot (stage=2, found=True, offset=frame.offset))
+            if frame.found:
+                stack.append (Snapshot (stage=0, found=True, offset=frame.offset))
+
+        elif frame.stage == 2:
+            result = parse_close (data, frame.offset)
+
+    return result
+
 def parse_recursive (data, offset = 0):
 
     (found, offset) = parse_open (data, offset)
@@ -23,53 +60,79 @@ def parse_recursive (data, offset = 0):
     while found:
         (found, offset) = parse_recursive (data, offset)
 
-    (found, offset) = parse_close (data, offset)
+    return parse_close (data, offset)
+
+def parse_recursive_inner (data, offset, found):
+
+    if not found:
+        return parse_close (data, offset)
+
+    (found, offset) = parse_recursive2 (data, offset)
+
+    return parse_recursive_inner (data, offset, found)
+
+
+def parse_recursive2 (data, offset = 0):
+
+    (found, offset) = parse_open (data, offset)
     if not found:
         return (False, offset)
 
-    return (True, offset)
+    return parse_recursive_inner (data, offset, found)
 
-def parse_iterative (data, offset = 0):
+def parse_recursive3 (data, offset = 0, found = False, stage = 0):
 
-    found = False
-    result = (False, 0)
+    if stage == 0:
 
+        (found, offset) = parse_open (data, offset)
+        if not found:
+            return (False, offset)
+
+    elif stage == 1:
+
+        if not found:
+            return parse_close (data, offset)
+
+        (found, offset) = parse_recursive3 (data, offset)
+
+    return parse_recursive3 (data, offset, found, stage=1)
+
+class State:
+    def __init__ (self, offset, found, stage):
+        self.offset = offset
+        self.found  = found
+        self.stage  = stage
+
+def parse_recursive4 (data, param_offset=0, param_found=False, param_stage = 0):
+
+    retval = (False, 0)
     stack = []
-    stack.append ({'offset': offset, 'found': found, 'location': 0})
+    stack.append (State (param_offset, param_found, param_stage))
 
-    while len (stack) > 0:
+    while stack:
 
-        current = stack.pop ()
+        state = stack.pop()
 
-        if current['location'] == 0:
+        if state.stage == 0:
 
-            (found, offset) = parse_open (data, current['offset'])
-            if not found:
-                result = (False, offset)
+            (loc_found, loc_offset) = parse_open (data, state.offset)
+            if not loc_found:
+                retval = (False, loc_offset)
             else:
-                stack.append ({'offset': offset, 'found': found, 'location': 1})
+                stack.append (State (loc_offset, loc_found, 1))
 
-        if current['location'] == 1:
+        elif state.stage == 1:
 
-            (found, offset) = parse_recursive (data, current['offset'])
-            if found:
-                stack.append ({'offset': offset, 'found': found, 'location': 1})
+            if not state.found:
+                retval = parse_close (data, state.offset)
             else:
-                stack.append ({'offset': offset, 'found': found, 'location': 2})
-            stack.append ({'offset': offset, 'found': found, 'location': 0})
+                stack.append (State (0, 0, 2))
+                stack.append (State (state.offset, False, 0))
 
-        if current['location'] == 2:
+        elif state.stage == 2:
+            stack.append (State (retval[1], retval[0], 1))
 
-            (found, offset) = parse_close (data, current['offset'])
-            if not found:
-                result = (False, offset)
-            else:
-                stack.append ({'offset': offset, 'found': found, 'location': 3})
-
-        if current['location'] == 3:
-            result = (True, offset)
-
-    return result
+    return retval
 
 class TestParser(unittest.TestCase):
 
@@ -97,29 +160,77 @@ class TestParser(unittest.TestCase):
     def test_fail_unrelated(self):
         self.assertEqual (parse_recursive ("This is a test"), (False, 0))
 
-    def test_simple1_i(self):
-        self.assertEqual (parse_iterative ("()"), (True, 2))
+    def test_simple1_r(self):
+        self.assertEqual (parse_recursive2 ("()"), (True, 2))
 
-    def test_simple2_i(self):
-        self.assertEqual (parse_iterative ("(())"), (True, 4))
+    def test_simple2_r(self):
+        self.assertEqual (parse_recursive2 ("(())"), (True, 4))
 
-    def test_simple3_i(self):
-        self.assertEqual (parse_iterative ("(()())"), (True, 6))
+    def test_simple3_r(self):
+        self.assertEqual (parse_recursive2 ("(()())"), (True, 6))
 
-    def test_simple9_i(self):
-        self.assertEqual (parse_iterative ("(()()()(((((()))))()))"), (True, 22))
+    def test_simple9_r(self):
+        self.assertEqual (parse_recursive2 ("(()()()(((((()))))()))"), (True, 22))
 
-    def test_fail_i(self):
-        self.assertEqual (parse_iterative ("(()(((((()))))())("), (False, 18))
+    def test_fail_r(self):
+        self.assertEqual (parse_recursive2 ("(()(((((()))))())("), (False, 18))
 
-    def test_fail_short1_i(self):
-        self.assertEqual (parse_iterative ("("), (False, 1))
+    def test_fail_short1_r(self):
+        self.assertEqual (parse_recursive2 ("("), (False, 1))
 
-    def test_fail_short2_i(self):
-        self.assertEqual (parse_iterative (")"), (False, 0))
+    def test_fail_short2_r(self):
+        self.assertEqual (parse_recursive2 (")"), (False, 0))
 
-    def test_fail_unrelated_i(self):
-        self.assertEqual (parse_iterative ("This is a test"), (False, 0))
+    def test_fail_unrelated_r(self):
+        self.assertEqual (parse_recursive2 ("This is a test"), (False, 0))
+
+    def test_simple1_r3(self):
+        self.assertEqual (parse_recursive3 ("()"), (True, 2))
+
+    def test_simple2_r3(self):
+        self.assertEqual (parse_recursive3 ("(())"), (True, 4))
+
+    def test_simple3_r3(self):
+        self.assertEqual (parse_recursive3 ("(()())"), (True, 6))
+
+    def test_simple9_r3(self):
+        self.assertEqual (parse_recursive3 ("(()()()(((((()))))()))"), (True, 22))
+
+    def test_fail_r3(self):
+        self.assertEqual (parse_recursive3 ("(()(((((()))))())("), (False, 18))
+
+    def test_fail_short1_r3(self):
+        self.assertEqual (parse_recursive3 ("("), (False, 1))
+
+    def test_fail_short2_r3(self):
+        self.assertEqual (parse_recursive3 (")"), (False, 0))
+
+    def test_fail_unrelated_r3(self):
+        self.assertEqual (parse_recursive3 ("This is a test"), (False, 0))
+
+    def test_simple1_r4(self):
+        self.assertEqual (parse_recursive4 ("()"), (True, 2))
+
+    def test_simple2_r4(self):
+        self.assertEqual (parse_recursive4 ("(())"), (True, 4))
+
+    def test_simple3_r4(self):
+        self.assertEqual (parse_recursive4 ("(()())"), (True, 6))
+
+    def test_simple9_r4(self):
+        self.assertEqual (parse_recursive4 ("(()()()(((((()))))()))"), (True, 22))
+
+    def test_fail_r4(self):
+        self.assertEqual (parse_recursive4 ("(()(((((()))))())("), (False, 18))
+
+    def test_fail_short1_r4(self):
+        self.assertEqual (parse_recursive4 ("("), (False, 1))
+
+    def test_fail_short2_r4(self):
+        self.assertEqual (parse_recursive4 (")"), (False, 0))
+
+    def test_fail_unrelated_r4(self):
+        self.assertEqual (parse_recursive4 ("This is a test"), (False, 0))
 
 if __name__ == '__main__':
     unittest.main()
