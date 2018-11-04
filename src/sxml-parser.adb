@@ -9,6 +9,8 @@
 --  GNU Affero General Public License version 3.
 --
 
+with SXML.Stack;
+
 package body SXML.Parser
 is
    pragma Annotate (GNATprove, Terminating, SXML.Parser);
@@ -23,8 +25,6 @@ is
                     Position     : out Natural)
    is
       Unused : Index_Type;
-
-      Parse_Internal_Depth : constant := 100;
 
       subtype Document_Index_Type is Index_Type
       with Predicate => Document_Index_Type in Document'Range;
@@ -990,9 +990,8 @@ is
       -- Parse_Internal --
       --------------------
 
-      procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
+      procedure Parse_Internal (Match : out Match_Type;
+                                Start : out Index_Type)
         with
            Post => (if Match = Match_OK
                     then Offset > Offset'Old
@@ -1133,128 +1132,225 @@ is
                 (Document (Previous).Kind = Kind_Element_Open or
                  Document (Previous).Kind = Kind_Content)));
 
-      ----------------
-      -- Link_Child --
-      ----------------
+      ------------------
+      -- Link_Element --
+      ------------------
 
-      procedure Link_Child (Child    : Index_Type;
-                            Parent   : Index_Type;
-                            Previous : in out Index_Type)
+      procedure Link_Element (Element  : Index_Type;
+                              Parent   : Index_Type;
+                              Previous : in out Index_Type)
       with
-         Pre  => Is_Valid_Link (Child, Parent, Previous),
-         Post => (if Child /= Invalid_Index then Previous = Child),
+         Pre  => Is_Valid_Link (Element, Parent, Previous),
+         Post => (if Element /= Invalid_Index then Previous = Element),
          Annotate => (GNATprove, Terminating);
 
-      procedure Link_Child (Child    : Index_Type;
-                            Parent   : Index_Type;
-                            Previous : in out Index_Type)
+      procedure Link_Element (Element  : Index_Type;
+                              Parent   : Index_Type;
+                              Previous : in out Index_Type)
       is
       begin
-         if Child /= Invalid_Index
+         if Element /= Invalid_Index
          then
             if Previous = Invalid_Index
             then
-               Document (Parent).Children := Sub (Child, Parent);
+               Document (Parent).Children := Sub (Element, Parent);
             else
-               Document (Previous).Siblings := Sub (Child, Previous);
+               Document (Previous).Siblings := Sub (Element, Previous);
             end if;
-            Previous := Child;
+            Previous := Element;
          end if;
-      end Link_Child;
+      end Link_Element;
 
       --------------------
       -- Parse_Internal --
       --------------------
 
-      procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
-      is
-         Old_Offset     : constant Natural := Offset;
-         Done           : Boolean;
-         Name           : Range_Type;
-         Sub_Match      : Match_Type;
-         Child_Start    : Index_Type;
-         Previous_Child : Index_Type := Invalid_Index;
-         Parent         : Index_Type;
-      begin
+      type Block_Type is
+         (Block_Invalid,
+          Block_Content_Pre,
+          Block_Open_Sections_Pre,
+          Block_Open_Tag,
+          Block_Open_Sections_Post,
+          Block_Child,
+          Block_Close);
 
+      type Parser_State_Type is
+      record
+         Block   : Block_Type;
+         Offset  : Integer;
+         Name    : Range_Type;
+         Current : Index_Type;
+         Parent  : Index_Type;
+         Sibling : Index_Type;
+         Done    : Boolean;
+      end record;
+
+      Null_Parser_State : constant Parser_State_Type :=
+         (Block   => Block_Invalid,
+          Offset  => 0,
+          Name    => Null_Range,
+          Current => Invalid_Index,
+          Parent  => Invalid_Index,
+          Sibling => Invalid_Index,
+          Done    => False);
+
+      type Parser_Stack_Type is array (SXML.Natural_Without_Last range <>) of Parser_State_Type;
+      Parser_Buffer : Parser_Stack_Type (1 .. 1000) := (others => Null_Parser_State);
+      package S is new SXML.Stack (Parser_State_Type, Parser_Stack_Type, Parser_Buffer, Null_Parser_State);
+
+      procedure Parse_Internal (Match : out Match_Type;
+                                Start : out Index_Type)
+      is
+         State : Parser_State_Type;
+      begin
          Match := Match_Invalid;
          Start := Invalid_Index;
 
-         if Level = 0
-         then
-            return;
-         end if;
+         S.Push ((Block   => Block_Open_Sections_Pre,
+                  Offset  => 0,
+                  Name    => Null_Range,
+                  Current => Invalid_Index,
+                  Parent  => Invalid_Index,
+                  Sibling => Invalid_Index,
+                  Done    => False));
 
-         if Level < Parse_Internal_Depth
-         then
-            Parse_Content (Sub_Match, Start);
-            if Sub_Match = Match_OK
-            then
-               Match := Match_OK;
-               return;
-            end if;
-         end if;
-
-         Parse_Sections;
-
-         if Data_Overflow
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-
-         Parse_Opening_Tag (Sub_Match, Name, Start, Done);
-         if Sub_Match /= Match_OK
-         then
-            Restore_Offset (Old_Offset);
-            Match := Match_None;
-            return;
-         end if;
-
-         Parent := Start;
-
-         if Context_Overflow
-         then
-            Restore_Offset (Old_Offset);
-            Match := Match_Out_Of_Memory;
-            return;
-         end if;
-
-         Parse_Sections;
-
-         if Done
-         then
-            Match := Match_OK;
-            return;
-         end if;
-
+         while not S.Is_Empty
          loop
-            Parse_Internal (Sub_Match, Child_Start, Level - 1);
-            exit when Sub_Match /= Match_OK;
+            S.Pop (State);
 
-            if not Is_Valid_Link (Child_Start, Parent, Previous_Child)
+            if State.Offset >= 0
             then
-               return;
+               State.Offset := Offset;
             end if;
 
-            Link_Child (Child_Start, Parent, Previous_Child);
+            case State.Block is
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset > Offset'Loop_Entry);
+               when Block_Content_Pre =>
 
+                  declare
+                     Sub_Match : Match_Type;
+                  begin
+                     Parse_Content (Sub_Match, Start);
+                     if Sub_Match = Match_OK
+                     then
+                        Match := Match_OK;
+                     else
+                        State.Block  := Block_Open_Sections_Pre;
+                        State.Offset := Offset;
+                        S.Push (State);
+                     end if;
+                  end;
+
+               when Block_Open_Sections_Pre =>
+
+                  Parse_Sections;
+
+                  if not Data_Overflow
+                  then
+                     State.Block  := Block_Open_Tag;
+                     State.Offset := Offset;
+                     S.Push (State);
+                  else
+                     Restore_Offset (State.Offset);
+                  end if;
+
+               when Block_Open_Tag =>
+
+                  declare
+                     Sub_Match : Match_Type;
+                  begin
+                     Parse_Opening_Tag (Sub_Match, State.Name, Start, State.Done);
+                     if Sub_Match /= Match_OK
+                     then
+                        Restore_Offset (State.Offset);
+                        Match := Match_None;
+                     elsif Context_Overflow
+                     then
+                        Restore_Offset (State.Offset);
+                        Match := Match_Out_Of_Memory;
+                     else
+                        State.Block   := Block_Open_Sections_Post;
+                        State.Current := Start;
+                        State.Offset  := Offset;
+                        S.Push (State);
+                     end if;
+                  end;
+
+               when Block_Open_Sections_Post =>
+
+                  Parse_Sections;
+
+                  if State.Done
+                  then
+                     Match := Match_OK;
+                  else
+                     S.Push ((Block   => Block_Child,
+                              Offset  => -1,
+                              Name    => State.Name,
+                              Current => State.Current,
+                              Parent  => Start,
+                              Sibling => State.Sibling,
+                              Done    => State.Done));
+
+                     S.Push ((Block   => Block_Content_Pre,
+                              Offset  => State.Offset,
+                              Name    => State.Name,
+                              Current => State.Current,
+                              Parent  => State.Parent,
+                              Sibling => State.Sibling,
+                              Done    => State.Done));
+                  end if;
+
+               when Block_Child =>
+
+                  if Match /= Match_OK
+                  then
+                     State.Block := Block_Close;
+                     S.Push (State);
+                  else
+                     if Is_Valid_Link (Start, State.Parent, State.Sibling)
+                     then
+                        Link_Element (Start, State.Parent, State.Sibling);
+                     end if;
+
+                     S.Push ((Block   => Block_Child,
+                              Offset  => -1,
+                              Name    => State.Name,
+                              Current => State.Current,
+                              Parent  => Invalid_Index,
+                              Sibling => Start,
+                              Done    => State.Done));
+
+                     S.Push ((Block   => Block_Content_Pre,
+                              Offset  => State.Offset,
+                              Name    => State.Name,
+                              Current => State.Current,
+                              Parent  => State.Parent,
+                              Sibling => State.Sibling,
+                              Done    => State.Done));
+                  end if;
+
+               when Block_Close =>
+
+                  declare
+                     Sub_Match : Match_Type;
+                  begin
+                     Parse_Closing_Tag (Data (State.Name.First .. State.Name.Last), Sub_Match);
+                     if Sub_Match /= Match_OK
+                     then
+                        Restore_Offset (State.Offset);
+                     else
+                        Parse_Sections;
+                        Match := Match_OK;
+                     end if;
+                  end;
+
+               when Block_Invalid =>
+
+                  Match := Match_Invalid;
+
+            end case;
          end loop;
-
-         Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
-         if Sub_Match /= Match_OK
-         then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-
-         Parse_Sections;
-         Match := Match_OK;
 
       end Parse_Internal;
 
