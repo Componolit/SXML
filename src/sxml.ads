@@ -226,18 +226,6 @@ is
        Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
        Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
 
-   ----------------
-   -- Put_String --
-   ----------------
-
-   procedure Put_String (Subtree : in out Subtree_Type;
-                         Offset  : Offset_Type;
-                         Name    : Attr_Data_Type)
-   with
-      Pre  => Has_Space (Subtree, Offset, Name),
-      Post => Same_Kind (Subtree (Add (Subtree'First, Offset)),
-                         Subtree (Add (Subtree'First, Offset))'Old);
-
    ----------
    -- Open --
    ----------

@@ -54,6 +54,18 @@ is
    procedure Put_String (Subtree : in out Subtree_Type;
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
+   with
+      Pre  => Has_Space (Subtree, Offset, Name),
+      Post => Same_Kind (Subtree (Add (Subtree'First, Offset)),
+                         Subtree (Add (Subtree'First, Offset))'Old);
+
+   ----------------
+   -- Put_String --
+   ----------------
+
+   procedure Put_String (Subtree : in out Subtree_Type;
+                         Offset  : Offset_Type;
+                         Name    : Attr_Data_Type)
    is
       Position : Natural := 0;
       Len      : Natural;
