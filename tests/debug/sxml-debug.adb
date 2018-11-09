@@ -44,12 +44,12 @@ is
         & ", Next: " & Offset (I, N.Next)
         & ", Data: """ & N.Data (N.Data'First .. N.Data'First + Natural (N.Length) - 1) & """"
         & (case N.Kind is
-              when Kind_Element_Open =>
+              when Kind_Element_Open
+                 | Kind_Content =>
                 ", Attributes: " & Offset (I, N.Attributes) &
                 ", Children: " & Offset (I, N.Children) &
                 ", Siblings: " & Offset (I, N.Siblings),
               when Kind_Invalid => "",
-              when Kind_Content => "",
               when Kind_Data => "",
               when Kind_Attribute =>
                 ", Next_Attribute: " & Offset (I, N.Next_Attribute) &
