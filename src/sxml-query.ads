@@ -198,8 +198,7 @@ is
                    Result       : out Result_Type;
                    Query_String : String)
    with
-       Pre'Class => Document'Length > 0 and
-                    Query_String'First > 0 and
+       Pre'Class => Query_String'First > 0 and
                     Query_String'First <= Query_String'Last and
                     Query_String'Last < Natural'Last and
                     Query_String'Length > 1 and
