@@ -13,10 +13,6 @@ test: SXML.gpr
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
-benchmark:
-	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@obj/benchmark tests/data/orders.xml 100 100
-
 testonly: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@time obj/tests
