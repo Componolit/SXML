@@ -1,8 +1,6 @@
 package SXML
 is
-   Get_String_Depth      : constant := 128;
-   Chunk_Length          : constant := 8;
-   Scratch_Buffer_Length : constant := 1024;
+   Chunk_Length : constant := 8;
 
    type Result_Type is (Result_OK,
                         Result_Overflow,
@@ -33,6 +31,14 @@ is
    subtype Natural_Without_Last is Natural range Natural'First .. Natural'Last - 1;
    --  Natural subtype that is useful for arrays, as we can use 'Length without
    --  having to show that 'Last is < Natural'Last.
+
+   type Node_Type is private;
+   Null_Node : constant Node_Type;
+
+   type Document_Type is array (Index_Type range <>) of Node_Type
+   with
+      Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
+   Null_Tree : constant Document_Type;
 
    ---------
    -- Add --
@@ -112,26 +118,13 @@ is
                        Right : Index_Type) return Boolean
    is (Right > Left);
 
-   -----------------------------------------------------------------------------
-
-   type Node_Type is private;
-   Null_Node : constant Node_Type;
-
-   type Document_Type is array (Index_Type range <>) of Node_Type
-   with
-      Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
-   Null_Tree : constant Document_Type;
+   -------------
+   -- Is_Open --
+   -------------
 
    function Is_Valid (Left, Right : Document_Type) return Boolean
    with
       Ghost;
-
-   --  This operator must not be used, as subtrees have to be
-   --  linked together. This is done by the * operator above.
-   pragma Warnings (Off, "precondition is statically False");
-   overriding function "&" (Left, Right : Document_Type) return Document_Type
-   with Pre => False;
-   pragma Warnings (On, "precondition is statically False");
 
    -------------
    -- Is_Open --
@@ -235,6 +228,13 @@ is
               Is_Open (Output (Start)) and
               Position = Add (Position'Old, Num_Elements (Name));
 
+   --  This operator must not be used, as subtrees have to be
+   --  linked together. This is done by the * operator above.
+   pragma Warnings (Off, "precondition is statically False");
+   overriding function "&" (Left, Right : Document_Type) return Document_Type
+   with Pre => False;
+   pragma Warnings (On, "precondition is statically False");
+
 private
 
    type Length_Type is range 0 .. Chunk_Length;
@@ -273,23 +273,13 @@ private
                                       Length => 0);
    Null_Tree : constant Document_Type := (1 .. 0 => Null_Node);
 
+   --------------
+   -- Is_Valid --
+   --------------
+
    function Is_Valid (Left, Right : Document_Type) return Boolean
    is
       ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
        Left'Length <= Index_Type'Last - Right'Length);
-
-   ----------------
-   -- Is_Invalid --
-   ----------------
-
-   function Is_Invalid (Node : Node_Type) return Boolean
-   is (Node.Kind = Kind_Invalid);
-
-   -------------
-   -- Is_Open --
-   -------------
-
-   function Is_Open (Node : Node_Type) return Boolean
-   is (Node.Kind = Kind_Element_Open);
 
 end SXML;

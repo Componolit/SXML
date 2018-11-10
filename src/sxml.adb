@@ -34,6 +34,20 @@ is
                 Children       => Invalid_Relative_Index,
                 Siblings       => Invalid_Relative_Index);
 
+   ----------------
+   -- Is_Invalid --
+   ----------------
+
+   function Is_Invalid (Node : Node_Type) return Boolean
+   is (Node.Kind = Kind_Invalid);
+
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Node : Node_Type) return Boolean
+   is (Node.Kind = Kind_Element_Open);
+
    ------------------
    -- Num_Elements --
    ------------------

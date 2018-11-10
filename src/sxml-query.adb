@@ -3,7 +3,8 @@ is
    pragma Annotate (GNATprove, Terminating, SXML.Query);
 
    --  Scratch buffer for queries. This will be the largest attribute size you can search for.
-   Scratch_Buffer : String (1 .. SXML.Scratch_Buffer_Length);
+   Scratch_Buffer_Length : constant := 1024;
+   Scratch_Buffer : String (1 .. Scratch_Buffer_Length);
 
    ------------
    -- Offset --
