@@ -6,10 +6,12 @@ generic
 package SXML.Stack is
 
    function Level return Natural;
+   --  Numver of elements on stack
 
    function Is_Valid return Boolean
    with
       Ghost;
+   --  Stack buffer is valid
 
    function Is_Empty return Boolean;
    --  Stack is empty
@@ -27,28 +29,22 @@ package SXML.Stack is
    with
       Pre  => Is_Valid and not Is_Empty,
       Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
+   --  Pop an element off the stack
 
    procedure Drop
    with
       Pre  => Is_Valid and not Is_Empty,
       Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
+   --  Drop an element from stack
 
    procedure Reset
    with
       Post => Is_Valid and Is_Empty and not Is_Full;
+   --  Reset stack without erasing data
 
    procedure Init
    with
       Post => Is_Valid and Is_Empty and not Is_Full;
-
-private
-
-   Index : Natural := S'First;
-
-   function Level return Natural
-   is (Index);
-
-   function Is_Valid return Boolean
-   is (Index >= S'First and Index <= S'Last);
+   --  Initialize stack and clear stack buffer
 
 end SXML.Stack;
