@@ -13,6 +13,13 @@ test: SXML.gpr
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
 
+doc: doc/api/index.html
+
+doc/api/index.html: SXML.gpr
+	@gprbuild -P SXML -Xlibtype=dynamic
+	@gnatdoc -q -P SXML --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
+	@gnatdoc -P SXML --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
+
 testonly: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@time obj/tests

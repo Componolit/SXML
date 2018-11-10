@@ -54,4 +54,8 @@ is
       for Switches use ("-Wa", "-a", "-p", "-ca", "-x", "-u64");
    end Stack;
 
+   package Documentation is
+      for Documentation_Dir use "doc/api";
+   end Documentation;
+
 end SXML;
