@@ -212,11 +212,4 @@ private
       Offset : Offset_Type;
    end record;
 
-   ------------
-   -- Offset --
-   ------------
-
-   function Offset (State : State_Type) return Offset_Type
-   is (State.Offset);
-
 end SXML.Query;

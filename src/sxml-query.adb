@@ -5,6 +5,13 @@ is
    --  Scratch buffer for queries. This will be the largest attribute size you can search for.
    Scratch_Buffer : String (1 .. SXML.Scratch_Buffer_Length);
 
+   ------------
+   -- Offset --
+   ------------
+
+   function Offset (State : State_Type) return Offset_Type
+   is (State.Offset);
+
    --------------
    -- Is_Valid --
    --------------
