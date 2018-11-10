@@ -17,7 +17,8 @@ is
    is
       Dummy   : constant Arg_Type := (others => 'x');
       Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
-      Result  : Document_Type (1 .. Index_Type (Arg_Len * Arguments'Length));
+      Result  : Document_Type (1 .. Index_Type (Arg_Len * Arguments'Length)) :=
+         (others => Null_Node);
    begin
       for I in Relative_Index_Type range 0 .. Arguments'Length - 1
       loop
