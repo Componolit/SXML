@@ -207,13 +207,6 @@ is
       Annotate => (GNATprove, Terminating);
 
    ---------------
-   -- Same_Kind --
-   ---------------
-
-   function Same_Kind (Current : Node_Type;
-                       Old     : Node_Type) return Boolean;
-
-   ---------------
    -- Has_Space --
    ---------------
 
@@ -284,10 +277,6 @@ private
    is
       ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
        Left'Length <= Index_Type'Last - Right'Length);
-
-   function Same_Kind (Current : Node_Type;
-                       Old     : Node_Type) return Boolean
-   is (Current.Kind = Old.Kind);
 
    ----------------
    -- Is_Invalid --

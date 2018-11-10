@@ -47,6 +47,14 @@ is
    function Num_Elements (Subtree : Document_Type) return Offset_Type
    is (Offset_Type (Subtree'Length));
 
+   ---------------
+   -- Same_Kind --
+   ---------------
+
+   function Same_Kind (Current : Node_Type;
+                       Old     : Node_Type) return Boolean
+   is (Current.Kind = Old.Kind);
+
    ----------------
    -- Put_String --
    ----------------
