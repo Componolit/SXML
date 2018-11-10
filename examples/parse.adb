@@ -30,7 +30,7 @@ is
    procedure Parse_Document (File : String)
    is
       Input   : access String := Read_File (File);
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. Input'Length);
+      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;

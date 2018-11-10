@@ -34,7 +34,7 @@ is
    is
       Input   : access String := Read_File (File);
       Output  : access String := new String (1 .. 3 * Input'Length);
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. Input'Length);
+      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML;
       use SXML.Parser;
       Match    : Match_Type;

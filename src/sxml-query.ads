@@ -14,7 +14,7 @@ is
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Document : Subtree_Type;
+   function Is_Valid (Document : Document_Type;
                       State    : State_Type) return Boolean
    with
       Ghost;
@@ -23,7 +23,7 @@ is
    -- Is_Open --
    -------------
 
-   function Is_Open (Document : Subtree_Type;
+   function Is_Open (Document : Document_Type;
                      State    : State_Type) return Boolean
    with
       Pre'Class => Is_Valid (Document, State);
@@ -32,7 +32,7 @@ is
    -- Is_Content --
    ----------------
 
-   function Is_Content (Document : Subtree_Type;
+   function Is_Content (Document : Document_Type;
                         State    : State_Type) return Boolean
    with
       Ghost,
@@ -42,7 +42,7 @@ is
    -- Is_Attribute --
    ------------------
 
-   function Is_Attribute (Document : Subtree_Type;
+   function Is_Attribute (Document : Document_Type;
                           State    : State_Type) return Boolean
    with
       Ghost,
@@ -52,7 +52,7 @@ is
    -- Init --
    ----------
 
-   function Init (Document : Subtree_Type) return State_Type
+   function Init (Document : Document_Type) return State_Type
    with
       Post => Is_Valid (Document, Init'Result);
 
@@ -61,7 +61,7 @@ is
    ----------
 
    procedure Name (State    : State_Type;
-                   Document : Subtree_Type;
+                   Document : Document_Type;
                    Result   : out Result_Type;
                    Data     : in out Content_Type;
                    Last     : out Natural)
@@ -74,7 +74,7 @@ is
    -----------
 
    procedure Child (State    : in out State_Type;
-                    Document : Subtree_Type;
+                    Document : Document_Type;
                     Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State),
@@ -90,7 +90,7 @@ is
    -------------
 
    procedure Sibling (State    : in out State_Type;
-                      Document : Subtree_Type;
+                      Document : Document_Type;
                       Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then
@@ -108,7 +108,7 @@ is
    ------------------
 
    procedure Find_Sibling (State        : in out State_Type;
-                           Document     : Subtree_Type;
+                           Document     : Document_Type;
                            Sibling_Name : Content_Type;
                            Result       : out Result_Type)
    with
@@ -126,7 +126,7 @@ is
    ---------------
 
    procedure Attribute (State    : in out State_Type;
-                        Document : Subtree_Type;
+                        Document : Document_Type;
                         Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then
@@ -141,7 +141,7 @@ is
    --------------------
 
    function Is_Valid_Value (State    : State_Type;
-                            Document : Subtree_Type) return Boolean
+                            Document : Document_Type) return Boolean
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Attribute (Document, State);
@@ -151,7 +151,7 @@ is
    -----------
 
    procedure Value (State    : State_Type;
-                    Document : Subtree_Type;
+                    Document : Document_Type;
                     Result   : out Result_Type;
                     Data     : in out Content_Type;
                     Last     : out Natural)
@@ -165,7 +165,7 @@ is
    --------------------
 
    procedure Next_Attribute (State    : in out State_Type;
-                             Document : Subtree_Type;
+                             Document : Document_Type;
                              Result   : out Result_Type)
    with
       Pre'Class  => Is_Valid (Document, State) and then
@@ -181,7 +181,7 @@ is
    --------------------
 
    procedure Find_Attribute (State          : in out State_Type;
-                             Document       : Subtree_Type;
+                             Document       : Document_Type;
                              Attribute_Name : Content_Type;
                              Result         : out Result_Type)
    with
@@ -194,7 +194,7 @@ is
    ----------
 
    procedure Path (State        : in out State_Type;
-                   Document     : Subtree_Type;
+                   Document     : Document_Type;
                    Result       : out Result_Type;
                    Query_String : String)
    with

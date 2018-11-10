@@ -37,7 +37,7 @@ is
    -- Put_Escaped --
    -----------------
 
-   procedure Put_Escaped (Doc      : Subtree_Type;
+   procedure Put_Escaped (Doc      : Document_Type;
                           Start    : Index_Type;
                           Data     : in out String;
                           Position : in out Integer)
@@ -47,7 +47,7 @@ is
               (if Position >= 0 and Doc (Start).Length > 0
                then Position > Position'Old);
 
-   procedure Put_Escaped (Doc      : Subtree_Type;
+   procedure Put_Escaped (Doc      : Document_Type;
                           Start    : Index_Type;
                           Data     : in out String;
                           Position : in out Integer)
@@ -109,7 +109,7 @@ is
    -- Serialize_Data --
    --------------------
 
-   procedure Serialize_Data (Doc      : Subtree_Type;
+   procedure Serialize_Data (Doc      : Document_Type;
                              Start    : Index_Type;
                              Data     : in out String;
                              Position : in out Integer)
@@ -121,7 +121,7 @@ is
                   then Position > Position'Old
                   else Position = Position'Old));
 
-   procedure Serialize_Data (Doc      : Subtree_Type;
+   procedure Serialize_Data (Doc      : Document_Type;
                              Start    : Index_Type;
                              Data     : in out String;
                              Position : in out Integer)
@@ -160,7 +160,7 @@ is
    -- Valid_Element --
    -------------------
 
-   function Valid_Element (Doc      : Subtree_Type;
+   function Valid_Element (Doc      : Document_Type;
                            Current  : Index_Type;
                            Mode     : Mode_Type) return Boolean
    is ((Mode = Mode_Open and Doc (Current).Kind = Kind_Content) or
@@ -174,7 +174,7 @@ is
    -- Serialize_Element --
    -----------------------
 
-   procedure Serialize_Element (Doc      : Subtree_Type;
+   procedure Serialize_Element (Doc      : Document_Type;
                                 Current  : Index_Type;
                                 Mode     : Mode_Type;
                                 Data     : in out String;
@@ -188,7 +188,7 @@ is
                then Position > Position'Old),
       Annotate => (GNATprove, Terminating);
 
-   procedure Serialize_Element (Doc      : Subtree_Type;
+   procedure Serialize_Element (Doc      : Document_Type;
                                 Current  : Index_Type;
                                 Mode     : Mode_Type;
                                 Data     : in out String;
@@ -265,7 +265,7 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Subtree_Type;
+   procedure To_String (Doc    : Document_Type;
                         Data   : out String;
                         Last   : out Natural;
                         Result : out Result_Type;
@@ -388,7 +388,7 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Subtree_Type;
+   procedure To_String (Doc    : Document_Type;
                         Data   : out String;
                         Last   : out Natural;
                         Result : out Result_Type)

@@ -9,7 +9,7 @@ is
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Document : Subtree_Type;
+   function Is_Valid (Document : Document_Type;
                       State    : State_Type) return Boolean
    is (Document'Length > 0 and
        State.Offset < Document'Length);
@@ -18,7 +18,7 @@ is
    -- Is_Open --
    -------------
 
-   function Is_Open (Document : Subtree_Type;
+   function Is_Open (Document : Document_Type;
                      State    : State_Type) return Boolean
    is (Document (Add (Document'First, State.Offset)).Kind = Kind_Element_Open);
 
@@ -26,7 +26,7 @@ is
    -- Is_Content --
    ----------------
 
-   function Is_Content (Document : Subtree_Type;
+   function Is_Content (Document : Document_Type;
                         State    : State_Type) return Boolean
    is (Document (Add (Document'First, State.Offset)).Kind = Kind_Content);
 
@@ -34,7 +34,7 @@ is
    -- Is_Attribute --
    ------------------
 
-   function Is_Attribute (Document : Subtree_Type;
+   function Is_Attribute (Document : Document_Type;
                           State    : State_Type) return Boolean
    is (Document (Add (Document'First, State.Offset)).Kind = Kind_Attribute);
 
@@ -42,7 +42,7 @@ is
    -- Init --
    ----------
 
-   function Init (Document : Subtree_Type) return State_Type
+   function Init (Document : Document_Type) return State_Type
    is
       pragma Unreferenced (Document);
    begin
@@ -54,7 +54,7 @@ is
    ----------
 
    procedure Name (State    : State_Type;
-                   Document : Subtree_Type;
+                   Document : Document_Type;
                    Result   : out Result_Type;
                    Data     : in out Content_Type;
                    Last     : out Natural)
@@ -68,7 +68,7 @@ is
    -----------
 
    procedure Child (State    : in out State_Type;
-                    Document : Subtree_Type;
+                    Document : Document_Type;
                     Result   : out Result_Type)
    is
       Children_Offset : constant Index_Type := Add (Document'First, State.Offset);
@@ -107,7 +107,7 @@ is
    -------------
 
    procedure Sibling (State    : in out State_Type;
-                      Document : Subtree_Type;
+                      Document : Document_Type;
                       Result   : out Result_Type)
    is
       Current  : constant Index_Type := Add (Document'First, State.Offset);
@@ -143,7 +143,7 @@ is
    ---------------
 
    procedure Attribute (State    : in out State_Type;
-                        Document : Subtree_Type;
+                        Document : Document_Type;
                         Result   : out Result_Type)
    is
       Tmp_State  : Offset_Type;
@@ -178,7 +178,7 @@ is
    --------------------
 
    procedure Next_Attribute (State    : in out State_Type;
-                             Document : Subtree_Type;
+                             Document : Document_Type;
                              Result   : out Result_Type)
    is
       Tmp_State : Offset_Type;
@@ -213,7 +213,7 @@ is
    --------------------
 
    function Is_Valid_Value (State    : State_Type;
-                            Document : Subtree_Type) return Boolean
+                            Document : Document_Type) return Boolean
    is (not Overflow (State.Offset, Document (Add (Document'First, State.Offset)).Value) and then
        Add (State.Offset, Document (Add (Document'First, State.Offset)).Value) < Document'Length);
 
@@ -222,7 +222,7 @@ is
    -----------
 
    procedure Value (State    : State_Type;
-                    Document : Subtree_Type;
+                    Document : Document_Type;
                     Result   : out Result_Type;
                     Data     : in out Content_Type;
                     Last     : out Natural)
@@ -238,7 +238,7 @@ is
    ----------
 
    procedure Path (State        : in out State_Type;
-                   Document     : Subtree_Type;
+                   Document     : Document_Type;
                    Result       : out Result_Type;
                    Query_String : String)
    is
@@ -313,7 +313,7 @@ is
    --------------------
 
    procedure Find_Attribute (State          : in out State_Type;
-                             Document       : Subtree_Type;
+                             Document       : Document_Type;
                              Attribute_Name : Content_Type;
                              Result         : out Result_Type)
    is
@@ -354,7 +354,7 @@ is
    ------------------
 
    procedure Find_Sibling (State        : in out State_Type;
-                           Document     : Subtree_Type;
+                           Document     : Document_Type;
                            Sibling_Name : Content_Type;
                            Result       : out Result_Type)
    is

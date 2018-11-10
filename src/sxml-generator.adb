@@ -51,12 +51,12 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type
+               Children   : Document_Type) return Document_Type
    is
       Len : constant Index_Type :=
          Index_Type (Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children));
 
-      Result   : Subtree_Type (1 .. Len) := (others => Null_Node);
+      Result   : Document_Type (1 .. Len) := (others => Null_Node);
       Position : Index_Type := Result'First;
       Start    : Index_Type;
    begin
@@ -72,7 +72,7 @@ is
 
       if Attributes /= Null_Attributes
       then
-         Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Subtree_Type (Attributes);
+         Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Document_Type (Attributes);
       end if;
 
       if Children /= Null_Tree
@@ -114,7 +114,7 @@ is
    function A (Name  : Content_Type;
                Value : Content_Type) return Attributes_Type
    is
-      Result : Subtree_Type (1 .. Sub (Add (Add (1, Num_Elements (Name)), Num_Elements (Value)), 1));
+      Result : Document_Type (1 .. Sub (Add (Add (1, Num_Elements (Name)), Num_Elements (Value)), 1));
       Offset : Offset_Type := 0;
    begin
       Result := (others => Null_Node);
@@ -130,9 +130,9 @@ is
    -- C --
    -------
 
-   function C (Value : Content_Type) return Subtree_Type
+   function C (Value : Content_Type) return Document_Type
    is
-      Result : Subtree_Type (1 .. Add (1, Num_Elements (Value) - 1)) :=
+      Result : Document_Type (1 .. Add (1, Num_Elements (Value) - 1)) :=
          (others => Null_Node);
    begin
       Put_Content (Result, 0, Value);
@@ -143,9 +143,9 @@ is
    -- "+"--
    ---------
 
-   function "+" (Left, Right : Subtree_Type) return Subtree_Type
+   function "+" (Left, Right : Document_Type) return Document_Type
    is
-      Result : Subtree_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
+      Result : Document_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin

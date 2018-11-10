@@ -61,7 +61,7 @@ is
    -- Dump --
    ----------
 
-   procedure Dump (Context : Subtree_Type;
+   procedure Dump (Context : Document_Type;
                    Short   : Boolean := False;
                    Message : String  := "Dumping context")
    is

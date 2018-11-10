@@ -17,7 +17,7 @@ with SXML.Generator.Debug; use SXML.Generator.Debug;
 
 package body SXML_Generator_Tests is
 
-   procedure Expect (Doc      : SXML.Subtree_Type;
+   procedure Expect (Doc      : SXML.Document_Type;
                      Expected : String)
    is
       use SXML;
@@ -39,7 +39,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config");
+      Doc : Document_Type := E ("config");
    begin
       Expect (Doc, "<config/>");
 	end Test_Generate_Single_Node;
@@ -49,7 +49,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Single_Node_Attrib (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"));
+      Doc : Document_Type := E ("config", A ("attrib", "Foo"));
    begin
       Expect (Doc, "<config attrib=""Foo""/>");
 	end Test_Generate_Single_Node_Attrib;
@@ -59,7 +59,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Nodes (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", E ("child"));
+      Doc : Document_Type := E ("config", E ("child"));
    begin
       Expect (Doc, "<config><child/></config>");
 	end Test_Generate_Nodes;
@@ -69,7 +69,7 @@ package body SXML_Generator_Tests is
    procedure Test_String_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", E ("child", A ("attr", "value")));
+      Doc : Document_Type := E ("config", E ("child", A ("attr", "value")));
    begin
       Expect (Doc, "<config><child attr=""value""/></config>");
 	end Test_String_Attribute;
@@ -79,7 +79,7 @@ package body SXML_Generator_Tests is
    procedure Test_Integer_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", E ("child", A ("attr", 42)));
+      Doc : Document_Type := E ("config", E ("child", A ("attr", 42)));
    begin
       Expect (Doc, "<config><child attr=""42""/></config>");
 	end Test_Integer_Attribute;
@@ -89,7 +89,7 @@ package body SXML_Generator_Tests is
    procedure Test_Float_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", E ("child", A ("attr", 3.14)));
+      Doc : Document_Type := E ("config", E ("child", A ("attr", 3.14)));
    begin
       Expect (Doc, "<config><child attr=""3.14000E+00""/></config>");
 	end Test_Float_Attribute;
@@ -100,7 +100,7 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Val : String (1 .. 100) := (others => 'x');
-      Doc : Subtree_Type := E ("config", A ("attr", Val));
+      Doc : Document_Type := E ("config", A ("attr", Val));
    begin
       Expect (Doc, "<config attr=""" & Val & """/>");
 	end Long_Attribute_Value;
@@ -111,7 +111,7 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Aname : String (1 .. 100) := (others => 'x');
-      Doc : Subtree_Type := E ("config", A (Aname, "value"));
+      Doc : Document_Type := E ("config", A (Aname, "value"));
    begin
       Expect (Doc, "<config " & Aname & "=""value""/>");
 	end Long_Attribute_Name;
@@ -122,7 +122,7 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Name : String (1 .. 100) := (others => 'x');
-      Doc  : Subtree_Type := E (Name, A ("attr", "value"));
+      Doc  : Document_Type := E (Name, A ("attr", "value"));
    begin
       Expect (Doc, "<" & Name & " attr=""value""/>");
 	end Long_Tag_Name;
@@ -133,7 +133,7 @@ package body SXML_Generator_Tests is
    is
       use SXML;
       Long : String (1 .. 100) := (others => 'x');
-      Doc  : Subtree_Type := E ("parent",
+      Doc  : Document_Type := E ("parent",
                                 A ("attr1", "value") +
                                 A ("attr2", Long) +
                                 A ("attr3_" & Long, "value"));
@@ -146,7 +146,7 @@ package body SXML_Generator_Tests is
    procedure Nested (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc  : Subtree_Type :=
+      Doc  : Document_Type :=
           E ("parent", A ("attr1", "value1") +
                        A ("attr2", "value2") +
                        A ("attr3", "value3") +
@@ -163,7 +163,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Simple_Content (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("Some content"));
+      Doc : Document_Type := E ("config", A ("attrib", "Foo"), C ("Some content"));
    begin
       Expect (Doc, "<config attrib=""Foo"">Some content</config>");
 	end Test_Generate_Simple_Content;
@@ -173,7 +173,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Escape_Content (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"), C ("<XML>""Quoted"" & 'Quoted'<XML/>"));
+      Doc : Document_Type := E ("config", A ("attrib", "Foo"), C ("<XML>""Quoted"" & 'Quoted'<XML/>"));
    begin
       Expect (Doc, "<config attrib=""Foo"">&lt;XML&gt;&quot;Quoted&quot; &amp; &apos;Quoted&apos;&lt;XML/&gt;</config>");
 	end Test_Generate_Escape_Content;
@@ -183,7 +183,7 @@ package body SXML_Generator_Tests is
    procedure Test_Generate_Interleaved_Content (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      Doc : Subtree_Type := E ("config", A ("attrib", "Foo"),
+      Doc : Document_Type := E ("config", A ("attrib", "Foo"),
                                C ("Some") +
                                C (" content") +
                                E ("element2") +
@@ -201,7 +201,7 @@ package body SXML_Generator_Tests is
 
       procedure Check_Length (N : String;
                               L : Offset_Type;
-                              S : Subtree_Type)
+                              S : Document_Type)
       is
       begin
          if Num_Elements (S) /= L

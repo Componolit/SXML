@@ -44,14 +44,14 @@ is
    function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
-   function Num_Elements (Subtree : Subtree_Type) return Offset_Type
+   function Num_Elements (Subtree : Document_Type) return Offset_Type
    is (Offset_Type (Subtree'Length));
 
    ----------------
    -- Put_String --
    ----------------
 
-   procedure Put_String (Subtree : in out Subtree_Type;
+   procedure Put_String (Subtree : in out Document_Type;
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
    with
@@ -63,7 +63,7 @@ is
    -- Put_String --
    ----------------
 
-   procedure Put_String (Subtree : in out Subtree_Type;
+   procedure Put_String (Subtree : in out Document_Type;
                          Offset  : Offset_Type;
                          Name    : Attr_Data_Type)
    is
@@ -99,7 +99,7 @@ is
    ----------
 
    procedure Open (Name     : Content_Type;
-                   Output   : in out Subtree_Type;
+                   Output   : in out Document_Type;
                    Position : in out Index_Type;
                    Start    : out Index_Type)
    is
@@ -115,7 +115,7 @@ is
    -- Put_Content --
    -----------------
 
-   procedure Put_Content (Subtree : in out Subtree_Type;
+   procedure Put_Content (Subtree : in out Document_Type;
                           Offset  : Offset_Type;
                           Value   : Content_Type)
    is
@@ -133,7 +133,7 @@ is
    procedure Attribute (Name   : Content_Type;
                         Data   : Attr_Data_Type;
                         Offset : in out Offset_Type;
-                        Output : in out Subtree_Type)
+                        Output : in out Document_Type)
    is
       Name_Elements : constant Offset_Type := Num_Elements (Name);
       Data_Elements : constant Offset_Type := Num_Attr_Elements (Data);
@@ -154,19 +154,19 @@ is
    -- Get_String --
    ----------------
 
-   procedure Get_String (Doc    : Subtree_Type;
+   procedure Get_String (Doc    : Document_Type;
                          Start  : Offset_Type;
                          Result : out Result_Type;
                          Data   : in out Content_Type;
                          Last   : out Natural)
    is
-      function String_Length (Document : Subtree_Type;
+      function String_Length (Document : Document_Type;
                               Offset   : Offset_Type) return Natural
       with
          Pre      => Offset < Document'Length,
          Annotate => (Gnatprove, Terminating);
 
-      function String_Length (Document : Subtree_Type;
+      function String_Length (Document : Document_Type;
                               Offset   : Offset_Type) return Natural
       is
          Pos : Index_Type := Add (Document'First, Offset);
@@ -232,7 +232,7 @@ is
    -------
 
    overriding
-   function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   function "&" (Left, Right : Document_Type) return Document_Type
    is
       pragma Unreferenced (Left, Right);
    begin

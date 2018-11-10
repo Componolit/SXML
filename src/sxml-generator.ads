@@ -41,7 +41,7 @@ is
    -- "+" --
    ---------
 
-   function "+" (Left, Right : Subtree_Type) return Subtree_Type
+   function "+" (Left, Right : Document_Type) return Document_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
@@ -57,7 +57,7 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Subtree_Type) return Subtree_Type
+               Children   : Document_Type) return Document_Type
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
       Post     => E'Result /= Null_Tree and
@@ -65,7 +65,7 @@ is
       Annotate => (GNATprove, Terminating);
 
    function E (Name       : Content_Type;
-               Children   : Subtree_Type) return Subtree_Type
+               Children   : Document_Type) return Document_Type
    is (E (Name, Null_Attributes, Children))
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
@@ -75,7 +75,7 @@ is
       Annotate => (GNATprove, Terminating);
 
    function E (Name       : Content_Type;
-               Attributes : Attributes_Type) return Subtree_Type
+               Attributes : Attributes_Type) return Document_Type
    is (E (Name, Attributes, Null_Tree))
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Tree),
@@ -83,7 +83,7 @@ is
                   Num_Elements (E'Result) = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Null_Tree),
       Annotate => (GNATprove, Terminating);
 
-   function E (Name : Content_Type) return Subtree_Type
+   function E (Name : Content_Type) return Document_Type
    is (E (Name, Null_Attributes, Null_Tree))
    with
       Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Tree),
@@ -132,7 +132,7 @@ is
    -- C --
    -------
 
-   function C (Value : Content_Type) return Subtree_Type
+   function C (Value : Content_Type) return Document_Type
    with
       Post => C'Result /= Null_Tree and
               C'Result'Length = Num_Elements (Value),
@@ -140,7 +140,7 @@ is
 
 private
 
-   type Attributes_Type is new Subtree_Type;
+   type Attributes_Type is new Document_Type;
    Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
 
    --------------
@@ -150,6 +150,6 @@ private
    overriding
    function Is_Valid (Left  : Attributes_Type;
                       Right : Attributes_Type) return Boolean
-   is (Is_Valid (Subtree_Type (Left), Subtree_Type (Right)));
+   is (Is_Valid (Document_Type (Left), Document_Type (Right)));
 
 end SXML.Generator;

@@ -7,7 +7,7 @@ is
                    Message : String  := "Dumping attribute")
    is
    begin
-      SXML.Debug.Dump (SXML.Subtree_Type (Context), Short, Message);
+      SXML.Debug.Dump (SXML.Document_Type (Context), Short, Message);
    end Dump;
 
 end SXML.Generator.Debug;

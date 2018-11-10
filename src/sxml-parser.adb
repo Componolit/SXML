@@ -7,7 +7,7 @@ is
    -----------
 
    procedure Parse (Data         : Content_Type;
-                    Context      : in out Subtree_Type;
+                    Context      : in out Document_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    is

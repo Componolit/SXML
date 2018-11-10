@@ -12,7 +12,7 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Subtree_Type;
+   procedure To_String (Doc    : Document_Type;
                         Data   : out String;
                         Last   : out Natural;
                         Result : out Result_Type)
@@ -24,7 +24,7 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Subtree_Type;
+   procedure To_String (Doc    : Document_Type;
                         Data   : out String;
                         Last   : out Natural;
                         Result : out Result_Type;

@@ -21,7 +21,7 @@ package body SXML_Query_Tests is
    Scratch : String (1 .. 1000);
 
    function Name (State : State_Type;
-                  Doc   : Subtree_Type) return String
+                  Doc   : Document_Type) return String
    is
       Result : Result_Type;
       Last   : Natural;
@@ -36,7 +36,7 @@ package body SXML_Query_Tests is
    end Name;
 
    function Value (State : State_Type;
-                   Doc   : Subtree_Type) return String
+                   Doc   : Document_Type) return String
    is
       Result : Result_Type;
       Last   : Natural;
@@ -50,7 +50,7 @@ package body SXML_Query_Tests is
       end if;
    end Value;
 
-   procedure Path_Query (Context      : in out SXML.Subtree_Type;
+   procedure Path_Query (Context      : in out SXML.Document_Type;
                          Input_File   : String;
                          Query_String : String;
                          Result       : out SXML.Result_Type;
@@ -80,7 +80,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc   : Subtree_Type := E ("config");
+      Doc   : Document_Type := E ("config");
       State : State_Type   := Init (Doc);
       N     : String       := Name (State, Doc);
    begin
@@ -93,7 +93,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("child"));
+      Doc    : Document_Type := E ("config", E ("child"));
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -112,7 +112,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config");
+      Doc    : Document_Type := E ("config");
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -126,7 +126,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
+      Doc    : Document_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -149,7 +149,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
+      Doc    : Document_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -165,7 +165,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("child1")
+      Doc    : Document_Type := E ("config", E ("child1")
                                           + C ("content")
                                           + E ("child2")
                                           + E ("child3"));
@@ -185,7 +185,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
+      Doc    : Document_Type := E ("config", E ("child1") + E ("child2") + E ("child3"));
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -201,7 +201,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", A ("attribute1", "value1"));
+      Doc    : Document_Type := E ("config", A ("attribute1", "value1"));
       State  : State_Type   := Init (Doc);
       Result : Result_Type;
    begin
@@ -222,7 +222,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config",
+      Doc    : Document_Type := E ("config",
                                   A ("attribute1", "value1") +
                                   A ("attribute2", "value2") +
                                   A ("attribute3", "value3") +
@@ -256,7 +256,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config",
+      Doc    : Document_Type := E ("config",
                                   A ("attribute1", "value1") +
                                   A ("attribute2", "value2") +
                                   A ("attribute3", "value3") +
@@ -275,7 +275,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config",
+      Doc    : Document_Type := E ("config",
                                   A ("attribute1", "value1") +
                                   A ("attribute2", "value2") +
                                   A ("attribute3", "value3") +
@@ -293,7 +293,7 @@ package body SXML_Query_Tests is
    is
       use SXML;
       use SXML.Query;
-      Doc    : Subtree_Type := E ("config", E ("sub",
+      Doc    : Document_Type := E ("config", E ("sub",
                                                 A ("attribute1", "value1") +
                                                 A ("attribute2", "value2") +
                                                 A ("attribute3", "value3") +
@@ -315,7 +315,7 @@ package body SXML_Query_Tests is
    is
       State    : State_Type;
       Result   : Result_Type;
-      Context  : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
       Position : Natural;
    begin
       Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/ClinicalDocument", Result, Position, State);
@@ -329,7 +329,7 @@ package body SXML_Query_Tests is
    is
       State    : State_Type;
       Result   : Result_Type;
-      Context  : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
       Position : Natural;
    begin
       Path_Query (Context.all, "tests/data/Vitera_CCDA_SMART_Sample.xml", "/Does_Not_Exist", Result, Position, State);
@@ -342,7 +342,7 @@ package body SXML_Query_Tests is
    is
       State   : State_Type;
       Result  : Result_Type;
-      Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 1000000);
+      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
       Position : Natural;
    begin
       Path_Query (Context.all,

@@ -14,7 +14,7 @@ is
       & "</parent>"
       & "<?xml-stylesheet type='text/xsl' href='baz.xsl'?>";
 
-      Context  : SXML.Subtree_Type (1 .. 100) := (others => Null_Node);
+      Context  : SXML.Document_Type (1 .. 100) := (others => Null_Node);
       Result   : Match_Type;
       Position : Natural;
 begin

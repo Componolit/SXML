@@ -20,7 +20,7 @@ with Text_IO;
 
 package body SXML_Utils
 is
-   Context : access SXML.Subtree_Type := new SXML.Subtree_Type (1 .. 150000000);
+   Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 150000000);
 
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);

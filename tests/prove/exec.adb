@@ -13,17 +13,17 @@ is
    type Arg_Type is new String (1..100);
    type Args_Type is array (Index_Type range <>) of Arg_Type;
 
-   function To_Subtree (Arguments : Args_Type) return Subtree_Type
+   function To_Subtree (Arguments : Args_Type) return Document_Type
    is
       Dummy   : constant Arg_Type := (others => 'x');
       Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
-      Result  : Subtree_Type (1 .. Index_Type (Arg_Len * Arguments'Length));
+      Result  : Document_Type (1 .. Index_Type (Arg_Len * Arguments'Length));
    begin
       for I in Relative_Index_Type range 0 .. Arguments'Length - 1
       loop
          declare
             Argument : constant Arg_Type := Arguments (Add (Arguments'First, I));
-            Arg : constant Subtree_Type := E ("arg", A ("value", String (Argument)));
+            Arg : constant Document_Type := E ("arg", A ("value", String (Argument)));
          begin
             Result (Add (Result'First, Relative_Index_Type (Arg_Len) * I) ..
                     Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I), Relative_Index_Type (Arg_Len) - 1)) := Arg;
@@ -90,7 +90,7 @@ is
    is
       pragma Assert (Num_Elements (Null_Tree) = 0);
 
-      Doc : Subtree_Type :=
+      Doc : Document_Type :=
        E ("config",
          E ("report",
            A ("delay_ms", 500)

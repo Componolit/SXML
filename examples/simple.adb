@@ -36,7 +36,7 @@ is
    -- 	</start>
    -- </config>
 
-   Doc : Subtree_Type :=
+   Doc : Document_Type :=
    E ("config",
      E ("report", A ("delay_ms", 500)) +
      E ("parent-provides",

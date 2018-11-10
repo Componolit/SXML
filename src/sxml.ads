@@ -117,19 +117,19 @@ is
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
-   type Subtree_Type is array (Index_Type range <>) of Node_Type
+   type Document_Type is array (Index_Type range <>) of Node_Type
    with
-      Dynamic_Predicate => Subtree_Type'First > 0 and Subtree_Type'Length > 0;
-   Null_Tree : constant Subtree_Type;
+      Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
+   Null_Tree : constant Document_Type;
 
-   function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   function Is_Valid (Left, Right : Document_Type) return Boolean
    with
       Ghost;
 
    --  This operator must not be used, as subtrees have to be
    --  linked together. This is done by the * operator above.
    pragma Warnings (Off, "precondition is statically False");
-   overriding function "&" (Left, Right : Subtree_Type) return Subtree_Type
+   overriding function "&" (Left, Right : Document_Type) return Document_Type
    with Pre => False;
    pragma Warnings (On, "precondition is statically False");
 
@@ -149,7 +149,7 @@ is
    -- Put_Content --
    -----------------
 
-   procedure Put_Content (Subtree : in out Subtree_Type;
+   procedure Put_Content (Subtree : in out Document_Type;
                           Offset  : Offset_Type;
                           Value   : Content_Type)
    with
@@ -167,7 +167,7 @@ is
    procedure Attribute (Name   : Content_Type;
                         Data   : Attr_Data_Type;
                         Offset : in out Offset_Type;
-                        Output : in out Subtree_Type)
+                        Output : in out Document_Type)
    with
       Pre => Offset <= Output'Length - Num_Elements (Name) - Num_Attr_Elements (Data) and then
              Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Output'Length and then
@@ -178,7 +178,7 @@ is
    -- Get_String --
    ----------------
 
-   procedure Get_String (Doc    : Subtree_Type;
+   procedure Get_String (Doc    : Document_Type;
                          Start  : Offset_Type;
                          Result : out Result_Type;
                          Data   : in out Content_Type;
@@ -201,7 +201,7 @@ is
       Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
       Annotate => (GNATprove, Terminating);
 
-   function Num_Elements (Subtree : Subtree_Type) return Offset_Type
+   function Num_Elements (Subtree : Document_Type) return Offset_Type
    with
       Post     => Num_Elements'Result = (if Subtree = Null_Tree then 0 else Subtree'Length),
       Annotate => (GNATprove, Terminating);
@@ -217,7 +217,7 @@ is
    -- Has_Space --
    ---------------
 
-   function Has_Space (Subtree : Subtree_Type;
+   function Has_Space (Subtree : Document_Type;
                        Offset  : Offset_Type;
                        Name    : Attr_Data_Type) return Boolean
    is (Offset < Subtree'Length and then
@@ -231,7 +231,7 @@ is
    ----------
 
    procedure Open (Name     : Content_Type;
-                   Output   : in out Subtree_Type;
+                   Output   : in out Document_Type;
                    Position : in out Index_Type;
                    Start    : out Index_Type)
    with
@@ -278,9 +278,9 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Tree : constant Subtree_Type := (1 .. 0 => Null_Node);
+   Null_Tree : constant Document_Type := (1 .. 0 => Null_Node);
 
-   function Is_Valid (Left, Right : Subtree_Type) return Boolean
+   function Is_Valid (Left, Right : Document_Type) return Boolean
    is
       ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
        Left'Length <= Index_Type'Last - Right'Length);
