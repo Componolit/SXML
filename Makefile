@@ -5,10 +5,12 @@ GPRBUILD_OPTS = -s -p -XMode=$(MODE)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --waitretry=30 --random-wait --no-clobber
 
 all:
+	@gnatcheck -P SXML
 	@gprbuild $(GPRBUILD_OPTS) -P SXML
 	@gnatprove $(GNATPROVE_OPTS) -P SXML
 
 test: SXML.gpr
+	@gnatcheck -P SXML
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
