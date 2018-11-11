@@ -60,7 +60,7 @@ is
                Children   : Document_Type) return Document_Type
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
-      Post     => E'Result /= Null_Tree and
+      Post     => E'Result /= Null_Document and
                   E'Result'Length = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
 
@@ -69,26 +69,30 @@ is
    is (E (Name, Null_Attributes, Children))
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
-      Post     => E'Result /= Null_Tree and
+      Post     => E'Result /= Null_Document and
                   Num_Elements (E'Result) =
                      Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type) return Document_Type
-   is (E (Name, Attributes, Null_Tree))
+   is (E (Name, Attributes, Null_Document))
    with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Tree),
-      Post     => E'Result /= Null_Tree and
-                  Num_Elements (E'Result) = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Null_Tree),
+      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Document),
+      Post     => E'Result /= Null_Document and
+                  Num_Elements (E'Result) = Num_Elements (Name) +
+                                            Num_Elements (Attributes) +
+                                            Num_Elements (Null_Document),
       Annotate => (GNATprove, Terminating);
 
    function E (Name : Content_Type) return Document_Type
-   is (E (Name, Null_Attributes, Null_Tree))
+   is (E (Name, Null_Attributes, Null_Document))
    with
-      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Tree),
-      Post => E'Result /= Null_Tree and
-              Num_Elements (E'Result) = Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Null_Tree),
+      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Document),
+      Post => E'Result /= Null_Document and
+      Num_Elements (E'Result) = Num_Elements (Name) +
+                                Num_Elements (Null_Attributes) +
+                                Num_Elements (Null_Document),
       Annotate => (GNATprove, Terminating);
 
    -------
@@ -134,14 +138,14 @@ is
 
    function C (Value : Content_Type) return Document_Type
    with
-      Post => C'Result /= Null_Tree and
+      Post => C'Result /= Null_Document and
               C'Result'Length = Num_Elements (Value),
       Annotate => (GNATprove, Terminating);
 
 private
 
    type Attributes_Type is new Document_Type;
-   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Tree);
+   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Document);
 
    --------------
    -- Is_Valid --

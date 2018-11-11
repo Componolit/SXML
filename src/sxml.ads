@@ -7,14 +7,12 @@ is
                         Result_Invalid,
                         Result_Not_Found);
 
-   --  FIXME: Rename
    subtype Content_Type is String
    with
       Predicate => Content_Type'First <= Content_Type'Last and then
                    Content_Type'Last <= Natural'Last - Chunk_Length and then
                    Content_Type'Length >= 0;
 
-   --  FIXME: Rename
    subtype Attr_Data_Type is String
    with
       Predicate => Attr_Data_Type'Last <= Natural'Last - Chunk_Length;
@@ -38,7 +36,7 @@ is
    type Document_Type is array (Index_Type range <>) of Node_Type
    with
       Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
-   Null_Tree : constant Document_Type;
+   Null_Document : constant Document_Type;
 
    ---------
    -- Add --
@@ -142,42 +140,42 @@ is
    -- Put_Content --
    -----------------
 
-   procedure Put_Content (Subtree : in out Document_Type;
-                          Offset  : Offset_Type;
-                          Value   : Content_Type)
+   procedure Put_Content (Document : in out Document_Type;
+                          Offset   : Offset_Type;
+                          Value    : Content_Type)
    with
       Pre => Offset < Offset_Type (Index_Type'Last) and then
-             Subtree'First <= Sub (Index_Type'Last, Offset) and then
-             Natural (Num_Elements (Value)) <= Subtree'Length - Natural (Offset) and then
-             Add (Subtree'First, Offset) <= Subtree'Last and then
+             Document'First <= Sub (Index_Type'Last, Offset) and then
+             Natural (Num_Elements (Value)) <= Document'Length - Natural (Offset) and then
+             Add (Document'First, Offset) <= Document'Last and then
              Num_Elements (Value) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-             Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Value));
+             Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Value));
 
    ---------------
    -- Attribute --
    ---------------
 
-   procedure Attribute (Name   : Content_Type;
-                        Data   : Attr_Data_Type;
-                        Offset : in out Offset_Type;
-                        Output : in out Document_Type)
+   procedure Attribute (Name     : Content_Type;
+                        Data     : Attr_Data_Type;
+                        Offset   : in out Offset_Type;
+                        Document : in out Document_Type)
    with
-      Pre => Offset <= Output'Length - Num_Elements (Name) - Num_Attr_Elements (Data) and then
-             Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Output'Length and then
+      Pre => Offset <= Document'Length - Num_Elements (Name) - Num_Attr_Elements (Data) and then
+             Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Document'Length and then
              Num_Attr_Elements (Data) <= Offset_Type (Index_Type'Last -
-                                                      Add (Add (Output'First, Offset), Num_Elements (Name)));
+                                                      Add (Add (Document'First, Offset), Num_Elements (Name)));
 
    ----------------
    -- Get_String --
    ----------------
 
-   procedure Get_String (Doc    : Document_Type;
-                         Start  : Offset_Type;
-                         Result : out Result_Type;
-                         Data   : in out Content_Type;
-                         Last   : out Natural)
+   procedure Get_String (Document : Document_Type;
+                         Start    : Offset_Type;
+                         Result   : out Result_Type;
+                         Data     : in out Content_Type;
+                         Last     : out Natural)
    with
-      Pre      => Start < Doc'Length,
+      Pre      => Start < Document'Length,
       Annotate => (Gnatprove, Terminating);
 
    ------------------
@@ -196,36 +194,36 @@ is
 
    function Num_Elements (Subtree : Document_Type) return Offset_Type
    with
-      Post     => Num_Elements'Result = (if Subtree = Null_Tree then 0 else Subtree'Length),
+      Post     => Num_Elements'Result = (if Subtree = Null_Document then 0 else Subtree'Length),
       Annotate => (GNATprove, Terminating);
 
    ---------------
    -- Has_Space --
    ---------------
 
-   function Has_Space (Subtree : Document_Type;
-                       Offset  : Offset_Type;
-                       Name    : Attr_Data_Type) return Boolean
-   is (Offset < Subtree'Length and then
+   function Has_Space (Document : Document_Type;
+                       Offset   : Offset_Type;
+                       Name     : Attr_Data_Type) return Boolean
+   is (Offset < Document'Length and then
        Offset < Offset_Type (Index_Type'Last) and then
        Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-       Subtree'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
-       Natural (Subtree'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
+       Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
+       Natural (Document'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
 
    ----------
    -- Open --
    ----------
 
    procedure Open (Name     : Content_Type;
-                   Output   : in out Document_Type;
+                   Document : in out Document_Type;
                    Position : in out Index_Type;
                    Start    : out Index_Type)
    with
-      Pre  => (Position in Output'Range and
+      Pre  => (Position in Document'Range and
                Position < Index_Type'Last) and then
-              Has_Space (Output, Sub (Position, Output'First), Name),
-      Post => Start in Output'Range and
-              Is_Open (Output (Start)) and
+              Has_Space (Document, Sub (Position, Document'First), Name),
+      Post => Start in Document'Range and
+              Is_Open (Document (Start)) and
               Position = Add (Position'Old, Num_Elements (Name));
 
    --  This operator must not be used, as subtrees have to be
@@ -271,7 +269,7 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Tree : constant Document_Type := (1 .. 0 => Null_Node);
+   Null_Document : constant Document_Type := (1 .. 0 => Null_Node);
 
    --------------
    -- Is_Valid --

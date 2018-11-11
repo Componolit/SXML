@@ -20,7 +20,7 @@ with Text_IO;
 
 package body SXML_Utils
 is
-   Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 150000000);
+   Document : access SXML.Document_Type := new SXML.Document_Type (1 .. 150000000);
 
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
@@ -40,7 +40,7 @@ is
       Position : Natural;
    begin
       Parser.Parse (Data         => Input,
-                    Context      => Context.all,
+                    Document     => Document.all,
                     Parse_Result => Result,
                     Position     => Position);
       pragma Unreferenced (Position);
@@ -91,16 +91,16 @@ is
       Serialize_Result : Result_Type;
 
    begin
-      Context.all (Context.all'First) := Null_Node;
+      Document.all (Document.all'First) := Null_Node;
       Parser.Parse (Data         => Input.all,
-                    Context      => Context.all,
+                    Document     => Document.all,
                     Parse_Result => Result,
                     Position     => Position);
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
       Stack := new Stack_Type (1 .. Stack_Size);
-      To_String (Context.all, Data.all, Last, Serialize_Result, Stack.All);
+      To_String (Document.all, Data.all, Last, Serialize_Result, Stack.All);
       Free (Data);
       Free (Stack);
       Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
@@ -122,14 +122,14 @@ is
       Last     : Integer := 0;
       Serialize_Result : Result_Type;
    begin
-      Context.all (1) := Null_Node;
+      Document.all (1) := Null_Node;
       Parser.Parse (Data         => Input,
-                    Context      => Context.all,
+                    Document     => Document.all,
                     Parse_Result => Result,
                     Position     => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
 
-      To_String (Context.all, XML.all, Last, Serialize_Result);
+      To_String (Document.all, XML.all, Last, Serialize_Result);
       Assert (Serialize_Result = Result_OK, "Error serializing: " & Serialize_Result'Img);
       Assert (XML.all (1 .. Last) = (if Output = "INPUT" then
                                         (if Ignore_Final_Newline then

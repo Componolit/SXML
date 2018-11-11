@@ -5,7 +5,7 @@ with SPARK_Mode
 is
    use SXML;
    use SXML.Parser;
-   Document : String := 
+   Text : String := 
         "<?xml version=""1.0""?>"
       & "<?xml-stylesheet type='text/xsl' href='foo.xsl'?>"
       & "<parent>"
@@ -14,12 +14,12 @@ is
       & "</parent>"
       & "<?xml-stylesheet type='text/xsl' href='baz.xsl'?>";
 
-      Context  : SXML.Document_Type (1 .. 100) := (others => Null_Node);
+      Document : SXML.Document_Type (1 .. 100) := (others => Null_Node);
       Result   : Match_Type;
       Position : Natural;
 begin
-   Parse (Data         => Document,
-          Context      => Context,
+   Parse (Data         => Text,
+          Document     => Document,
           Parse_Result => Result,
           Position     => Position); 
 end Doc;

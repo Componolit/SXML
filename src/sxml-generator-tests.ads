@@ -1,6 +1,6 @@
 package SXML.Generator.Tests is
 
-   pragma Assert (Num_Elements (Null_Tree) = 0);
+   pragma Assert (Num_Elements (Null_Document) = 0);
 
    --  Simple element
    T001 : constant Document_Type := E ("elem1");

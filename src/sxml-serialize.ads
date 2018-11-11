@@ -12,10 +12,10 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Document_Type;
-                        Data   : out String;
-                        Last   : out Natural;
-                        Result : out Result_Type)
+   procedure To_String (Document : Document_Type;
+                        Data     : out String;
+                        Last     : out Natural;
+                        Result   : out Result_Type)
    with
       Pre => Data'Length > 0;
 
@@ -23,11 +23,11 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Doc    : Document_Type;
-                        Data   : out String;
-                        Last   : out Natural;
-                        Result : out Result_Type;
-                        Buffer : in out Stack_Type)
+   procedure To_String (Document : Document_Type;
+                        Data     : out String;
+                        Last     : out Natural;
+                        Result   : out Result_Type;
+                        Buffer   : in out Stack_Type)
    with
       Pre => Data'Length > 0 and
              Buffer'Length > 1;

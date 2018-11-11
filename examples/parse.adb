@@ -29,15 +29,15 @@ is
 
    procedure Parse_Document (File : String)
    is
-      Input   : access String := Read_File (File);
-      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
+      Input    : access String := Read_File (File);
+      Document : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
    begin
-      Context.all := (others => SXML.Null_Node);
+      Document.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
-             Context      => Context.all,
+             Document     => Document.all,
              Parse_Result => Result,
              Position     => Position);
       if Result /= Match_OK

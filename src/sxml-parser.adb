@@ -7,7 +7,7 @@ is
    -----------
 
    procedure Parse (Data         : Content_Type;
-                    Context      : in out Document_Type;
+                    Document     : in out Document_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    is
@@ -15,12 +15,12 @@ is
 
       Parse_Internal_Depth : constant := 100;
 
-      subtype Context_Index_Type is Index_Type
-      with Predicate => Context_Index_Type in Context'Range;
+      subtype Document_Index_Type is Index_Type
+      with Predicate => Document_Index_Type in Document'Range;
 
-      Context_Index : Context_Index_Type := Context'First;
-      Offset        : Natural    := 0;
-      Error_Index   : Natural    := 0;
+      Document_Index : Document_Index_Type := Document'First;
+      Offset         : Natural    := 0;
+      Error_Index    : Natural    := 0;
 
       type Range_Type is
          record
@@ -76,15 +76,15 @@ is
       -- Restore_Context --
       ---------------------
 
-      procedure Restore_Context (Old_Context : Context_Index_Type)
+      procedure Restore_Context (Old_Index : Document_Index_Type)
       with
-         Post => Context_Index = Old_Context,
+         Post => Document_Index = Old_Index,
          Annotate => (GNATprove, Terminating);
 
-      procedure Restore_Context (Old_Context : Context_Index_Type)
+      procedure Restore_Context (Old_Index : Document_Index_Type)
       is
       begin
-         Context_Index := Old_Context;
+         Document_Index := Old_Index;
       end Restore_Context;
 
       --------------
@@ -263,7 +263,7 @@ is
       ----------------------
 
       function Context_Overflow return Boolean is
-        (Context_Index >= Context'Last);
+        (Document_Index >= Document'Last);
 
       ------------------------
       -- Context_Put_String --
@@ -284,16 +284,16 @@ is
          Result := False;
          Start  := Invalid_Index;
 
-         if (Underflow (Context'Last, NE) or else
-             Context_Index > Sub (Context'Last, NE)) or
-            Underflow (Context_Index, Context'First)
+         if (Underflow (Document'Last, NE) or else
+             Document_Index > Sub (Document'Last, NE)) or
+            Underflow (Document_Index, Document'First)
          then
             return;
          end if;
 
-         Start := Context_Index;
-         Put_Content (Context, Sub (Context_Index, Context'First), Value);
-         Context_Index := Add (Context_Index, NE);
+         Start := Document_Index;
+         Put_Content (Document, Sub (Document_Index, Document'First), Value);
+         Document_Index := Add (Document_Index, NE);
          Result := True;
       end Context_Put_String;
 
@@ -529,33 +529,33 @@ is
          end if;
          Offset := Offset + 1;
 
-         Start := Context_Index;
-         Off := Sub (Context_Index, Context'First);
+         Start := Document_Index;
+         Off := Sub (Document_Index, Document'First);
 
-         if Off > Context'Length -
+         if Off > Document'Length -
                   Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) -
                   Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) or else
             Off + Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) +
-               Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) >= Context'Length
+               Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) >= Document'Length
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          SXML.Attribute
-           (Name   => Data (Attribute_Name.First .. Attribute_Name.Last),
-            Data   => Data (Attribute_Value.First .. Attribute_Value.Last),
-            Offset => Off,
-            Output => Context);
+           (Name     => Data (Attribute_Name.First .. Attribute_Name.Last),
+            Data     => Data (Attribute_Value.First .. Attribute_Value.Last),
+            Offset   => Off,
+            Document => Document);
 
-         if Off > Offset_Type (Index_Type'Last - Context'First) or
-            Off >= Context'Length
+         if Off > Offset_Type (Index_Type'Last - Document'First) or
+            Off >= Document'Length
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
-         Context_Index := Add (Context'First, Off);
+         Document_Index := Add (Document'First, Off);
          Match := Match_OK;
 
       end Parse_Attribute;
@@ -575,12 +575,12 @@ is
                                         Previous : Index_Type) return Boolean
       is ((if Next /= Invalid_Index and then
               Previous = Invalid_Index
-           then Parent in Context'Range and then
+           then Parent in Document'Range and then
                 Next > Parent and then
-                (Context (Parent).Kind = Kind_Element_Open)
-           else Previous in Context'Range and then
+                (Document (Parent).Kind = Kind_Element_Open)
+           else Previous in Document'Range and then
                 Next > Previous and then
-                (Context (Previous).Kind = Kind_Attribute)));
+                (Document (Previous).Kind = Kind_Attribute)));
 
       --------------------
       -- Link_Attribute --
@@ -603,9 +603,9 @@ is
          then
             if Previous = Invalid_Index
             then
-               Context (Parent).Attributes := Sub (Next, Parent);
+               Document (Parent).Attributes := Sub (Next, Parent);
             else
-               Context (Previous).Next_Attribute := Sub (Next, Previous);
+               Document (Previous).Next_Attribute := Sub (Next, Previous);
             end if;
             Previous := Next;
          end if;
@@ -630,7 +630,7 @@ is
                                    Start : out Index_Type;
                                    Done  : out Boolean)
       is
-         Old_Index          : constant Index_Type := Context_Index;
+         Old_Index          : constant Index_Type := Document_Index;
          Old_Offset         : constant Natural := Offset;
          Match_Attr         : Match_Type;
          Match_Tmp          : Match_Type;
@@ -667,16 +667,16 @@ is
          --  Match tag name
          Match_Until_Set (Whitespace & ">/", Empty_Set, Match_Tmp, Name);
          if Match_Tmp /= Match_OK or else
-            not (Context_Index in Context'Range) or else
-            not Has_Space (Context, Offset_Type (Context_Index) + 1, Data (Name.First .. Name.Last))
+            not (Document_Index in Document'Range) or else
+            not Has_Space (Document, Offset_Type (Document_Index) + 1, Data (Name.First .. Name.Last))
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Open (Name     => Data (Name.First .. Name.Last),
-               Output   => Context,
-               Position => Context_Index,
+               Document => Document,
+               Position => Document_Index,
                Start    => Start);
 
          loop
@@ -1113,14 +1113,14 @@ is
                               Previous : Index_Type) return Boolean
       is ((if Child /= Invalid_Index and then
               Previous = Invalid_Index
-           then Parent in Context'Range and then
+           then Parent in Document'Range and then
                 Child > Parent and then
-                (Context (Parent).Kind = Kind_Element_Open or
-                 Context (Parent).Kind = Kind_Content)
-           else Previous in Context'Range and then
+                (Document (Parent).Kind = Kind_Element_Open or
+                 Document (Parent).Kind = Kind_Content)
+           else Previous in Document'Range and then
                 Child > Previous and then
-                (Context (Previous).Kind = Kind_Element_Open or
-                 Context (Previous).Kind = Kind_Content)));
+                (Document (Previous).Kind = Kind_Element_Open or
+                 Document (Previous).Kind = Kind_Content)));
 
       ----------------
       -- Link_Child --
@@ -1143,9 +1143,9 @@ is
          then
             if Previous = Invalid_Index
             then
-               Context (Parent).Children := Sub (Child, Parent);
+               Document (Parent).Children := Sub (Child, Parent);
             else
-               Context (Previous).Siblings := Sub (Child, Previous);
+               Document (Previous).Siblings := Sub (Child, Previous);
             end if;
             Previous := Child;
          end if;
@@ -1293,9 +1293,9 @@ is
          Position := Error_Index;
       end if;
 
-      if Context_Index in Context'Range
+      if Document_Index in Document'Range
       then
-         Context (Context_Index) := Null_Node;
+         Document (Document_Index) := Null_Node;
       end if;
    end Parse;
 

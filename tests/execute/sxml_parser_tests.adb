@@ -459,7 +459,7 @@ package body SXML_Parser_Tests is
       procedure Free_Subtree is new Ada.Unchecked_Deallocation
          (Object => Document_Type, Name => Subtree_Access);
       File_Name : constant String := "obj/generated.xml";
-      Context   : Subtree_Access := new Document_Type (1 .. 1000000);
+      Document   : Subtree_Access := new Document_Type (1 .. 1000000);
    begin
       Generate_Deep_Nodes (File_Name, 1000000);
       declare
@@ -469,10 +469,10 @@ package body SXML_Parser_Tests is
          Result   : Match_Type;
       begin
          Parse (Data         => Input.all,
-                Context      => Context.all,
+                Document     => Document.all,
                 Parse_Result => Result,
                 Position     => Position);
-         Free_Subtree (Context);
+         Free_Subtree (Document);
          Assert (Result /= Match_OK,
                  File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
       end;

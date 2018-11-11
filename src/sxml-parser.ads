@@ -25,7 +25,7 @@ is
    -----------
 
    procedure Parse (Data         : Content_Type;
-                    Context      : in out Document_Type;
+                    Document     : in out Document_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural);
    --  Parse an XML file

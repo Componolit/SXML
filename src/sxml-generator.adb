@@ -66,7 +66,7 @@ is
           then Invalid_Relative_Index
           else Relative_Index_Type (Num_Elements (Name)));
       Result (Start).Children :=
-         (if Children = Null_Tree
+         (if Children = Null_Document
           then Invalid_Relative_Index
           else Relative_Index_Type (Num_Elements (Name) + Num_Elements (Attributes)));
 
@@ -75,7 +75,7 @@ is
          Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Document_Type (Attributes);
       end if;
 
-      if Children /= Null_Tree
+      if Children /= Null_Document
       then
          pragma Assert (Children'Length = Num_Elements (Children));
          Result (Add (Position, Num_Elements (Attributes)) ..
@@ -118,10 +118,10 @@ is
       Offset : Offset_Type := 0;
    begin
       Result := (others => Null_Node);
-      SXML.Attribute (Name   => Name,
-                      Data   => Value,
-                      Offset => Offset,
-                      Output => Result);
+      SXML.Attribute (Name     => Name,
+                      Data     => Value,
+                      Offset   => Offset,
+                      Document => Result);
       pragma Unreferenced (Offset);
       return Attributes_Type (Result);
    end A;

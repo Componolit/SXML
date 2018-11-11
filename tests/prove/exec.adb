@@ -89,7 +89,7 @@ is
    procedure Execute (Program   : String;
                       Arguments : Args_Type)
    is
-      pragma Assert (Num_Elements (Null_Tree) = 0);
+      pragma Assert (Num_Elements (Null_Document) = 0);
 
       Doc : Document_Type :=
        E ("config",
