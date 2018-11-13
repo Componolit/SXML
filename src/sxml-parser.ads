@@ -30,6 +30,9 @@ is
                     Position     : out Natural);
    --  Parse an XML file
    --
-   --  @param Result Result of parsing operation
+   --  @param Data          Input data
+   --  @param Document      Document
+   --  @param Parse_Result  Result of operation
+   --  @param Position      Input location after parsing or error
 
 end SXML.Parser;

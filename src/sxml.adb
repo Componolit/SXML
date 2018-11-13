@@ -58,8 +58,8 @@ is
    function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
    is ((Offset_Type (D'Length + Data_Type'Length - 1)) / Offset_Type (Data_Type'Length));
 
-   function Num_Elements (Subtree : Document_Type) return Offset_Type
-   is (Offset_Type (Subtree'Length));
+   function Num_Elements (Document : Document_Type) return Offset_Type
+   is (Offset_Type (Document'Length));
 
    ---------------
    -- Same_Kind --

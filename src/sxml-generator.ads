@@ -12,6 +12,9 @@ is
    function Num_Elements (Attributes : Attributes_Type) return Offset_Type
    with
       Annotate => (GNATprove, Terminating);
+   --  Number of elements required for attributes
+   --
+   --  @param Attributes  Attributes
 
    --------------
    -- Is_Valid --
@@ -30,12 +33,18 @@ is
       SPARK_Mode,
       Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);
+   --  Convert float number to content
+   --
+   --  @param Value  Float number to convert
 
    function To_String (Value : Integer) return Content_Type
    with
       SPARK_Mode,
       Post     => To_String'Result'Length < 12,
       Annotate => (GNATprove, Terminating);
+   --  Convert integer number to content
+   --
+   --  @param Value  Integer number to convert
 
    ---------
    -- "+" --
@@ -45,11 +54,19 @@ is
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+   --  Concatenate documents
+   --
+   --  @param Left  First document
+   --  @param Right Second document
 
    function "+" (Left, Right : Attributes_Type) return Attributes_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+   --  Concatenate attributes
+   --
+   --  @param Left  First attributes
+   --  @param Right Second attributes
 
    -------
    -- E --
@@ -63,6 +80,11 @@ is
       Post     => E'Result /= Null_Document and
                   E'Result'Length = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
+   --  Construct element with attributes and child document
+   --
+   --  @param Name        Name of element
+   --  @param Attributes  Attribute data
+   --  @param Children    Child documents
 
    function E (Name       : Content_Type;
                Children   : Document_Type) return Document_Type
@@ -73,6 +95,10 @@ is
                   Num_Elements (E'Result) =
                      Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
+   --  Construct element with child document and without attributes
+   --
+   --  @param Name        Name of element
+   --  @param Children    Child documents
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type) return Document_Type
@@ -84,6 +110,10 @@ is
                                             Num_Elements (Attributes) +
                                             Num_Elements (Null_Document),
       Annotate => (GNATprove, Terminating);
+   --  Construct element with attributes and without child document
+   --
+   --  @param Name        Name of element
+   --  @param Attributes  Attribute data
 
    function E (Name : Content_Type) return Document_Type
    is (E (Name, Null_Attributes, Null_Document))
@@ -94,6 +124,9 @@ is
                                 Num_Elements (Null_Attributes) +
                                 Num_Elements (Null_Document),
       Annotate => (GNATprove, Terminating);
+   --  Construct element without attributes and without child document
+   --
+   --  @param Name  Name of element
 
    -------
    -- A --
@@ -106,6 +139,10 @@ is
       Post => A'Result /= Null_Attributes and
               Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)),
       Annotate => (GNATprove, Terminating);
+   --  Construct attribute from integer number
+   --
+   --  @param Name  Name of attribute
+   --  @param Value Integer number of attribute
 
    -------
    -- A --
@@ -118,6 +155,10 @@ is
       Post => A'Result /= Null_Attributes and
               Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)),
       Annotate => (GNATprove, Terminating);
+   --  Construct attribute from float number value
+   --
+   --  @param Name  Name of attribute
+   --  @param Value Float number of attribute
 
    -------
    -- A --
@@ -131,6 +172,10 @@ is
       Post => A'Result /= Null_Attributes and
               Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (Value),
       Annotate => (GNATproof, Terminating);
+   --  Construct attribute from string value
+   --
+   --  @param Name  Name of attribute
+   --  @param Value String value of attribute
 
    -------
    -- C --
@@ -141,6 +186,9 @@ is
       Post => C'Result /= Null_Document and
               C'Result'Length = Num_Elements (Value),
       Annotate => (GNATprove, Terminating);
+   --  Construct content value
+   --
+   --  @param Value String value of content
 
 private
 

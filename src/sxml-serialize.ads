@@ -18,6 +18,12 @@ is
                         Result   : out Result_Type)
    with
       Pre => Data'Length > 0;
+   --  Serialize document to string using runtime stack
+   --
+   --  @param Document  Document to serialize
+   --  @param Data      Output string
+   --  @param Last      Last valid element of output string
+   --  @param Result    Result of operation
 
    ---------------
    -- To_String --
@@ -31,6 +37,13 @@ is
    with
       Pre => Data'Length > 0 and
              Buffer'Length > 1;
+   --  Serialize document to string using heap stack
+   --
+   --  @param Document  Document to serialize
+   --  @param Data      Output string
+   --  @param Last      Last valid element of output string
+   --  @param Result    Result of operation
+   --  @param Buffer    Stack buffer
 
 private
 

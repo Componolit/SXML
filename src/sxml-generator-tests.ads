@@ -1,3 +1,4 @@
+--  @private  Do not document test cases
 package SXML.Generator.Tests is
 
    pragma Assert (Num_Elements (Null_Document) = 0);

@@ -2,10 +2,13 @@ package SXML
 is
    Chunk_Length : constant := 8;
 
-   type Result_Type is (Result_OK,
-                        Result_Overflow,
-                        Result_Invalid,
-                        Result_Not_Found);
+   type Result_Type is
+   (
+      Result_OK,        --  Result OK
+      Result_Overflow,  --  Operation would cause overflow
+      Result_Invalid,   --  Invalid input data
+      Result_Not_Found  --  Queried data not found
+   );
 
    subtype Content_Type is String
    with
@@ -48,6 +51,10 @@ is
    with
       Pre      => Offset_Type (Right) <= Offset_Type'Last - Left,
       Annotate => (GNATprove, Terminating);
+   --  Add relative index to offset
+   --
+   --  @param Left   Offset
+   --  @param Right  Relative offset
 
    function Add (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
@@ -55,6 +62,10 @@ is
    with
       Pre      => Right <= Offset_Type (Index_Type'Last - Left),
       Annotate => (GNATprove, Terminating);
+   --  Add offset to index
+   --
+   --  @param Left   Index
+   --  @param Right  Offset
 
    function Add (Left  : Index_Type;
                  Right : Relative_Index_Type) return Index_Type
@@ -62,6 +73,10 @@ is
    with
       Pre      => Right <= Relative_Index_Type (Index_Type'Last - Left),
       Annotate => (GNATprove, Terminating);
+   --  Add relative index to index
+   --
+   --  @param Left   Index
+   --  @param Right  Relative offset
 
    --------------
    -- Overflow --
@@ -70,14 +85,26 @@ is
    function Overflow (Left  : Offset_Type;
                       Right : Relative_Index_Type) return Boolean
    is (Offset_Type (Right) > Offset_Type'Last - Left);
+   --  Check whether adding a relative index would overflow an offset
+   --
+   --  @param Left   Offset
+   --  @param Right  Relative index
 
    function Overflow (Left  : Index_Type;
                       Right : Relative_Index_Type) return Boolean
    is (Right > Relative_Index_Type (Index_Type'Last - Left));
+   --  Check whether adding a relative index would overflow an index
+   --
+   --  @param Left   Index
+   --  @param Right  Relative index
 
    function Overflow (Left  : Index_Type;
                       Right : Offset_Type) return Boolean
    is (Right > Offset_Type (Index_Type'Last - Left));
+   --  Check whether adding an index would overflow an index
+   --
+   --  @param Left   Index
+   --  @param Right  Relative index
 
    ---------
    -- Sub --
@@ -89,6 +116,10 @@ is
    with
       Pre      => Left >= Right,
       Annotate => (GNATprove, Terminating);
+   --  Substract index from index yielding realtive index
+   --
+   --  @param Left   Index
+   --  @param Right  Index
 
    function Sub (Left  : Index_Type;
                  Right : Index_Type) return Offset_Type
@@ -96,6 +127,10 @@ is
    with
       Pre      => Left >= Right,
       Annotate => (GNATprove, Terminating);
+   --  Substract index from index yielding offset
+   --
+   --  @param Left   Index
+   --  @param Right  Index
 
    function Sub (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
@@ -103,6 +138,10 @@ is
    with
       Pre      => Offset_Type (Left) > Right,
       Annotate => (GNATprove, Terminating);
+   --  Substract offset from index yielding index
+   --
+   --  @param Left   Index
+   --  @param Right  Offset
 
    ---------------
    -- Underflow --
@@ -111,10 +150,18 @@ is
    function Underflow (Left  : Index_Type;
                        Right : Offset_Type) return Boolean
    is (Right >= Offset_Type (Left));
+   --  Check whether subtracting an offset would underflow an index
+   --
+   --  @param Left   Index
+   --  @param Right  Offset
 
    function Underflow (Left  : Index_Type;
                        Right : Index_Type) return Boolean
    is (Right > Left);
+   --  Check whether subtracting an index would underflow an index
+   --
+   --  @param Left   Index
+   --  @param Right  Index
 
    -------------
    -- Is_Open --
@@ -129,12 +176,18 @@ is
    -------------
 
    function Is_Open (Node : Node_Type) return Boolean;
+   --  Node is an opening element
+   --
+   --  @param Node  Document node
 
    ----------------
    -- Is_Invalid --
    ----------------
 
    function Is_Invalid (Node : Node_Type) return Boolean;
+   --  Node is an invalid element
+   --
+   --  @param Node  Document node
 
    -----------------
    -- Put_Content --
@@ -150,6 +203,11 @@ is
              Add (Document'First, Offset) <= Document'Last and then
              Num_Elements (Value) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
              Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Value));
+   --  Write content to a document at the specified offset
+   --
+   --  @param Document Document to write content into
+   --  @param Offset   Document offset to write data to
+   --  @param Value    Value to write to document
 
    ---------------
    -- Attribute --
@@ -164,6 +222,12 @@ is
              Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Document'Length and then
              Num_Attr_Elements (Data) <= Offset_Type (Index_Type'Last -
                                                       Add (Add (Document'First, Offset), Num_Elements (Name)));
+   --  Write attribute to document at the specified offset
+   --
+   --  @param Name     Attribute name
+   --  @param Data     Attribute data
+   --  @param Offset   Document offset to write attribute to
+   --  @param Document Document to write attribute to
 
    ----------------
    -- Get_String --
@@ -177,6 +241,13 @@ is
    with
       Pre      => Start < Document'Length,
       Annotate => (Gnatprove, Terminating);
+   --  Extract string at given position
+   --
+   --  @param Document Source document
+   --  @param Start    Offset to extract string from
+   --  @param Result   Result of operation
+   --  @param Data     Variable to write result to
+   --  @param Last     Last valid element in result data
 
    ------------------
    -- Num_Elements --
@@ -186,16 +257,24 @@ is
    with
       Post     => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
       Annotate => (GNATprove, Terminating);
+   --  Number of elements to store content
+   --
+   --  @param D  Element content
 
    function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
    with
       Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
       Annotate => (GNATprove, Terminating);
+   --  Number of elements required to store attribute data
+   --  @param D  Attribute content
 
-   function Num_Elements (Subtree : Document_Type) return Offset_Type
+   function Num_Elements (Document : Document_Type) return Offset_Type
    with
-      Post     => Num_Elements'Result = (if Subtree = Null_Document then 0 else Subtree'Length),
+      Post     => Num_Elements'Result = (if Document = Null_Document then 0 else Document'Length),
       Annotate => (GNATprove, Terminating);
+   --  Number of elements in document
+   --
+   --  @param Document  Document
 
    ---------------
    -- Has_Space --
@@ -209,6 +288,11 @@ is
        Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
        Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
        Natural (Document'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
+   --  Check whether document has sufficient space to store name at offset
+   --
+   --  @param Document  Document to calculate space for
+   --  @param Offset    Offset to calculate space at
+   --  @param Name      Name to calculate space for
 
    ----------
    -- Open --
@@ -225,12 +309,21 @@ is
       Post => Start in Document'Range and
               Is_Open (Document (Start)) and
               Position = Add (Position'Old, Num_Elements (Name));
+   --  Write open element to document
+   --
+   --  @param Name      Content to write to document
+   --  @param Document  Document to write content to
+   --  @param Position  Position to write content to, updated to next available element
+   --  @param Start     Start offset of open element
 
-   --  This operator must not be used, as subtrees have to be
-   --  linked together. This is done by the * operator above.
    pragma Warnings (Off, "precondition is statically False");
    overriding function "&" (Left, Right : Document_Type) return Document_Type
    with Pre => False;
+   --  This operator must not be used, as subtrees have to be
+   --  linked together. This is done by the * operator above.
+   --
+   --  @param Left  Unused
+   --  @param Right Unused
    pragma Warnings (On, "precondition is statically False");
 
 private

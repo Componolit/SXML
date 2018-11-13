@@ -27,6 +27,10 @@ is
                      State    : State_Type) return Boolean
    with
       Pre'Class => Is_Valid (Document, State);
+   --  Current state points to open element in document
+   --
+   --  @param Document  Document
+   --  @param State     Current query state
 
    ----------------
    -- Is_Content --
@@ -37,6 +41,10 @@ is
    with
       Ghost,
       Pre'Class => Is_Valid (Document, State);
+   --  Current state points to content element in document
+   --
+   --  @param Document  Document
+   --  @param State     Current query state
 
    ------------------
    -- Is_Attribute --
@@ -47,6 +55,10 @@ is
    with
       Ghost,
       Pre'Class => Is_Valid (Document, State);
+   --  Current state points to attribute element in document
+   --
+   --  @param Document  Document
+   --  @param State     Current query state
 
    ----------
    -- Init --
@@ -55,6 +67,9 @@ is
    function Init (Document : Document_Type) return State_Type
    with
       Post => Is_Valid (Document, Init'Result);
+   --  Initialize state
+   --
+   --  @param Document  Document to initialize state for
 
    ----------
    -- Name --
@@ -68,6 +83,13 @@ is
    with
       Pre'Class  => (Is_Valid (Document, State) and then
                     (Is_Open (Document, State) or Is_Attribute (Document, State)));
+   --  Return name for current node
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
+   --  @param Data      Result data
+   --  @param Last      Last valid element of result
 
    -----------
    -- Child --
@@ -84,6 +106,11 @@ is
                            (Is_Open (Document, State) or
                             Is_Content (Document, State)))
                      else State = State'Old);
+   --  Get child
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
 
    -------------
    -- Sibling --
@@ -102,6 +129,11 @@ is
                              (Is_Open (Document, State) or
                                       Is_Content (Document, State)))
                      else State = State'Old);
+   --  Get next sibling
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
 
    ------------------
    -- Find_Sibling --
@@ -120,6 +152,12 @@ is
                           (Is_Valid (Document, State) and then
                            Is_Open (Document, State))
                      else State = State'Old);
+   --  Find sibling by name
+   --
+   --  @param State         Current state
+   --  @param Document      Document
+   --  @param Sibling_Name  Name of sibling
+   --  @param Result        Result of operation
 
    ---------------
    -- Attribute --
@@ -135,6 +173,11 @@ is
                      (Is_Valid (Document, State) and then
                       Is_Attribute (Document, State))) or
                     (Result /= Result_OK and State = State'Old);
+   --  Get first attribute of opening element
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
 
    --------------------
    -- Is_Valid_Value --
@@ -145,6 +188,10 @@ is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Attribute (Document, State);
+   --  Check if current attribute has valid value
+   --
+   --  @param State     Current state
+   --  @param Document  Document
 
    -----------
    -- Value --
@@ -159,6 +206,13 @@ is
       Pre'Class => Is_Valid (Document, State) and then
                    Is_Attribute (Document, State) and then
                    Is_Valid_Value (State, Document);
+   --  Return value for current attribute
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
+   --  @param Data      Result data
+   --  @param Last      Last valid element of result
 
    --------------------
    -- Next_Attribute --
@@ -175,6 +229,11 @@ is
                           (Is_Valid (Document, State) and then
                            Is_Attribute (Document, State))
                      else State = State'Old);
+   --  Get next attribute
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Result    Result of operation
 
    --------------------
    -- Find_Attribute --
@@ -188,6 +247,12 @@ is
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Open (Document, State),
       Post'Class => Is_Valid (Document, State);
+   --  Find attribute by name
+   --
+   --  @param State           Current state
+   --  @param Document        Document
+   --  @param Attribute_Name  Name to search for
+   --  @param Result          Result of operation
 
    ----------
    -- Path --
@@ -204,6 +269,15 @@ is
                     Query_String'Length > 1 and
                     (Is_Valid (Document, State) and then
                      Is_Open (Document, State));
+   --  Query element by path beging at root of document. Only
+   --  simple path queries referencing element names are supported,
+   --  e.g. /root/parent/child/grandchild.
+   --  FIXME: Relative queries starting from state could be supported easily, add tests.
+   --
+   --  @param State         Current state
+   --  @param Document      Document
+   --  @param Result        Result of operation
+   --  @param Query_String  Path to query
 
 private
 

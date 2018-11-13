@@ -24,12 +24,16 @@ package SXML.Stack is
       Pre  => Is_Valid and not Is_Full,
       Post => Is_Valid and not Is_Empty and Level = Level'Old + 1;
    --  Push element onto stack
+   --
+   --  @param E  Element to push onto stack
 
    procedure Pop (E : out Element_Type)
    with
       Pre  => Is_Valid and not Is_Empty,
       Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
    --  Pop an element off the stack
+   --
+   --  @param E  Result element
 
    procedure Drop
    with
