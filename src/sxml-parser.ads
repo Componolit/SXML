@@ -1,3 +1,14 @@
+--
+--  @summary XML parser specification
+--  @author  Alexander Senier
+--  @date    2018-11-15
+--
+--  Copyright (C) 2018 Componolit GmbH
+--
+--  This file is part of SXML, which is distributed under the terms of the
+--  GNU Affero General Public License version 3.
+--
+
 package SXML.Parser
 is
    type Match_Type is (Match_OK,
