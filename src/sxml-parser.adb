@@ -21,6 +21,7 @@ is
 
    procedure Parse (Data         : Content_Type;
                     Document     : in out Document_Type;
+                    Buffer       : in out Stack_Type;
                     Parse_Result : out Match_Type;
                     Position     : out Natural)
    is
@@ -32,16 +33,6 @@ is
       Document_Index : Document_Index_Type := Document'First;
       Offset         : Natural    := 0;
       Error_Index    : Natural    := 0;
-
-      type Range_Type is
-         record
-            First : Natural;
-            Last  : Natural;
-         end record
-      with
-         Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last) or
-                      (Range_Type.First = Natural'Last and Range_Type.Last = 0);
-      Null_Range : constant Range_Type := (Natural'Last, 0);
 
       function Is_Valid (R : Range_Type) return Boolean
       is (R.Last < Natural'Last and R.Last >= R.First);
@@ -989,14 +980,14 @@ is
       --------------------
       -- Parse_Internal --
       --------------------
-
-      procedure Parse_Internal (Match : out Match_Type;
+      procedure Parse_Internal (Buf   : in out Stack_Type;
+                                Match : out Match_Type;
                                 Start : out Index_Type)
-        with
-           Post => (if Match = Match_OK
-                    then Offset > Offset'Old
-                    else Offset >= Offset'Old),
-           Annotate => (GNATprove, Terminating);
+      with
+         Post => (if Match = Match_OK
+                  then Offset > Offset'Old
+                  else Offset >= Offset'Old),
+         Annotate => (GNATprove, Terminating);
 
       -----------------
       -- Parse_CDATA --
@@ -1165,43 +1156,17 @@ is
       -- Parse_Internal --
       --------------------
 
-      type Block_Type is
-         (Block_Invalid,
-          Block_Content_Pre,
-          Block_Open_Sections_Pre,
-          Block_Open_Tag,
-          Block_Open_Sections_Post,
-          Block_Child,
-          Block_Close);
-
-      type Parser_State_Type is
-      record
-         Block   : Block_Type;
-         Offset  : Integer;
-         Name    : Range_Type;
-         Current : Index_Type;
-         Parent  : Index_Type;
-         Sibling : Index_Type;
-         Done    : Boolean;
-      end record;
-
-      Null_Parser_State : constant Parser_State_Type :=
-         (Block   => Block_Invalid,
-          Offset  => 0,
-          Name    => Null_Range,
-          Current => Invalid_Index,
-          Parent  => Invalid_Index,
-          Sibling => Invalid_Index,
-          Done    => False);
-
-      type Parser_Stack_Type is array (SXML.Natural_Without_Last range <>) of Parser_State_Type;
-      Parser_Buffer : Parser_Stack_Type (1 .. 1000) := (others => Null_Parser_State);
-      package S is new SXML.Stack (Parser_State_Type, Parser_Stack_Type, Parser_Buffer, Null_Parser_State);
-
-      procedure Parse_Internal (Match : out Match_Type;
+      procedure Parse_Internal (Buf   : in out Stack_Type;
+                                Match : out Match_Type;
                                 Start : out Index_Type)
       is
-         State : Parser_State_Type;
+         package S is new SXML.Stack
+            (State_Type,
+             Stack_Type,
+             Buf,
+             Null_Parser_State);
+
+         State : State_Type;
       begin
          Match := Match_Invalid;
          Start := Invalid_Index;
@@ -1385,7 +1350,7 @@ is
 
    begin
       Skip_Byte_Order_Mark;
-      Parse_Internal (Parse_Result, Unused);
+      Parse_Internal (Buffer, Parse_Result, Unused);
       pragma Unreferenced (Unused);
       Skip (Whitespace);
 
@@ -1404,6 +1369,17 @@ is
       then
          Document (Document_Index) := Null_Node;
       end if;
+   end Parse;
+
+   procedure Parse (Data         : Content_Type;
+                    Document     : in out Document_Type;
+                    Parse_Result : out Match_Type;
+                    Position     : out Natural)
+   is
+      Parse_Buffer : Stack_Type (1 .. 1000) := (others => Null_Parser_State);
+   begin
+      Parse (Data, Document, Parse_Buffer, Parse_Result, Position);
+      pragma Unreferenced (Parse_Buffer);
    end Parse;
 
 end SXML.Parser;

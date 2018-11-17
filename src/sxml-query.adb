@@ -75,7 +75,7 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : in out Content_Type;
+                   Data     : out Content_Type;
                    Last     : out Natural)
    is
    begin
@@ -243,7 +243,7 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : in out Content_Type;
+                    Data     : out Content_Type;
                     Last     : out Natural)
    is
       Val : constant Relative_Index_Type :=

@@ -23,7 +23,8 @@ is
 
    subtype Content_Type is String
    with
-      Predicate => Content_Type'First <= Content_Type'Last and then
+      Predicate => Content_Type'First >= 0 and then
+                   Content_Type'First <= Content_Type'Last and then
                    Content_Type'Last <= Natural'Last - Chunk_Length and then
                    Content_Type'Length >= 0;
 
@@ -247,7 +248,7 @@ is
    procedure Get_String (Document : Document_Type;
                          Start    : Offset_Type;
                          Result   : out Result_Type;
-                         Data     : in out Content_Type;
+                         Data     : out Content_Type;
                          Last     : out Natural)
    with
       Pre      => Start < Document'Length,

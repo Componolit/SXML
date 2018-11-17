@@ -87,7 +87,7 @@ is
       Position : Natural;
       Data : access String := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
       Last : Natural := 1;
-      Stack : access Stack_Type;
+      Stack : access Serialize.Stack_Type;
       Serialize_Result : Result_Type;
 
    begin
@@ -99,7 +99,7 @@ is
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      Stack := new Stack_Type (1 .. Stack_Size);
+      Stack := new Serialize.Stack_Type (1 .. Stack_Size);
       To_String (Document.all, Data.all, Last, Serialize_Result, Stack.All);
       Free (Data);
       Free (Stack);

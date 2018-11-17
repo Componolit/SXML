@@ -89,7 +89,7 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : in out Content_Type;
+                   Data     : out Content_Type;
                    Last     : out Natural)
    with
       Pre'Class  => (Is_Valid (Document, State) and then
@@ -211,7 +211,7 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : in out Content_Type;
+                    Data     : out Content_Type;
                     Last     : out Natural)
    with
       Pre'Class => Is_Valid (Document, State) and then
