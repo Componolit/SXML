@@ -30,7 +30,7 @@ is
 
    function Is_Valid (Document : Document_Type;
                       State    : State_Type) return Boolean
-   is (Document'Length > 0 and
+   is (Document /= Null_Document and then
        State.Offset < Document'Length);
 
    -------------

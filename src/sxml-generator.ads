@@ -13,7 +13,12 @@ package SXML.Generator
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generator);
 
-   type Attributes_Type (<>) is private;
+   type Attributes_Base_Type (<>) is private;
+
+   subtype Attributes_Type is Attributes_Base_Type
+   with
+      Dynamic_Predicate => Attributes_Type'First > 0 and Attributes_Type'Length > 0;
+
    Null_Attributes : constant Attributes_Type;
 
    ------------------
@@ -86,8 +91,8 @@ is
    -------
 
    function E (Name       : Content_Type;
-               Attributes : Attributes_Type;
-               Children   : Document_Type) return Document_Type
+               Attributes : Attributes_Base_Type;
+               Children   : Document_Base_Type) return Document_Type
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
       Post     => E'Result /= Null_Document and
@@ -103,10 +108,10 @@ is
                Children   : Document_Type) return Document_Type
    is (E (Name, Null_Attributes, Children))
    with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
+      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Children),
       Post     => E'Result /= Null_Document and
                   Num_Elements (E'Result) =
-                     Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Children),
+                     Num_Elements (Name) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
    --  Construct element with child document and without attributes
    --
@@ -117,11 +122,10 @@ is
                Attributes : Attributes_Type) return Document_Type
    is (E (Name, Attributes, Null_Document))
    with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Document),
+      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes),
       Post     => E'Result /= Null_Document and
                   Num_Elements (E'Result) = Num_Elements (Name) +
-                                            Num_Elements (Attributes) +
-                                            Num_Elements (Null_Document),
+                                            Num_Elements (Attributes),
       Annotate => (GNATprove, Terminating);
    --  Construct element with attributes and without child document
    --
@@ -131,11 +135,9 @@ is
    function E (Name : Content_Type) return Document_Type
    is (E (Name, Null_Attributes, Null_Document))
    with
-      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Document),
+      Pre  => Num_Elements (Name) < Offset_Type'Last,
       Post => E'Result /= Null_Document and
-      Num_Elements (E'Result) = Num_Elements (Name) +
-                                Num_Elements (Null_Attributes) +
-                                Num_Elements (Null_Document),
+      Num_Elements (E'Result) = Num_Elements (Name),
       Annotate => (GNATprove, Terminating);
    --  Construct element without attributes and without child document
    --
@@ -205,8 +207,8 @@ is
 
 private
 
-   type Attributes_Type is new Document_Type;
-   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Document);
+   type Attributes_Base_Type is new Document_Base_Type;
+   Null_Attributes : constant Attributes_Base_Type := Attributes_Base_Type (Null_Document);
 
    --------------
    -- Is_Valid --

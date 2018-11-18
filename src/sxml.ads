@@ -48,10 +48,12 @@ is
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
-   type Document_Type is array (Index_Type range <>) of Node_Type
+   type Document_Base_Type is array (Index_Type range <>) of Node_Type;
+   Null_Document : constant Document_Base_Type;
+
+   subtype Document_Type is Document_Base_Type
    with
       Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
-   Null_Document : constant Document_Type;
 
    ---------
    -- Add --
@@ -287,9 +289,9 @@ is
    --  Number of elements required to store attribute data
    --  @param D  Attribute content
 
-   function Num_Elements (Document : Document_Type) return Offset_Type
+   function Num_Elements (Document : Document_Base_Type) return Offset_Type
    with
-      Post     => Num_Elements'Result = (if Document = Null_Document then 0 else Document'Length),
+      Post     => Num_Elements'Result = Document'Length,
       Annotate => (GNATprove, Terminating);
    --  Number of elements in document
    --
@@ -381,7 +383,7 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Document : constant Document_Type := (1 .. 0 => Null_Node);
+   Null_Document : constant Document_Base_Type := (1 .. 0 => Null_Node);
 
    --------------
    -- Is_Valid --
