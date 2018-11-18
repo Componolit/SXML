@@ -64,7 +64,8 @@ is
    function "+" (Left, Right : Document_Type) return Document_Type
    with
       Pre  => Is_Valid (Left, Right),
-      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right),
+      Annotate => (GNATprove, Terminating);
    --  Concatenate documents
    --
    --  @param Left  First document
@@ -73,7 +74,8 @@ is
    function "+" (Left, Right : Attributes_Type) return Attributes_Type
    with
       Pre  => Is_Valid (Left, Right),
-      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right),
+      Annotate => (GNATprove, Terminating);
    --  Concatenate attributes
    --
    --  @param Left  First attributes

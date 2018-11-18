@@ -37,7 +37,8 @@ is
    function Is_Open (Document : Document_Type;
                      State    : State_Type) return Boolean
    with
-      Pre'Class => Is_Valid (Document, State);
+      Pre'Class => Is_Valid (Document, State),
+      Annotate => (GNATprove, Terminating);
    --  Current state points to open element in document
    --
    --  @param Document  Document
@@ -51,7 +52,8 @@ is
                         State    : State_Type) return Boolean
    with
       Ghost,
-      Pre'Class => Is_Valid (Document, State);
+      Pre'Class => Is_Valid (Document, State),
+      Annotate => (GNATprove, Terminating);
    --  Current state points to content element in document
    --
    --  @param Document  Document
@@ -65,7 +67,8 @@ is
                           State    : State_Type) return Boolean
    with
       Ghost,
-      Pre'Class => Is_Valid (Document, State);
+      Pre'Class => Is_Valid (Document, State),
+      Annotate => (GNATprove, Terminating);
    --  Current state points to attribute element in document
    --
    --  @param Document  Document
@@ -77,7 +80,8 @@ is
 
    function Init (Document : Document_Type) return State_Type
    with
-      Post => Is_Valid (Document, Init'Result);
+      Post => Is_Valid (Document, Init'Result),
+      Annotate => (GNATprove, Terminating);
    --  Initialize state
    --
    --  @param Document  Document to initialize state for
@@ -89,11 +93,12 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : out Content_Type;
+                   Data     : in out Content_Type;
                    Last     : out Natural)
    with
       Pre'Class  => (Is_Valid (Document, State) and then
-                    (Is_Open (Document, State) or Is_Attribute (Document, State)));
+                    (Is_Open (Document, State) or Is_Attribute (Document, State))),
+      Annotate => (GNATprove, Terminating);
    --  Return name for current node
    --
    --  @param State     Current state
@@ -116,7 +121,8 @@ is
                           (Is_Valid (Document, State) and then
                            (Is_Open (Document, State) or
                             Is_Content (Document, State)))
-                     else State = State'Old);
+                     else State = State'Old),
+      Annotate => (GNATprove, Terminating);
    --  Get child
    --
    --  @param State     Current state
@@ -139,7 +145,8 @@ is
                           (Is_Valid (Document, State) and then
                              (Is_Open (Document, State) or
                                       Is_Content (Document, State)))
-                     else State = State'Old);
+                     else State = State'Old),
+      Annotate => (GNATprove, Terminating);
    --  Get next sibling
    --
    --  @param State     Current state
@@ -162,7 +169,8 @@ is
                      then State.Offset >= State'Old.Offset and
                           (Is_Valid (Document, State) and then
                            Is_Open (Document, State))
-                     else State = State'Old);
+                     else State = State'Old),
+      Annotate => (GNATprove, Terminating);
    --  Find sibling by name
    --
    --  @param State         Current state
@@ -183,7 +191,8 @@ is
       Post'Class => (Result = Result_OK and
                      (Is_Valid (Document, State) and then
                       Is_Attribute (Document, State))) or
-                    (Result /= Result_OK and State = State'Old);
+                    (Result /= Result_OK and State = State'Old),
+      Annotate => (GNATprove, Terminating);
    --  Get first attribute of opening element
    --
    --  @param State     Current state
@@ -198,7 +207,8 @@ is
                             Document : Document_Type) return Boolean
    with
       Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Attribute (Document, State);
+                    Is_Attribute (Document, State),
+      Annotate => (GNATprove, Terminating);
    --  Check if current attribute has valid value
    --
    --  @param State     Current state
@@ -211,12 +221,13 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : out Content_Type;
+                    Data     : in out Content_Type;
                     Last     : out Natural)
    with
       Pre'Class => Is_Valid (Document, State) and then
                    Is_Attribute (Document, State) and then
-                   Is_Valid_Value (State, Document);
+                   Is_Valid_Value (State, Document),
+      Annotate => (GNATprove, Terminating);
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -239,7 +250,8 @@ is
                      then State.Offset > State'Old.Offset and
                           (Is_Valid (Document, State) and then
                            Is_Attribute (Document, State))
-                     else State = State'Old);
+                     else State = State'Old),
+      Annotate => (GNATprove, Terminating);
    --  Get next attribute
    --
    --  @param State     Current state
@@ -257,7 +269,8 @@ is
    with
       Pre'Class  => Is_Valid (Document, State) and then
                     Is_Open (Document, State),
-      Post'Class => Is_Valid (Document, State);
+      Post'Class => Is_Valid (Document, State),
+      Annotate => (GNATprove, Terminating);
    --  Find attribute by name
    --
    --  @param State           Current state
@@ -279,7 +292,8 @@ is
                     Query_String'Last < Natural'Last and
                     Query_String'Length > 1 and
                     (Is_Valid (Document, State) and then
-                     Is_Open (Document, State));
+                     Is_Open (Document, State)),
+      Annotate => (GNATprove, Terminating);
    --  Query element by path beging at root of document. Only
    --  simple path queries referencing element names are supported,
    --  e.g. /root/parent/child/grandchild.

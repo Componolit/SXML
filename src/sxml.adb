@@ -190,7 +190,7 @@ is
    procedure Get_String (Document : Document_Type;
                          Start    : Offset_Type;
                          Result   : out Result_Type;
-                         Data     : out Content_Type;
+                         Data     : in out Content_Type;
                          Last     : out Natural)
    is
       function String_Length (Doc    : Document_Type;

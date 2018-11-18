@@ -59,19 +59,22 @@ is
       -- Restore_Offset --
       --------------------
 
-      procedure Restore_Offset (Old_Offset : Natural)
+      procedure Restore_Offset (Old_Offset : Integer)
       with
-         Post => Offset = Old_Offset,
+         Post => (if Old_Offset >= 0 then Offset = Old_Offset),
          Annotate => (GNATprove, Terminating);
 
-      procedure Restore_Offset (Old_Offset : Natural)
+      procedure Restore_Offset (Old_Offset : Integer)
       is
       begin
          if Offset > Error_Index
          then
             Error_Index := Offset;
          end if;
-         Offset := Old_Offset;
+         if Old_Offset >= 0
+         then
+            Offset := Old_Offset;
+         end if;
       end Restore_Offset;
 
       ---------------------
@@ -984,9 +987,6 @@ is
                                 Match : out Match_Type;
                                 Start : out Index_Type)
       with
-         Post => (if Match = Match_OK
-                  then Offset > Offset'Old
-                  else Offset >= Offset'Old),
          Annotate => (GNATprove, Terminating);
 
       -----------------
@@ -1166,10 +1166,13 @@ is
              Buf,
              Null_Parser_State);
 
-         State : State_Type;
+         State      : State_Type;
+         Iterations : Natural := 0;
       begin
          Match := Match_Invalid;
          Start := Invalid_Index;
+
+         S.Init;
 
          S.Push ((Block   => Block_Open_Sections_Pre,
                   Offset  => 0,
@@ -1179,8 +1182,13 @@ is
                   Sibling => Invalid_Index,
                   Done    => False));
 
-         while not S.Is_Empty
+         while not S.Is_Empty and
+               not (Iterations = Natural'Last)
          loop
+            pragma Loop_Variant (Increases => Iterations);
+            pragma Loop_Invariant (S.Is_Valid);
+
+            Iterations := Iterations + 1;
             S.Pop (State);
 
             if State.Offset >= 0
@@ -1257,6 +1265,12 @@ is
                               Sibling => State.Sibling,
                               Done    => State.Done));
 
+                     if S.Is_Full
+                     then
+                        Match := Match_Out_Of_Memory;
+                        return;
+                     end if;
+
                      S.Push ((Block   => Block_Content_Pre,
                               Offset  => State.Offset,
                               Name    => State.Name,
@@ -1286,6 +1300,12 @@ is
                               Sibling => Start,
                               Done    => State.Done));
 
+                     if S.Is_Full
+                     then
+                        Match := Match_Out_Of_Memory;
+                        return;
+                     end if;
+
                      S.Push ((Block   => Block_Content_Pre,
                               Offset  => State.Offset,
                               Name    => State.Name,
@@ -1300,6 +1320,11 @@ is
                   declare
                      Sub_Match : Match_Type;
                   begin
+                     if not In_Range (State.Name)
+                     then
+                        return;
+                     end if;
+
                      Parse_Closing_Tag (Data (State.Name.First .. State.Name.Last), Sub_Match);
                      if Sub_Match /= Match_OK
                      then

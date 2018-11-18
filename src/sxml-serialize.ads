@@ -28,7 +28,8 @@ is
                         Last     : out Natural;
                         Result   : out Result_Type)
    with
-      Pre => Data'Length > 0;
+      Pre => Data'Length > 0,
+      Annotate => (GNATprove, Terminating);
    --  Serialize document to string using runtime stack
    --
    --  @param Document  Document to serialize
@@ -47,7 +48,8 @@ is
                         Buffer   : in out Stack_Type)
    with
       Pre => Data'Length > 0 and
-             Buffer'Length > 1;
+             Buffer'Length > 1,
+      Annotate => (GNATprove, Terminating);
    --  Serialize document to string using heap stack
    --
    --  @param Document  Document to serialize

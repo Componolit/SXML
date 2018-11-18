@@ -96,7 +96,9 @@ is
 
    function Overflow (Left  : Offset_Type;
                       Right : Relative_Index_Type) return Boolean
-   is (Offset_Type (Right) > Offset_Type'Last - Left);
+   is (Offset_Type (Right) > Offset_Type'Last - Left)
+   with
+      Annotate => (GNATprove, Terminating);
    --  Check whether adding a relative index would overflow an offset
    --
    --  @param Left   Offset
@@ -245,10 +247,14 @@ is
    -- Get_String --
    ----------------
 
+   pragma Warnings
+      (Off, "unused initial value of ""Data""",
+       Reason => "We need 'Length from the Content_Type predicate, but"
+               & "it is not available for out-mode parameters");
    procedure Get_String (Document : Document_Type;
                          Start    : Offset_Type;
                          Result   : out Result_Type;
-                         Data     : out Content_Type;
+                         Data     : in out Content_Type;
                          Last     : out Natural)
    with
       Pre      => Start < Document'Length,
@@ -260,6 +266,7 @@ is
    --  @param Result   Result of operation
    --  @param Data     Variable to write result to
    --  @param Last     Last valid element in result data
+   pragma Warnings (On, "unused initial value of ""Data""");
 
    ------------------
    -- Num_Elements --
