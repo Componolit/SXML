@@ -42,11 +42,14 @@ is
       with
          Pre => Is_Valid (R);
 
-      type Set_Type is new String
+      type Set_Type_Base is new String;
+
+      subtype Set_Type is Set_Type_Base
       with
          Predicate => Set_Type'First >= 0 and
                       Set_Type'Last < Natural'Last and
                       Set_Type'First <= Set_Type'Last;
+
       Empty_Set : constant Set_Type := (1 => Character'Val (0));
 
       Whitespace : constant Set_Type :=

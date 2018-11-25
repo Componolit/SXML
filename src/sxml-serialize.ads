@@ -14,7 +14,9 @@ is
    type Traversal_Type is private;
    Null_Traversal : constant Traversal_Type;
 
-   type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type
+   type Stack_Type_Base is array (SXML.Natural_Without_Last range <>) of Traversal_Type;
+
+   subtype Stack_Type is Stack_Type_Base
    with
       Dynamic_Predicate => Stack_Type'First <= Stack_Type'Last and
                            Stack_Type'Length > 3;

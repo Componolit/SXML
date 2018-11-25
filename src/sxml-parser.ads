@@ -14,7 +14,9 @@ is
    type State_Type is private;
    Null_Parser_State : constant State_Type;
 
-   type Stack_Type is array (SXML.Natural_Without_Last range <>) of State_Type
+   type Stack_Type_Base is array (SXML.Natural_Without_Last range <>) of State_Type;
+
+   subtype Stack_Type is Stack_Type_Base
    with
       Dynamic_Predicate => Stack_Type'First <= Stack_Type'Last and
                            Stack_Type'Length > 3;
@@ -73,11 +75,13 @@ is
 
 private
 
-   type Range_Type is
+   type Range_Type_Base is
       record
          First : Natural;
          Last  : Natural;
-      end record
+      end record;
+
+   subtype Range_Type is Range_Type_Base
    with
       Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last) or
                    (Range_Type.First = Natural'Last and Range_Type.Last = 0);
