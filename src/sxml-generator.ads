@@ -153,7 +153,7 @@ is
    with
       Pre  => Num_Elements (Name) < Offset_Type'Last - 2,
       Post => A'Result /= Null_Attributes and
-              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)),
+              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)) + 1,
       Annotate => (GNATprove, Terminating);
    --  Construct attribute from integer number
    --
@@ -169,7 +169,7 @@ is
    with
       Pre  => Num_Elements (Name) < Offset_Type'Last - 2,
       Post => A'Result /= Null_Attributes and
-              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)),
+              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (To_String (Value)) + 1,
       Annotate => (GNATprove, Terminating);
    --  Construct attribute from float number value
    --
@@ -186,7 +186,7 @@ is
       Pre  => Num_Elements (Name) < Offset_Type'Last and then
               Num_Elements (Value) <= Offset_Type (Index_Type'Last - Add (1, Num_Elements (Name))),
       Post => A'Result /= Null_Attributes and
-              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (Value),
+              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (Value) + 1,
       Annotate => (GNATproof, Terminating);
    --  Construct attribute from string value
    --

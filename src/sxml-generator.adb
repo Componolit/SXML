@@ -125,7 +125,7 @@ is
    function A (Name  : Content_Type;
                Value : Content_Type) return Attributes_Type
    is
-      Result : Document_Type (1 .. Sub (Add (Add (1, Num_Elements (Name)), Num_Elements (Value)), 1));
+      Result : Document_Type (1 .. Add (Add (1, Num_Elements (Name)), Num_Attr_Elements (Value)));
       Offset : Offset_Type := 0;
    begin
       Result := (others => Null_Node);
