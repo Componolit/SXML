@@ -18,8 +18,8 @@ is
    ------------------
 
    overriding
-   function Num_Elements (Attributes : Attributes_Type) return Offset_Type
-   is (Attributes'Length);
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
+   is (if Attributes = Null_Attributes then 0 else Attributes'Length);
 
    ---------------
    -- To_String --

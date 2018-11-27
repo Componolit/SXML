@@ -394,4 +394,11 @@ private
       ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
        Left'Length <= Index_Type'Last - Right'Length);
 
+   -------------
+   -- Is_Open --
+   -------------
+
+   function Is_Open (Node : Node_Type) return Boolean
+   is (Node.Kind = Kind_Element_Open);
+
 end SXML;

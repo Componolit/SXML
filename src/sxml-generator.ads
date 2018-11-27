@@ -14,18 +14,17 @@ is
    pragma Annotate (GNATprove, Terminating, SXML.Generator);
 
    type Attributes_Base_Type (<>) is private;
+   Null_Attributes : constant Attributes_Base_Type;
 
    subtype Attributes_Type is Attributes_Base_Type
    with
       Dynamic_Predicate => Attributes_Type'First > 0 and Attributes_Type'Length > 0;
 
-   Null_Attributes : constant Attributes_Type;
-
    ------------------
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (Attributes : Attributes_Type) return Offset_Type
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
    with
       Annotate => (GNATprove, Terminating);
    --  Number of elements required for attributes
@@ -38,6 +37,8 @@ is
 
    function Is_Valid (Left  : Attributes_Type;
                       Right : Attributes_Type) return Boolean
+   is ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
+       Num_Elements (Left) <= Offset_Type (Index_Type'Last) - Num_Elements (Right))
    with Ghost;
 
    ---------------
@@ -208,15 +209,6 @@ is
 private
 
    type Attributes_Base_Type is new Document_Base_Type;
-   Null_Attributes : constant Attributes_Base_Type := Attributes_Base_Type (Null_Document);
-
-   --------------
-   -- Is_Valid --
-   --------------
-
-   overriding
-   function Is_Valid (Left  : Attributes_Type;
-                      Right : Attributes_Type) return Boolean
-   is (Is_Valid (Document_Type (Left), Document_Type (Right)));
+   Null_Attributes : constant Attributes_Base_Type := (1 .. 0 => Null_Node);
 
 end SXML.Generator;
