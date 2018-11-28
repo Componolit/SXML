@@ -48,7 +48,7 @@ is
       then
          Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
       else
-         SXML.Serialize.To_String (Context.all, Output.all, Position, Result);
+         SXML.Serialize.To_String (Document.all, Output.all, Position, Result);
          if Result = Result_OK
          then
             Ada.Text_IO.Put_Line (Output.all (1 .. Position));
