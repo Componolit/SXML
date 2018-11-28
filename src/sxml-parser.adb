@@ -1399,15 +1399,15 @@ is
       end if;
    end Parse;
 
-   procedure Parse (Data         : Content_Type;
-                    Document     : in out Document_Type;
-                    Parse_Result : out Match_Type;
-                    Position     : out Natural)
+   procedure Unsafe_Parse (Data         : Content_Type;
+                           Document     : in out Document_Type;
+                           Parse_Result : out Match_Type;
+                           Position     : out Natural)
    is
       Parse_Buffer : Stack_Type (1 .. 1000) := (others => Null_Parser_State);
    begin
       Parse (Data, Document, Parse_Buffer, Parse_Result, Position);
       pragma Unreferenced (Parse_Buffer);
-   end Parse;
+   end Unsafe_Parse;
 
 end SXML.Parser;

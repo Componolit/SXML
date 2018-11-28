@@ -18,6 +18,8 @@ with Ada.Unchecked_Deallocation;
 
 package body SXML_Parser_Tests is
 
+   Stack_Buffer : access SXML.Parser.Stack_Type_Base := new SXML.Parser.Stack_Type_Base (1 .. 10000);
+
    procedure Single_Node (T : in out Test_Cases.Test_Case'Class)
    is
       Data : String := "<valid></valid>";
@@ -470,6 +472,7 @@ package body SXML_Parser_Tests is
       begin
          Parse (Data         => Input.all,
                 Document     => Document.all,
+                Buffer       => Stack_Buffer.all,
                 Parse_Result => Result,
                 Position     => Position);
          Free_Subtree (Document);

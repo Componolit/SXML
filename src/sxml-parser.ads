@@ -60,13 +60,13 @@ is
    --  @param Parse_Result  Result of operation
    --  @param Position      Input location after parsing or error
 
-   procedure Parse (Data         : Content_Type;
-                    Document     : in out Document_Type;
-                    Parse_Result : out Match_Type;
-                    Position     : out Natural)
+   procedure Unsafe_Parse (Data         : Content_Type;
+                           Document     : in out Document_Type;
+                           Parse_Result : out Match_Type;
+                           Position     : out Natural)
    with
       Annotate => (GNATprove, Terminating);
-   --  Parse an XML file
+   --  Parse an XML file using the runtime stack
    --
    --  @param Data          Input data
    --  @param Document      Document

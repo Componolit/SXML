@@ -1,6 +1,5 @@
 with SXML.Generator; use SXML.Generator;
 with SXML.Serialize; use SXML.Serialize;
-with SXML.Debug;     use SXML.Debug;
 with Ada.Text_IO;    use Ada.Text_IO;
 
 use SXML;
@@ -69,7 +68,6 @@ is
    Offset : Natural := 0;
    Result : Result_Type;
 begin
-   Debug.Dump (Doc);
    To_String (Doc, Data, Offset, Result);
    if Result = Result_OK
    then

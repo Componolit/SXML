@@ -6,6 +6,8 @@ with Ada.Directories;
 
 procedure Parse
 is
+   Stack_Buffer : access SXML.Parser.Stack_Type_Base := new SXML.Parser.Stack_Type_Base (1 .. 10000);
+
    function Read_File (Name : String) return access String
    is
       Block_Size : constant := 1024;
@@ -38,6 +40,7 @@ is
       Document.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
              Document     => Document.all,
+             Buffer       => Stack_Buffer.all,
              Parse_Result => Result,
              Position     => Position);
       if Result /= Match_OK

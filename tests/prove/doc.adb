@@ -3,6 +3,8 @@ with SXML.Parser;
 procedure Doc
 with SPARK_Mode
 is
+   Stack_Buffer : SXML.Parser.Stack_Type_Base (1 .. 1000);
+
    use SXML;
    use SXML.Parser;
    Text : String := 
@@ -20,6 +22,7 @@ is
 begin
    Parse (Data         => Text,
           Document     => Document,
+          Buffer       => Stack_Buffer,
           Parse_Result => Result,
           Position     => Position); 
 end Doc;

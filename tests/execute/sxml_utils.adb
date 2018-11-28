@@ -21,6 +21,7 @@ with Text_IO;
 package body SXML_Utils
 is
    Document : access SXML.Document_Type := new SXML.Document_Type (1 .. 150000000);
+   Stack_Buffer : access SXML.Parser.Stack_Type_Base := new SXML.Parser.Stack_Type_Base (1 .. 10000);
 
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
@@ -41,6 +42,7 @@ is
    begin
       Parser.Parse (Data         => Input,
                     Document     => Document.all,
+                    Buffer       => Stack_Buffer.all,
                     Parse_Result => Result,
                     Position     => Position);
       pragma Unreferenced (Position);
@@ -94,6 +96,7 @@ is
       Document.all (Document.all'First) := Null_Node;
       Parser.Parse (Data         => Input.all,
                     Document     => Document.all,
+                    Buffer       => Stack_Buffer.all,
                     Parse_Result => Result,
                     Position     => Position);
       Free (Input);
@@ -126,6 +129,7 @@ is
       Document.all (1) := Null_Node;
       Parser.Parse (Data         => Input,
                     Document     => Document.all,
+                    Buffer       => Stack_Buffer.all,
                     Parse_Result => Result,
                     Position     => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");

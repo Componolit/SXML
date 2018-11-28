@@ -19,6 +19,7 @@ use SXML;
 package body SXML_Query_Tests is
 
    Scratch : String (1 .. 1000);
+   Stack_Buffer : access SXML.Parser.Stack_Type_Base := new SXML.Parser.Stack_Type_Base (1 .. 10000);
 
    function Name (State : State_Type;
                   Doc   : Document_Type) return String
@@ -65,7 +66,7 @@ package body SXML_Query_Tests is
    begin
       State := Init (Context);
       Result := Result_Invalid;
-      Parser.Parse (Input.all, Context, Match, Position);
+      Parser.Parse (Input.all, Context, Stack_Buffer.all, Match, Position);
       if Match /= Match_OK
       then
          Result := Result_Invalid;
