@@ -100,6 +100,7 @@ is
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
       Stack := new Serialize.Stack_Type (1 .. Stack_Size);
+      Assert (Stack /= Null, "Could not allocate stack");
       To_String (Document.all, Data.all, Last, Serialize_Result, Stack.All);
       Free (Data);
       Free (Stack);

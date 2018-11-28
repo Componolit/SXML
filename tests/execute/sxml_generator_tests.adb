@@ -206,7 +206,6 @@ package body SXML_Generator_Tests is
       begin
          if Num_Elements (S) /= L
          then
-            Dump (S);
             Assert (False, N & ": Expected length" & L'Img & " got " & Num_Elements (S)'Img);
          end if;
       end Check_Length;
@@ -218,7 +217,6 @@ package body SXML_Generator_Tests is
       begin
          if Num_Elements (A) /= L
          then
-            Dump (A);
             Assert (Num_Elements (A) = L, N & ": Expected length" & L'Img & " got" & Num_Elements (A)'Img);
          end if;
       end Check_Length;
