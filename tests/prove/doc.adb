@@ -3,7 +3,7 @@ with SXML.Parser;
 procedure Doc
 with SPARK_Mode
 is
-   Stack_Buffer : SXML.Parser.Stack_Type_Base (1 .. 1000);
+   Stack_Buffer : SXML.Parser.Stack_Type_Base (1 .. 1000) := (others => SXML.Parser.Null_Parser_State);
 
    use SXML;
    use SXML.Parser;
