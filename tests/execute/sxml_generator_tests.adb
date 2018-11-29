@@ -12,8 +12,6 @@
 with AUnit.Assertions; use AUnit.Assertions;
 with SXML.Generator; use SXML.Generator;
 with SXML.Serialize; use SXML.Serialize;
-with SXML.Debug; use SXML.Debug;
-with SXML.Generator.Debug; use SXML.Generator.Debug;
 
 package body SXML_Generator_Tests is
 
