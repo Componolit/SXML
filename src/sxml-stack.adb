@@ -92,7 +92,9 @@ is
    procedure Init
    is
    begin
-      S := (others => Null_Element);
+      --  We need to give explicit bounds here, as a direct assignment to S
+      --  causes a buffer overflow due to a compiler bug, cf. RB29-053
+      S (S'First .. S'Last) := (others => Null_Element);
       Index := S'First;
    end Init;
 
