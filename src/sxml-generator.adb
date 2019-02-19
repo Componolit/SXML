@@ -157,8 +157,6 @@ is
    function "+" (Left, Right : Document_Type) return Document_Type
    is
       Result : Document_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
-      I      : Relative_Index_Type := 0;
-      N      : Index_Type;
    begin
       if Right'Length = 0
       then
@@ -166,37 +164,7 @@ is
       end if;
 
       Result (1 .. Left'Length) := Left;
-      Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
-
-      --  Find last element
-      loop
-         pragma Loop_Variant (Increases => I);
-
-         if Overflow (Result'First, I)
-         then
-            return Result;
-         end if;
-
-         N :=  Add (Result'First, I);
-         if (N - Result'First) > Left'Length or
-            (not (N in Result'Range) or else
-             (Result (N).Kind /= Kind_Content and
-              Result (N).Kind /= Kind_Element_Open))
-         then
-            return Result;
-         end if;
-
-         exit when Result (N).Siblings = Invalid_Relative_Index;
-
-         if Result (N).Siblings > Relative_Index_Type'Last - I
-         then
-            return Result;
-         end if;
-
-         I := I + Result (N).Siblings;
-      end loop;
-
-      Result (N).Siblings := Left'Length - I;
+      Append (Result, Offset_Type (Left'Length), Right);
       return Result;
    end "+";
 

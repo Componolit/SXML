@@ -144,6 +144,52 @@ is
       Position := Add (Position, Num_Elements (Name));
    end Open;
 
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append (Left   : in out Document_Type;
+                     Offset :        Offset_Type;
+                     Right  :        Document_Type)
+   is
+      Off : constant Index_Type := Index_Type (Offset_Type (Left'First) + Offset);
+      I   : Relative_Index_Type := 0;
+      N   : Index_Type;
+   begin
+      Left (Off .. Off - 1 + Right'Length) := Right;
+
+      --  Find last element
+      loop
+         pragma Loop_Variant (Increases => I);
+         pragma Loop_Invariant (I <= Relative_Index_Type (Offset));
+
+         if Overflow (Left'First, I)
+         then
+            return;
+         end if;
+
+         N :=  Add (Left'First, I);
+         if (N - Left'First) > Left'Length or
+            (not (N in Left'Range) or else
+             (Left (N).Kind /= Kind_Content and
+              Left (N).Kind /= Kind_Element_Open))
+         then
+            return;
+         end if;
+
+         exit when Left (N).Siblings = Invalid_Relative_Index;
+
+         if Left (N).Siblings > Relative_Index_Type (Offset) - I
+         then
+            return;
+         end if;
+
+         I := I + Left (N).Siblings;
+      end loop;
+
+      Left (N).Siblings := Relative_Index_Type (Offset) - I;
+   end Append;
+
    -----------------
    -- Put_Content --
    -----------------

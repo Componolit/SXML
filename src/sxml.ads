@@ -174,9 +174,9 @@ is
    --  @param Left   Index
    --  @param Right  Index
 
-   -------------
-   -- Is_Open --
-   -------------
+   --------------
+   -- Is_Valid --
+   --------------
 
    function Is_Valid (Left, Right : Document_Type) return Boolean
    with
@@ -199,6 +199,21 @@ is
    --  Node is an invalid element
    --
    --  @param Node  Document node
+
+   ------------
+   -- Append --
+   ------------
+
+   procedure Append (Left   : in out Document_Type;
+                     Offset :        Offset_Type;
+                     Right  :        Document_Type)
+   with
+      Pre => Offset < Offset_Type (Index_Type'Last) and then
+             Offset < Left'Length and then
+             Left'Length - Offset <= Right'Length and then
+             Right'Length <= Offset_Type'Last - Offset and then
+             Right'Length <= Left'Length - Offset,
+      Annotate => (GNATprove, Terminating);
 
    -----------------
    -- Put_Content --
