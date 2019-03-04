@@ -65,7 +65,7 @@ is
    is
       pragma Unreferenced (Document);
    begin
-      return State_Type'(Offset => 0);
+      return State_Type'(Result => Result_OK, Offset => 0);
    end Init;
 
    ----------
@@ -86,48 +86,43 @@ is
    -- Child --
    -----------
 
-   procedure Child (State    : in out State_Type;
-                    Document : Document_Type;
-                    Result   : out Result_Type)
+   function Child (State    : State_Type;
+                   Document : Document_Type) return State_Type
    is
       Children_Offset : constant Index_Type := Add (Document'First, State.Offset);
       Children        : Relative_Index_Type;
       Tmp_Offset      : Offset_Type;
    begin
-      Result := Result_Invalid;
       if Document (Children_Offset).Kind /= Kind_Element_Open
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
       Children := Document (Children_Offset).Children;
       if Offset_Type (Children) > Offset_Type'Last - State.Offset
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
       if Children = Invalid_Relative_Index
       then
-         Result := Result_Not_Found;
-         return;
+         return (Result => Result_Not_Found);
       end if;
       Tmp_Offset := Add (State.Offset, Children);
       if Tmp_Offset >= Document'Length or else
          (Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Element_Open and
           Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Content)
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
-      Result := Result_OK;
-      State.Offset := Tmp_Offset;
+      return (Result => Result_OK, Offset => Tmp_Offset);
    end Child;
 
    -------------
    -- Sibling --
    -------------
 
-   procedure Sibling (State    : in out State_Type;
-                      Document : Document_Type;
-                      Result   : out Result_Type)
+   function Sibling (State    : State_Type;
+                     Document : Document_Type) return State_Type
    is
       Current  : constant Index_Type := Add (Document'First, State.Offset);
       Siblings : constant Relative_Index_Type := Document (Current).Siblings;
@@ -135,14 +130,12 @@ is
    begin
       if Siblings = Invalid_Relative_Index
       then
-         Result := Result_Not_Found;
-         return;
+         return (Result => Result_Not_Found);
       end if;
 
-      Result := Result_Invalid;
       if Overflow (Current, Siblings)
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
       Tmp_Index := Add (Current, Siblings);
@@ -150,81 +143,75 @@ is
         (Document (Tmp_Index).Kind /= Kind_Element_Open and
          Document (Tmp_Index).Kind /= Kind_Content)
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
-      State.Offset := Sub (Tmp_Index, Document'First);
-      Result := Result_OK;
+      return (Result => Result_OK,
+              Offset => Sub (Tmp_Index, Document'First));
    end Sibling;
 
    ---------------
    -- Attribute --
    ---------------
 
-   procedure Attribute (State    : in out State_Type;
-                        Document : Document_Type;
-                        Result   : out Result_Type)
+   function Attribute (State    : State_Type;
+                       Document : Document_Type) return State_Type
    is
       Tmp_State  : Offset_Type;
       Attributes : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Attributes;
    begin
-      Result := Result_Invalid;
       if Overflow (State.Offset, Attributes)
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
       if Attributes = Invalid_Relative_Index
       then
-         Result := Result_Not_Found;
-         return;
+         return (Result => Result_Not_Found);
       end if;
 
       Tmp_State := Add (State.Offset, Attributes);
       if Tmp_State >= Document'Length or else
          Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
-      State.Offset := Tmp_State;
-      Result := Result_OK;
+      return (Result => Result_OK,
+              Offset => Tmp_State);
    end Attribute;
 
    --------------------
    -- Next_Attribute --
    --------------------
 
-   procedure Next_Attribute (State    : in out State_Type;
-                             Document : Document_Type;
-                             Result   : out Result_Type)
+   function Next_Attribute (State    : State_Type;
+                            Document : Document_Type) return State_Type
    is
       Tmp_State : Offset_Type;
       Next      : constant Relative_Index_Type :=
         Document (Add (Document'First, State.Offset)).Next_Attribute;
    begin
-      Result := Result_Invalid;
       if Overflow (State.Offset, Next)
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
       if Next = Invalid_Relative_Index
       then
-         Result := Result_Not_Found;
-         return;
+         return (Result => Result_Not_Found);
       end if;
 
       Tmp_State := Add (State.Offset, Next);
       if Tmp_State >= Document'Length or else
          Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
       then
-         return;
+         return (Result => Result_Invalid);
       end if;
 
-      Result := Result_OK;
-      State.Offset := Tmp_State;
+      return (Result => Result_OK,
+              Offset => Tmp_State);
    end Next_Attribute;
 
    --------------------
@@ -256,21 +243,18 @@ is
    -- Path --
    ----------
 
-   procedure Path (State        : in out State_Type;
-                   Document     : Document_Type;
-                   Result       : out Result_Type;
-                   Query_String : String)
+   function Path (State        : State_Type;
+                  Document     : Document_Type;
+                  Query_String : String) return State_Type
    is
       First : Natural;
       Last  : Natural := Query_String'First - 1;
-      Tmp_Result : Result_Type;
+      Result_State : State_Type := State;
    begin
-      Result := Result_Not_Found;
-      State  := Init (Document);
 
-      if not Is_Open (Document, State)
+      if not Is_Open (Document, Result_State)
       then
-         return;
+         return (Result => Result_Not_Found);
       end if;
 
       loop
@@ -278,17 +262,17 @@ is
          First := Last + 2;
          Last  := First;
 
-         pragma Loop_Variant (Increases => State.Offset);
-         pragma Loop_Invariant (Is_Valid (Document, State));
-         pragma Loop_Invariant (Is_Open (Document, State) or
-                                Is_Content (Document, State));
+         pragma Loop_Variant (Increases => Result_State.Offset);
+         pragma Loop_Invariant (Is_Valid (Document, Result_State));
+         pragma Loop_Invariant (Is_Open (Document, Result_State) or
+                                Is_Content (Document, Result_State));
          pragma Loop_Invariant (First >= Query_String'First);
          pragma Loop_Invariant (Last >= Query_String'First);
          pragma Loop_Invariant (Last <= Query_String'Last);
 
          loop
             pragma Loop_Variant (Increases => Last);
-            pragma Loop_Invariant (State.Offset = State.Offset'Loop_Entry);
+            pragma Loop_Invariant (Result_State.Offset = Result_State.Offset'Loop_Entry);
             pragma Loop_Invariant (First >= Query_String'First);
             pragma Loop_Invariant (Last >= Query_String'First);
             pragma Loop_Invariant (Last <= Query_String'Last);
@@ -304,109 +288,103 @@ is
             exit;
          end if;
 
-         State.Find_Sibling (Document, Query_String (First .. Last), Tmp_Result);
-         if Tmp_Result /= Result_OK
+         Result_State := Find_Sibling (Result_State, Document, Query_String (First .. Last));
+         if Result_State.Result /= Result_OK
          then
-            return;
+            return (Result => Result_Not_Found);
          end if;
 
          --  Query string processed
          if Last = Query_String'Last
          then
-            Result := Result_OK;
-            return;
+            return Result_State;
          end if;
 
-         State.Child (Document, Tmp_Result);
-         if Tmp_Result /= Result_OK
+         Result_State := Child (Result_State, Document);
+         if Result_State.Result /= Result_OK
          then
-            return;
+            return (Result => Result_Not_Found);
          end if;
       end loop;
 
-      Result := Result_OK;
+      return Result_State;
    end Path;
 
    --------------------
    -- Find_Attribute --
    --------------------
 
-   procedure Find_Attribute (State          : in out State_Type;
-                             Document       : Document_Type;
-                             Attribute_Name : Content_Type;
-                             Result         : out Result_Type)
+   function Find_Attribute (State          : State_Type;
+                            Document       : Document_Type;
+                            Attribute_Name : Content_Type) return State_Type
    is
-      Tmp_Result : Result_Type;
-      Tmp_Last   : Natural;
+      Result       : Result_Type;
+      Result_State : State_Type := Attribute (State, Document);
+      Last         : Natural;
    begin
-      Result := Result_Not_Found;
-
       if Attribute_Name'Length > Scratch_Buffer'Length
       then
-         Result := Result_Overflow;
-         return;
+         return (Result => Result_Overflow);
       end if;
 
-      State.Attribute (Document, Tmp_Result);
-
-      while Tmp_Result = Result_OK
+      while Result_State.Result = Result_OK
       loop
-         pragma Loop_Variant (Increases => State.Offset);
-         pragma Loop_Invariant (Is_Valid (Document, State));
-         pragma Loop_Invariant (Is_Attribute (Document, State));
+         pragma Loop_Variant (Increases => Offset (Result_State));
+         pragma Loop_Invariant (Is_Valid (Document, Result_State));
+         pragma Loop_Invariant (Is_Attribute (Document, Result_State));
 
-         State.Name (Document, Tmp_Result, Scratch_Buffer (1 .. Attribute_Name'Length), Tmp_Last);
-         if Tmp_Result = Result_OK and then
-            Tmp_Last = Attribute_Name'Length and then
-            Scratch_Buffer (1 .. Tmp_Last) = Attribute_Name
+         Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
+         if Result = Result_OK and then
+            Last = Attribute_Name'Length and then
+            Scratch_Buffer (1 .. Last) = Attribute_Name
          then
-            Result := Result_OK;
-            return;
+            return Result_State;
          end if;
-         State.Next_Attribute (Document, Tmp_Result);
+         Result_State := Next_Attribute (Result_State, Document);
       end loop;
 
+      return (Result => Result_Not_Found);
    end Find_Attribute;
 
    ------------------
    -- Find_Sibling --
    ------------------
 
-   procedure Find_Sibling (State        : in out State_Type;
-                           Document     : Document_Type;
-                           Sibling_Name : Content_Type;
-                           Result       : out Result_Type)
+   function Find_Sibling (State        : State_Type;
+                          Document     : Document_Type;
+                          Sibling_Name : Content_Type) return State_Type
    is
-      Old_State : constant State_Type := State;
-      Tmp_Last  : Natural;
+      Result_State : State_Type := State;
+      Result       : Result_Type;
+      Last         : Natural;
    begin
       if Sibling_Name'Length >= Scratch_Buffer'Length
       then
-         Result := Result_Overflow;
-         return;
+         return (Result => Result_Overflow);
       end if;
 
       loop
-         if Is_Open (Document, State)
+         if Is_Open (Document, Result_State)
          then
-            State.Name (Document, Result, Scratch_Buffer (1 .. Sibling_Name'Length), Tmp_Last);
+            Name (Result_State, Document, Result, Scratch_Buffer (1 .. Sibling_Name'Length), Last);
             if Result = Result_OK and then
-               Tmp_Last = Sibling_Name'Length and then
-               Scratch_Buffer (1 .. Tmp_Last) = Sibling_Name
+               Last = Sibling_Name'Length and then
+               Scratch_Buffer (1 .. Last) = Sibling_Name
             then
-               return;
+               return Result_State;
             end if;
          end if;
-         State.Sibling (Document, Result);
-         exit when Result /= Result_OK;
+         Result_State := Sibling (Result_State, Document);
+         exit when Result_State.Result /= Result_OK;
 
-         pragma Loop_Variant (Increases => State.Offset);
-         pragma Loop_Invariant (Is_Valid (Document, State) and then
-                                  (Is_Open (Document, State) or
-                                   Is_Content (Document, State)));
-         pragma Loop_Invariant (State.Offset > State.Offset'Loop_Entry);
+         pragma Loop_Variant (Increases => Result_State.Offset);
+         pragma Loop_Invariant (Is_Valid (Document, Result_State) and then
+                                  (Is_Open (Document, Result_State) or
+                                   Is_Content (Document, Result_State)));
+         pragma Loop_Invariant (Result_State.Offset > Result_State.Offset'Loop_Entry);
       end loop;
-      State := Old_State;
+
+      return (Result => Result_Not_Found);
    end Find_Sibling;
 
 end SXML.Query;
