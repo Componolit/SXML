@@ -1,6 +1,6 @@
 with SXML.Parser;
 
-procedure Parse
+procedure Parse_Simple
 is
    use SXML.Parser;
    Input : String :=
@@ -23,4 +23,4 @@ begin
    then
       null;
    end if;
-end Parse;
+end Parse_Simple;

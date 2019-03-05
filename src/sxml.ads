@@ -214,6 +214,11 @@ is
              Right'Length <= Offset_Type'Last - Offset and then
              Right'Length <= Left'Length - Offset,
       Annotate => (GNATprove, Terminating);
+   --  Append a document inplace
+   --
+   --  @param Left    Document to append to
+   --  @param Offset  Offset to append at
+   --  @param Right   Document to append
 
    -----------------
    -- Put_Content --
