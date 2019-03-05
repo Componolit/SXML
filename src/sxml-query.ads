@@ -11,7 +11,10 @@
 
 package SXML.Query
 is
-   type State_Type is tagged private;
+   type State_Type (Result : Result_Type := Result_Invalid) is private;
+   --  @field  Result Result of the last operation
+
+   Invalid_State : constant State_Type;
 
    ------------
    -- Offset --
@@ -19,6 +22,7 @@ is
 
    function Offset (State : State_Type) return Offset_Type
    with
+      Pre => State.Result = Result_OK,
       Ghost;
 
    --------------
@@ -37,7 +41,7 @@ is
    function Is_Open (Document : Document_Type;
                      State    : State_Type) return Boolean
    with
-      Pre'Class => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to open element in document
    --
    --  @param Document  Document
@@ -51,7 +55,7 @@ is
                         State    : State_Type) return Boolean
    with
       Ghost,
-      Pre'Class => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to content element in document
    --
    --  @param Document  Document
@@ -65,7 +69,7 @@ is
                           State    : State_Type) return Boolean
    with
       Ghost,
-      Pre'Class => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to attribute element in document
    --
    --  @param Document  Document
@@ -89,11 +93,13 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : in out Content_Type;
+                   Data     : out Content_Type;
                    Last     : out Natural)
    with
-      Pre'Class  => (Is_Valid (Document, State) and then
-                    (Is_Open (Document, State) or Is_Attribute (Document, State)));
+      Pre => Valid_Content (Data'First, Data'Last) and then
+             State.Result = Result_OK and then
+             (Is_Valid (Document, State) and then
+              (Is_Open (Document, State) or Is_Attribute (Document, State)));
    --  Return name for current node
    --
    --  @param State     Current state
@@ -106,89 +112,86 @@ is
    -- Child --
    -----------
 
-   procedure Child (State    : in out State_Type;
-                    Document : Document_Type;
-                    Result   : out Result_Type)
+   function Child (State    : State_Type;
+                   Document : Document_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State),
-      Post'Class => (if Result = Result_OK
-                     then State.Offset > State'Old.Offset and
-                          (Is_Valid (Document, State) and then
-                           (Is_Open (Document, State) or
-                            Is_Content (Document, State)))
-                     else State = State'Old);
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State),
+      Post => (if Child'Result.Result = Result_OK
+               then Offset (Child'Result) > Offset (State) and then
+                    (Is_Valid (Document, Child'Result) and then
+                      (Is_Open (Document, Child'Result) or
+                       Is_Content (Document, Child'Result))));
    --  Get child
    --
    --  @param State     Current state
    --  @param Document  Document
-   --  @param Result    Result of operation
+   --  @return          Result of operation
 
    -------------
    -- Sibling --
    -------------
 
-   procedure Sibling (State    : in out State_Type;
-                      Document : Document_Type;
-                      Result   : out Result_Type)
+   function Sibling (State    : State_Type;
+                     Document : Document_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    (Is_Open (Document, State) or
-                     Is_Content (Document, State)),
-      Post'Class => (if Result = Result_OK
-                     then State.Offset > State'Old.Offset and
-                          (Is_Valid (Document, State) and then
-                             (Is_Open (Document, State) or
-                                      Is_Content (Document, State)))
-                     else State = State'Old);
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+              (Is_Open (Document, State) or
+               Is_Content (Document, State)),
+      Post => (if Sibling'Result.Result = Result_OK
+               then  Offset (Sibling'Result) > Offset (State) and then
+                     (Is_Valid (Document, Sibling'Result) and then
+                       (Is_Open (Document, Sibling'Result) or
+                        Is_Content (Document, Sibling'Result))));
    --  Get next sibling
    --
    --  @param State     Current state
    --  @param Document  Document
-   --  @param Result    Result of operation
+   --  @return          Result of operation
 
    ------------------
    -- Find_Sibling --
    ------------------
 
-   procedure Find_Sibling (State        : in out State_Type;
-                           Document     : Document_Type;
-                           Sibling_Name : Content_Type;
-                           Result       : out Result_Type)
+   function Find_Sibling (State        : State_Type;
+                          Document     : Document_Type;
+                          Sibling_Name : Content_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                     (Is_Open (Document, State) or
-                      Is_Content (Document, State)),
-      Post'Class => (if Result = Result_OK
-                     then State.Offset >= State'Old.Offset and
-                          (Is_Valid (Document, State) and then
-                           Is_Open (Document, State))
-                     else State = State'Old);
+      Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
+              State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
+               (Is_Open (Document, State) or
+                Is_Content (Document, State)),
+      Post => (if Find_Sibling'Result.Result = Result_OK
+               then Offset (Find_Sibling'Result) >= Offset (State) and then
+                    (Is_Valid (Document, Find_Sibling'Result) and then
+                     Is_Open (Document, Find_Sibling'Result)));
    --  Find sibling by name
    --
    --  @param State         Current state
    --  @param Document      Document
    --  @param Sibling_Name  Name of sibling
-   --  @param Result        Result of operation
+   --  @return              Result of operation
 
    ---------------
    -- Attribute --
    ---------------
 
-   procedure Attribute (State    : in out State_Type;
-                        Document : Document_Type;
-                        Result   : out Result_Type)
+   function Attribute (State    : State_Type;
+                       Document : Document_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Open (Document, State),
-      Post'Class => (Result = Result_OK and
-                     (Is_Valid (Document, State) and then
-                      Is_Attribute (Document, State))) or
-                    (Result /= Result_OK and State = State'Old);
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
+              Is_Open (Document, State),
+      Post => (if Attribute'Result.Result = Result_OK
+               then (Is_Valid (Document, Attribute'Result) and then
+                     Is_Attribute (Document, Attribute'Result)));
    --  Get first attribute of opening element
    --
    --  @param State     Current state
    --  @param Document  Document
-   --  @param Result    Result of operation
+   --  @return          Result of operation
 
    --------------------
    -- Is_Valid_Value --
@@ -197,8 +200,9 @@ is
    function Is_Valid_Value (State    : State_Type;
                             Document : Document_Type) return Boolean
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Attribute (Document, State);
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+             Is_Attribute (Document, State);
    --  Check if current attribute has valid value
    --
    --  @param State     Current state
@@ -211,12 +215,14 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : in out Content_Type;
+                    Data     : out Content_Type;
                     Last     : out Natural)
    with
-      Pre'Class => Is_Valid (Document, State) and then
-                   Is_Attribute (Document, State) and then
-                   Is_Valid_Value (State, Document);
+      Pre => Valid_Content (Data'First, Data'Last) and then
+             State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+             Is_Attribute (Document, State) and then
+             Is_Valid_Value (State, Document);
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -229,57 +235,56 @@ is
    -- Next_Attribute --
    --------------------
 
-   procedure Next_Attribute (State    : in out State_Type;
-                             Document : Document_Type;
-                             Result   : out Result_Type)
+   function Next_Attribute (State    : State_Type;
+                            Document : Document_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Attribute (Document, State),
-      Post'Class => (if Result = Result_OK
-                     then State.Offset > State'Old.Offset and
-                          (Is_Valid (Document, State) and then
-                           Is_Attribute (Document, State))
-                     else State = State'Old);
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+             Is_Attribute (Document, State),
+      Post => (if Next_Attribute'Result.Result = Result_OK
+               then Offset (Next_Attribute'Result) > Offset (State) and then
+                     (Is_Valid (Document, Next_Attribute'Result) and then
+                      Is_Attribute (Document, Next_Attribute'Result)));
    --  Get next attribute
    --
    --  @param State     Current state
    --  @param Document  Document
-   --  @param Result    Result of operation
+   --  @return          Result of operation
 
    --------------------
    -- Find_Attribute --
    --------------------
 
-   procedure Find_Attribute (State          : in out State_Type;
-                             Document       : Document_Type;
-                             Attribute_Name : Content_Type;
-                             Result         : out Result_Type)
+   function Find_Attribute (State          : State_Type;
+                            Document       : Document_Type;
+                            Attribute_Name : Content_Type) return State_Type
    with
-      Pre'Class  => Is_Valid (Document, State) and then
-                    Is_Open (Document, State),
-      Post'Class => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+             Is_Open (Document, State),
+      Post => Is_Valid (Document, Find_Attribute'Result);
    --  Find attribute by name
    --
    --  @param State           Current state
    --  @param Document        Document
    --  @param Attribute_Name  Name to search for
-   --  @param Result          Result of operation
+   --  @return                Result of operation
 
    ----------
    -- Path --
    ----------
 
-   procedure Path (State        : in out State_Type;
-                   Document     : Document_Type;
-                   Result       : out Result_Type;
-                   Query_String : String)
+   function Path (State        : State_Type;
+                  Document     : Document_Type;
+                  Query_String : String) return State_Type
    with
-       Pre'Class => Query_String'First > 0 and
-                    Query_String'First <= Query_String'Last and
-                    Query_String'Last < Natural'Last and
-                    Query_String'Length > 1 and
-                    (Is_Valid (Document, State) and then
-                     Is_Open (Document, State));
+       Pre => State.Result = Result_OK and then
+              Query_String'First > 0 and then
+              Query_String'First <= Query_String'Last and then
+              Query_String'Last < Natural'Last and then
+              Query_String'Length > 1 and then
+              (Is_Valid (Document, State) and then
+               Is_Open (Document, State));
    --  Query element by path beging at root of document. Only
    --  simple path queries referencing element names are supported,
    --  e.g. /root/parent/child/grandchild.
@@ -287,14 +292,21 @@ is
    --
    --  @param State         Current state
    --  @param Document      Document
-   --  @param Result        Result of operation
    --  @param Query_String  Path to query
+   --  @return              Result of operation
 
 private
 
-   type State_Type is tagged
+   type State_Type (Result : Result_Type := Result_Invalid) is
    record
-      Offset : Offset_Type;
+      case Result is
+         when Result_OK =>
+            Offset : Offset_Type;
+         when others =>
+            null;
+      end case;
    end record;
+
+   Invalid_State : constant State_Type := (Result => Result_Invalid);
 
 end SXML.Query;

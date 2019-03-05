@@ -182,6 +182,10 @@ is
       --  Result := (Result'Range => Null_Node);
 
       Result (1 .. Left'Length) := Left;
+
+      pragma Annotate (GNATprove, False_Positive, """Result"" might not be initialized",
+                      "Aggregate initialization yields a bug box, cf. RA06 - 002");
+
       Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 
       pragma Assert (Num_Elements (Result) = Num_Elements (Left) + Num_Elements (Right));

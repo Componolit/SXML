@@ -32,25 +32,25 @@ is
 
    procedure Parse_Document (File : String)
    is
-      Input   : access String := Read_File (File);
-      Output  : access String := new String (1 .. 3 * Input'Length);
-      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
+      Input    : access String := Read_File (File);
+      Output   : access String := new String (1 .. 3 * Input'Length);
+      Document : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML;
       use SXML.Parser;
       Match    : Match_Type;
       Result   : Result_Type;
       Position : Natural;
    begin
-      Context.all := (others => SXML.Null_Node);
+      Document.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
-             Context      => Context.all,
+             Document     => Document.all,
              Parse_Result => Match,
              Position     => Position);
       if Match /= Match_OK
       then
          Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
       else
-         SXML.Serialize.To_String (Context.all, Output.all, Position, Result);
+         SXML.Serialize.To_String (Document.all, Output.all, Position, Result);
          if Result /= Result_OK
          then
             Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Position'Img);

@@ -103,7 +103,7 @@ is
       --------------
 
       function In_Range (R : Range_Type) return Boolean
-      is (R.First >= Data'First and R.Last <= Data'Last and R.First <= R.Last);
+      is (R.First >= Data'First and R.Last <= Data'Last and R.First <= R.Last and Valid_Content (R.First, R.Last));
 
       -------------------
       -- Data_Overflow --
@@ -371,7 +371,9 @@ is
       with
          Pre  => Data'First <= Data'Last - Offset,
          Post => (case Match is
-                     when Match_OK   => In_Range (Result) and Offset > Offset'Old,
+                     when Match_OK   => In_Range (Result) and
+                                        Valid_Content (Result.First, Result.Last) and
+                                        Offset > Offset'Old,
                      when Match_None => Result = Null_Range and Offset >= Offset'Old,
                      when others     => Offset = Offset'Old),
          Annotate => (GNATprove, Terminating);
@@ -542,6 +544,8 @@ is
 
          Start := Document_Index;
          Off := Sub (Document_Index, Document'First);
+
+         pragma Assert (Valid_Content (Attribute_Name.First, Attribute_Name.Last));
 
          if Off > Document'Length -
                   Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) -
@@ -1021,9 +1025,9 @@ is
 
          Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
          if Tmp_Result /= Null_Range and then
-            Length (Tmp_Result) > 0 and then
             Tmp_Result.First >= Data'First and then
-            Tmp_Result.Last <= Data'Last
+            Tmp_Result.Last <= Data'Last and then
+            Valid_Content (Tmp_Result.First, Tmp_Result.Last)
          then
             Context_Put_String (Value  => Data (Tmp_Result.First .. Tmp_Result.Last),
                                 Start  => Tmp_Start,

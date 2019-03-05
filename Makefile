@@ -3,14 +3,15 @@ CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
 GPRBUILD_OPTS = -s -p -XMode=$(MODE)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --waitretry=30 --random-wait --no-clobber
+CHECK = \#
 
 all:
-	@gnatcheck -P SXML
+	$(CHECK)gnatcheck -P SXML
 	@gprbuild $(GPRBUILD_OPTS) -P SXML
 	@gnatprove $(GNATPROVE_OPTS) -P SXML
 
 test: SXML.gpr
-	@gnatcheck -P SXML
+	$(CHECK)gnatcheck -P SXML
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
