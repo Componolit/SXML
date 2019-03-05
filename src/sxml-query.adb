@@ -15,7 +15,6 @@ is
 
    --  Scratch buffer for queries. This will be the largest attribute size you can search for.
    Scratch_Buffer_Length : constant := 1024;
-   Scratch_Buffer : String (1 .. Scratch_Buffer_Length);
 
    ------------
    -- Offset --
@@ -31,7 +30,7 @@ is
    function Is_Valid (Document : Document_Type;
                       State    : State_Type) return Boolean
    is (Document'Length > 0 and
-       State.Offset < Document'Length);
+       (if State.Result = Result_OK then State.Offset < Document'Length));
 
    -------------
    -- Is_Open --
@@ -263,6 +262,7 @@ is
          Last  := First;
 
          pragma Loop_Variant (Increases => Result_State.Offset);
+         pragma Loop_Invariant (Result_State.Result = Result_OK);
          pragma Loop_Invariant (Is_Valid (Document, Result_State));
          pragma Loop_Invariant (Is_Open (Document, Result_State) or
                                 Is_Content (Document, Result_State));
@@ -318,9 +318,10 @@ is
                             Document       : Document_Type;
                             Attribute_Name : Content_Type) return State_Type
    is
-      Result       : Result_Type;
-      Result_State : State_Type := Attribute (State, Document);
-      Last         : Natural;
+      Result         : Result_Type;
+      Result_State   : State_Type := Attribute (State, Document);
+      Last           : Natural;
+      Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
    begin
       if Attribute_Name'Length > Scratch_Buffer'Length
       then
@@ -354,14 +355,17 @@ is
                           Document     : Document_Type;
                           Sibling_Name : Content_Type) return State_Type
    is
-      Result_State : State_Type := State;
-      Result       : Result_Type;
-      Last         : Natural;
+      Result_State   : State_Type := State;
+      Result         : Result_Type;
+      Last           : Natural;
+      Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
    begin
       if Sibling_Name'Length >= Scratch_Buffer'Length
       then
          return (Result => Result_Overflow);
       end if;
+
+      pragma Assert (Result_State.Result = Result_OK);
 
       loop
          if Is_Open (Document, Result_State)
@@ -378,10 +382,10 @@ is
          exit when Result_State.Result /= Result_OK;
 
          pragma Loop_Variant (Increases => Result_State.Offset);
-         pragma Loop_Invariant (Is_Valid (Document, Result_State) and then
-                                  (Is_Open (Document, Result_State) or
-                                   Is_Content (Document, Result_State)));
-         pragma Loop_Invariant (Result_State.Offset > Result_State.Offset'Loop_Entry);
+         pragma Loop_Invariant (Result_State.Result = Result_OK);
+         pragma Loop_Invariant (Is_Valid (Document, Result_State));
+         pragma Loop_Invariant (Offset (Result_State) > Offset (Result_State'Loop_Entry));
+         pragma Loop_Invariant (Is_Open (Document, Result_State) or Is_Content (Document, Result_State));
       end loop;
 
       return (Result => Result_Not_Found);

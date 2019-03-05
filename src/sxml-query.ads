@@ -22,6 +22,7 @@ is
 
    function Offset (State : State_Type) return Offset_Type
    with
+      Pre => State.Result = Result_OK,
       Ghost;
 
    --------------
@@ -40,7 +41,7 @@ is
    function Is_Open (Document : Document_Type;
                      State    : State_Type) return Boolean
    with
-      Pre => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to open element in document
    --
    --  @param Document  Document
@@ -54,7 +55,7 @@ is
                         State    : State_Type) return Boolean
    with
       Ghost,
-      Pre => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to content element in document
    --
    --  @param Document  Document
@@ -68,7 +69,7 @@ is
                           State    : State_Type) return Boolean
    with
       Ghost,
-      Pre => Is_Valid (Document, State);
+      Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to attribute element in document
    --
    --  @param Document  Document
@@ -95,7 +96,8 @@ is
                    Data     : in out Content_Type;
                    Last     : out Natural)
    with
-      Pre => (Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             (Is_Valid (Document, State) and then
               (Is_Open (Document, State) or Is_Attribute (Document, State)));
    --  Return name for current node
    --
@@ -112,12 +114,13 @@ is
    function Child (State    : State_Type;
                    Document : Document_Type) return State_Type
    with
-      Pre  => Is_Valid (Document, State),
-      Post => (Child'Result.Result = Result_OK and
-               Offset (State) > Offset (Child'Result) and
-               (Is_Valid (Document, Child'Result) and then
-                (Is_Open (Document, Child'Result) or
-                 Is_Content (Document, Child'Result))));
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State),
+      Post => (if Child'Result.Result = Result_OK
+               then Offset (Child'Result) > Offset (State) and then
+                    (Is_Valid (Document, Child'Result) and then
+                      (Is_Open (Document, Child'Result) or
+                       Is_Content (Document, Child'Result))));
    --  Get child
    --
    --  @param State     Current state
@@ -131,14 +134,15 @@ is
    function Sibling (State    : State_Type;
                      Document : Document_Type) return State_Type
    with
-      Pre => Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
               (Is_Open (Document, State) or
                Is_Content (Document, State)),
-      Post => (Sibling'Result.Result = Result_OK and
-               Offset (State) > Offset (Sibling'Result) and
-               (Is_Valid (Document, Sibling'Result) and then
-                (Is_Open (Document, Sibling'Result) or
-                 Is_Content (Document, Sibling'Result))));
+      Post => (if Sibling'Result.Result = Result_OK
+               then  Offset (Sibling'Result) > Offset (State) and then
+                     (Is_Valid (Document, Sibling'Result) and then
+                       (Is_Open (Document, Sibling'Result) or
+                        Is_Content (Document, Sibling'Result))));
    --  Get next sibling
    --
    --  @param State     Current state
@@ -153,13 +157,14 @@ is
                           Document     : Document_Type;
                           Sibling_Name : Content_Type) return State_Type
    with
-      Pre  => Is_Valid (Document, State) and then
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
                (Is_Open (Document, State) or
                 Is_Content (Document, State)),
-      Post => (Find_Sibling'Result.Result = Result_OK and
-               Offset (Find_Sibling'Result) >= Offset (State) and
-               (Is_Valid (Document, Find_Sibling'Result) and then
-                Is_Open (Document, Find_Sibling'Result)));
+      Post => (if Find_Sibling'Result.Result = Result_OK
+               then Offset (Find_Sibling'Result) >= Offset (State) and then
+                    (Is_Valid (Document, Find_Sibling'Result) and then
+                     Is_Open (Document, Find_Sibling'Result)));
    --  Find sibling by name
    --
    --  @param State         Current state
@@ -174,11 +179,12 @@ is
    function Attribute (State    : State_Type;
                        Document : Document_Type) return State_Type
    with
-      Pre  => Is_Valid (Document, State) and then
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
               Is_Open (Document, State),
-      Post => (Attribute'Result.Result = Result_OK and
-               (Is_Valid (Document, Attribute'Result) and then
-                Is_Attribute (Document, Attribute'Result)));
+      Post => (if Attribute'Result.Result = Result_OK
+               then (Is_Valid (Document, Attribute'Result) and then
+                     Is_Attribute (Document, Attribute'Result)));
    --  Get first attribute of opening element
    --
    --  @param State     Current state
@@ -192,7 +198,8 @@ is
    function Is_Valid_Value (State    : State_Type;
                             Document : Document_Type) return Boolean
    with
-      Pre => Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
              Is_Attribute (Document, State);
    --  Check if current attribute has valid value
    --
@@ -209,7 +216,8 @@ is
                     Data     : in out Content_Type;
                     Last     : out Natural)
    with
-      Pre => Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
              Is_Attribute (Document, State) and then
              Is_Valid_Value (State, Document);
    --  Return value for current attribute
@@ -227,12 +235,13 @@ is
    function Next_Attribute (State    : State_Type;
                             Document : Document_Type) return State_Type
    with
-      Pre => Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
              Is_Attribute (Document, State),
-      Post => (Next_Attribute'Result.Result = Result_OK and
-               Offset (State) > Offset (Next_Attribute'Result) and
-               (Is_Valid (Document, Next_Attribute'Result) and then
-                Is_Attribute (Document, Next_Attribute'Result)));
+      Post => (if Next_Attribute'Result.Result = Result_OK
+               then Offset (Next_Attribute'Result) > Offset (State) and then
+                     (Is_Valid (Document, Next_Attribute'Result) and then
+                      Is_Attribute (Document, Next_Attribute'Result)));
    --  Get next attribute
    --
    --  @param State     Current state
@@ -247,7 +256,8 @@ is
                             Document       : Document_Type;
                             Attribute_Name : Content_Type) return State_Type
    with
-      Pre => Is_Valid (Document, State) and then
+      Pre => State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
              Is_Open (Document, State),
       Post => Is_Valid (Document, Find_Attribute'Result);
    --  Find attribute by name
@@ -265,10 +275,11 @@ is
                   Document     : Document_Type;
                   Query_String : String) return State_Type
    with
-       Pre => Query_String'First > 0 and
-              Query_String'First <= Query_String'Last and
-              Query_String'Last < Natural'Last and
-              Query_String'Length > 1 and
+       Pre => State.Result = Result_OK and then
+              Query_String'First > 0 and then
+              Query_String'First <= Query_String'Last and then
+              Query_String'Last < Natural'Last and then
+              Query_String'Length > 1 and then
               (Is_Valid (Document, State) and then
                Is_Open (Document, State));
    --  Query element by path beging at root of document. Only
