@@ -18,6 +18,7 @@ is
       Result   : Match_Type;
       Position : Natural;
 begin
+   pragma Assert (Valid_Content (Text'First, Text'Last));
    Parse (Data         => Text,
           Document     => Document,
           Parse_Result => Result,

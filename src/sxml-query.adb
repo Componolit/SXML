@@ -74,7 +74,7 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : in out Content_Type;
+                   Data     : out Content_Type;
                    Last     : out Natural)
    is
    begin
@@ -229,7 +229,7 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : in out Content_Type;
+                    Data     : out Content_Type;
                     Last     : out Natural)
    is
       Val : constant Relative_Index_Type :=
@@ -282,8 +282,7 @@ is
             Last := Last + 1;
          end loop;
 
-         if First > Last or
-            Last > Natural'Last - Chunk_Length
+         if not Valid_Content (First, Last)
          then
             exit;
          end if;
@@ -333,6 +332,7 @@ is
          pragma Loop_Variant (Increases => Offset (Result_State));
          pragma Loop_Invariant (Is_Valid (Document, Result_State));
          pragma Loop_Invariant (Is_Attribute (Document, Result_State));
+         pragma Assert (Valid_Content (1, Attribute_Name'Length));
 
          Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
          if Result = Result_OK and then
@@ -365,7 +365,7 @@ is
          return (Result => Result_Overflow);
       end if;
 
-      pragma Assert (Result_State.Result = Result_OK);
+      pragma Assert (Valid_Content (1, Sibling_Name'Length));
 
       loop
          if Is_Open (Document, Result_State)

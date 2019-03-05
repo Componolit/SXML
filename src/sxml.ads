@@ -21,11 +21,21 @@ is
       Result_Not_Found  --  Queried data not found
    );
 
+   function Valid_Content (First : Integer;
+                           Last  : Integer) return Boolean is
+      (First >= 0 and then
+       Last >= 0 and then
+       First <= Last and then
+       Last <= Natural'Last - Chunk_Length and then
+       Last - First + 1 > 0);
+   --  Check validity of the range of a content type
+   --
+   --  @param First  First index
+   --  @param Last   Last index
+
    subtype Content_Type is String
    with
-      Predicate => Content_Type'First <= Content_Type'Last and then
-                   Content_Type'Last <= Natural'Last - Chunk_Length and then
-                   Content_Type'Length >= 0;
+      Predicate => Valid_Content (Content_Type'First, Content_Type'Last);
 
    subtype Attr_Data_Type is String
    with
@@ -267,10 +277,11 @@ is
    procedure Get_String (Document : Document_Type;
                          Start    : Offset_Type;
                          Result   : out Result_Type;
-                         Data     : in out Content_Type;
+                         Data     : out Content_Type;
                          Last     : out Natural)
    with
-      Pre      => Start < Document'Length,
+      Pre      => Start < Document'Length and
+                  Valid_Content (Data'First, Data'Last),
       Annotate => (Gnatprove, Terminating);
    --  Extract string at given position
    --

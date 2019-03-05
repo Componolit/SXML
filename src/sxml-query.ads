@@ -93,10 +93,11 @@ is
    procedure Name (State    : State_Type;
                    Document : Document_Type;
                    Result   : out Result_Type;
-                   Data     : in out Content_Type;
+                   Data     : out Content_Type;
                    Last     : out Natural)
    with
-      Pre => State.Result = Result_OK and then
+      Pre => Valid_Content (Data'First, Data'Last) and then
+             State.Result = Result_OK and then
              (Is_Valid (Document, State) and then
               (Is_Open (Document, State) or Is_Attribute (Document, State)));
    --  Return name for current node
@@ -157,7 +158,8 @@ is
                           Document     : Document_Type;
                           Sibling_Name : Content_Type) return State_Type
    with
-      Pre  => State.Result = Result_OK and then
+      Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
+              State.Result = Result_OK and then
               Is_Valid (Document, State) and then
                (Is_Open (Document, State) or
                 Is_Content (Document, State)),
@@ -213,10 +215,11 @@ is
    procedure Value (State    : State_Type;
                     Document : Document_Type;
                     Result   : out Result_Type;
-                    Data     : in out Content_Type;
+                    Data     : out Content_Type;
                     Last     : out Natural)
    with
-      Pre => State.Result = Result_OK and then
+      Pre => Valid_Content (Data'First, Data'Last) and then
+             State.Result = Result_OK and then
              Is_Valid (Document, State) and then
              Is_Attribute (Document, State) and then
              Is_Valid_Value (State, Document);
