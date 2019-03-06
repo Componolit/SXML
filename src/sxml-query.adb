@@ -313,9 +313,10 @@ is
    -- Find_Attribute --
    --------------------
 
-   function Find_Attribute (State          : State_Type;
-                            Document       : Document_Type;
-                            Attribute_Name : Content_Type) return State_Type
+   function Find_Attribute (State           : State_Type;
+                            Document        : Document_Type;
+                            Attribute_Name  : Content_Type;
+                            Attribute_Value : Content_Type := "*") return State_Type
    is
       Result         : Result_Type;
       Result_State   : State_Type := Attribute (State, Document);
@@ -339,7 +340,21 @@ is
             Last = Attribute_Name'Length and then
             Scratch_Buffer (1 .. Last) = Attribute_Name
          then
-            return Result_State;
+            if Attribute_Value = "*"
+            then
+               return Result_State;
+            else
+               declare
+                  R : Result_Type;
+                  L : Natural;
+               begin
+                  Value (Result_State, Document, R, Scratch_Buffer, L);
+                  if R = Result_OK and Scratch_Buffer (1 .. L) = Attribute_Value
+                  then
+                     return Result_State;
+                  end if;
+               end;
+            end if;
          end if;
          Result_State := Next_Attribute (Result_State, Document);
       end loop;

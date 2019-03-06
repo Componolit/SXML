@@ -344,6 +344,36 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
+   is
+      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Position : Natural;
+      Attr  : State_Type;
+      State : State_Type :=
+         Path_Query (Context.all,
+                     "tests/data/attribute_value.xml",
+                     "/root/child/elem",
+                     Position);
+   begin
+      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
+
+      Attr := Find_Attribute (State, Context.all, "id");
+      Assert (Attr.Result = Result_OK, "Invalid attribute (1): " & Attr.Result'Img);
+      Assert (Value (Attr, Context.all) = "1", "Invalid value");
+
+      Attr := Find_Attribute (State, Context.all, "id", "1");
+      Assert (Attr.Result = Result_OK, "Invalid attribute (2): " & Attr.Result'Img);
+
+      Attr := Find_Attribute (State, Context.all, "value", "a");
+      Assert (Attr.Result = Result_OK, "Invalid value: " & Attr.Result'Img);
+
+      Attr := Find_Attribute (State, Context.all, "id", "invalid");
+      Assert (Attr.Result = Result_Not_Found, "Expected Result_Not_Found, got: " & Attr.Result'Img);
+	end Test_Attribute_Value;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -362,6 +392,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Path_Query_Simple'Access, "Simple path query");
       Register_Routine (T, Test_Path_Query_Simple_Missing'Access, "Simple path query for missing path");
       Register_Routine (T, Test_Path_Query_Long'Access, "Long path query");
+      Register_Routine (T, Test_Attribute_Value'Access, "Attribute value");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

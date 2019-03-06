@@ -255,9 +255,10 @@ is
    -- Find_Attribute --
    --------------------
 
-   function Find_Attribute (State          : State_Type;
-                            Document       : Document_Type;
-                            Attribute_Name : Content_Type) return State_Type
+   function Find_Attribute (State           : State_Type;
+                            Document        : Document_Type;
+                            Attribute_Name  : Content_Type;
+                            Attribute_Value : Content_Type := "*") return State_Type
    with
       Pre => State.Result = Result_OK and then
              Is_Valid (Document, State) and then
