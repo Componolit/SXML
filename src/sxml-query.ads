@@ -157,12 +157,10 @@ is
    function Find_Sibling (State           : State_Type;
                           Document        : Document_Type;
                           Sibling_Name    : Content_Type;
-                          Attribute_Name  : Content_Type := "*";
-                          Attribute_Value : Content_Type := "*") return State_Type
+                          Attribute_Name  : String := "*";
+                          Attribute_Value : String := "*") return State_Type
    with
       Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
-              Valid_Content (Attribute_Name'First, Attribute_Name'Last) and then
-              Valid_Content (Attribute_Value'First, Attribute_Value'Last) and then
               State.Result = Result_OK and then
               Is_Valid (Document, State) and then
                (Is_Open (Document, State) or
@@ -226,7 +224,9 @@ is
              State.Result = Result_OK and then
              Is_Valid (Document, State) and then
              Is_Attribute (Document, State) and then
-             Is_Valid_Value (State, Document);
+             Is_Valid_Value (State, Document),
+      Post => (if Result = Result_OK
+               then Last in Data'Range);
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -261,8 +261,8 @@ is
 
    function Find_Attribute (State           : State_Type;
                             Document        : Document_Type;
-                            Attribute_Name  : Content_Type := "*";
-                            Attribute_Value : Content_Type := "*") return State_Type
+                            Attribute_Name  : String := "*";
+                            Attribute_Value : String := "*") return State_Type
    with
       Pre => State.Result = Result_OK and then
              Is_Valid (Document, State) and then

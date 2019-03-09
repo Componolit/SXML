@@ -359,7 +359,11 @@ package body SXML_Query_Tests is
 
       Attr := Find_Attribute (State, Context.all, "id");
       Assert (Attr.Result = Result_OK, "Invalid attribute (1): " & Attr.Result'Img);
-      Assert (Value (Attr, Context.all) = "1", "Invalid value");
+      Assert (Value (Attr, Context.all) = "1", "Invalid value (1)");
+
+      Attr := Find_Attribute (State, Context.all, "id", "");
+      Assert (Attr.Result = Result_OK, "Invalid attribute (1b): " & Attr.Result'Img);
+      Assert (Value (Attr, Context.all) = "1", "Invalid value (1b)");
 
       Attr := Find_Attribute (State, Context.all, "id", "1");
       Assert (Attr.Result = Result_OK, "Invalid attribute (2): " & Attr.Result'Img);
@@ -406,14 +410,61 @@ package body SXML_Query_Tests is
       Assert (Elem.Result = Result_Not_Found, "Expected Result_Not_Found, got " & Elem.Result'Img);
 
       Elem := Find_Sibling (State, Context.all, "elem", "value", "e");
-      Assert (Elem.Result = Result_OK, "Element not found (3): " & Elem.Result'Img);
+      Assert (Elem.Result = Result_OK, "Element not found (4): " & Elem.Result'Img);
       Attr := Find_Attribute (Elem, Context.all, "value");
-      Assert (Value (Attr, Context.all) = "e", "Invalid attribute (3)" & Value (Attr, Context.all));
+      Assert (Value (Attr, Context.all) = "e", "Invalid attribute (4)" & Value (Attr, Context.all));
 
       Elem := Find_Sibling (State, Context.all, "elem", "id", "invalid");
       Assert (Elem.Result = Result_Not_Found, "Expected Result_Not_Found, got " & Elem.Result'Img);
 
    end Test_Find_Node_By_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Test_Path_Query_With_Attribute (T : in out Test_Cases.Test_Case'Class)
+   is
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Position : Natural;
+   begin
+      declare
+         Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[@id=3]", Position);
+         Attr : State_Type;
+      begin
+         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Attr := Find_Attribute (Elem, Context.all, "value");
+         Assert (Value (Attr, Context.all) = "c", "Invalid value, got: " & Value (Attr, Context.all));
+      end;
+
+      declare
+         Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[@foo]", Position);
+         Attr : State_Type;
+      begin
+         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Attr := Find_Attribute (Elem, Context.all, "value");
+         Assert (Value (Attr, Context.all) = "x", "Invalid value");
+      end;
+
+      declare
+         Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[", Position);
+      begin
+         Assert (Elem.Result = Result_Invalid, "Expected Result_Invalid, got " & Elem.Result'Img);
+      end;
+
+      declare
+         Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[x]", Position);
+      begin
+         Assert (Elem.Result = Result_Invalid, "Expected Result_Invalid, got " & Elem.Result'Img);
+      end;
+
+      declare
+         Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[]", Position);
+         Attr : State_Type;
+      begin
+         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Attr := Find_Attribute (Elem, Context.all, "value");
+         Assert (Value (Attr, Context.all) = "a", "Invalid value");
+      end;
+   end Test_Path_Query_With_Attribute;
 
    ---------------------------------------------------------------------------
 
@@ -437,6 +488,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Path_Query_Long'Access, "Long path query");
       Register_Routine (T, Test_Attribute_Value'Access, "Attribute value");
       Register_Routine (T, Test_Find_Node_By_Attribute'Access, "Find node by attribute value");
+      Register_Routine (T, Test_Path_Query_With_Attribute'Access, "Path query with attribute");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

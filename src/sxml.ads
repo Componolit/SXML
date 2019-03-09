@@ -282,6 +282,8 @@ is
    with
       Pre      => Start < Document'Length and
                   Valid_Content (Data'First, Data'Last),
+      Post     => (if Result = Result_OK
+                   then Last in Data'Range),
       Annotate => (Gnatprove, Terminating);
    --  Extract string at given position
    --

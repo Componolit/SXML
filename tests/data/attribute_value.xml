@@ -6,4 +6,13 @@
       <elem id="4" value="d"/>
       <elem id="4" value="e"/>
    </child>
+
+   <child2>
+      <elem id="1" value="a"/>
+      <elem id="2" value="b"/>
+      <elem id="3" value="c"/>
+      <elem id="4" value="d"/>
+      <elem id="4" value="x" foo="bar" />
+      <elem id="4" value="e"/>
+   </child2>
 </root>
