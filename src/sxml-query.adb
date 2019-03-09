@@ -315,13 +315,15 @@ is
 
    function Find_Attribute (State           : State_Type;
                             Document        : Document_Type;
-                            Attribute_Name  : Content_Type;
+                            Attribute_Name  : Content_Type := "*";
                             Attribute_Value : Content_Type := "*") return State_Type
    is
-      Result         : Result_Type;
-      Result_State   : State_Type := Attribute (State, Document);
-      Last           : Natural;
-      Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
+      Result          : Result_Type;
+      Result_State    : State_Type := Attribute (State, Document);
+      Last            : Natural;
+      Scratch_Buffer  : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
+      Attribute_Found : Boolean;
+      Value_Matches   : Boolean;
    begin
       if Attribute_Name'Length > Scratch_Buffer'Length
       then
@@ -335,25 +337,33 @@ is
          pragma Loop_Invariant (Is_Attribute (Document, Result_State));
          pragma Assert (Valid_Content (1, Attribute_Name'Length));
 
-         Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
-         if Result = Result_OK and then
-            Last = Attribute_Name'Length and then
-            Scratch_Buffer (1 .. Last) = Attribute_Name
+         if Attribute_Name = "*"
+         then
+            Attribute_Found := True;
+         else
+            Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
+            Attribute_Found := Result = Result_OK and then
+                               Last = Attribute_Name'Length and then
+                               Scratch_Buffer (1 .. Last) = Attribute_Name;
+         end if;
+
+         if Attribute_Found
          then
             if Attribute_Value = "*"
             then
-               return Result_State;
+               Value_Matches := True;
             else
                declare
                   R : Result_Type;
                   L : Natural;
                begin
                   Value (Result_State, Document, R, Scratch_Buffer, L);
-                  if R = Result_OK and Scratch_Buffer (1 .. L) = Attribute_Value
-                  then
-                     return Result_State;
-                  end if;
+                  Value_Matches := R = Result_OK and Scratch_Buffer (1 .. L) = Attribute_Value;
                end;
+            end if;
+            if Value_Matches
+            then
+               return Result_State;
             end if;
          end if;
          Result_State := Next_Attribute (Result_State, Document);
@@ -366,11 +376,14 @@ is
    -- Find_Sibling --
    ------------------
 
-   function Find_Sibling (State        : State_Type;
-                          Document     : Document_Type;
-                          Sibling_Name : Content_Type) return State_Type
+   function Find_Sibling (State           : State_Type;
+                          Document        : Document_Type;
+                          Sibling_Name    : Content_Type;
+                          Attribute_Name  : Content_Type := "*";
+                          Attribute_Value : Content_Type := "*") return State_Type
    is
       Result_State   : State_Type := State;
+      Attr_State     : State_Type := State;
       Result         : Result_Type;
       Last           : Natural;
       Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
@@ -382,6 +395,7 @@ is
 
       pragma Assert (Valid_Content (1, Sibling_Name'Length));
 
+      while Result_State.Result = Result_OK
       loop
          if Is_Open (Document, Result_State)
          then
@@ -390,11 +404,14 @@ is
                Last = Sibling_Name'Length and then
                Scratch_Buffer (1 .. Last) = Sibling_Name
             then
-               return Result_State;
+               Attr_State := Find_Attribute (Result_State, Document, Attribute_Name, Attribute_Value);
+               if (Attribute_Name = "*" and Attribute_Value = "*") or Attr_State.Result = Result_OK
+               then
+                  return Result_State;
+               end if;
             end if;
          end if;
          Result_State := Sibling (Result_State, Document);
-         exit when Result_State.Result /= Result_OK;
 
          pragma Loop_Variant (Increases => Result_State.Offset);
          pragma Loop_Invariant (Result_State.Result = Result_OK);

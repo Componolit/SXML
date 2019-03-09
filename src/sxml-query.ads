@@ -154,11 +154,15 @@ is
    -- Find_Sibling --
    ------------------
 
-   function Find_Sibling (State        : State_Type;
-                          Document     : Document_Type;
-                          Sibling_Name : Content_Type) return State_Type
+   function Find_Sibling (State           : State_Type;
+                          Document        : Document_Type;
+                          Sibling_Name    : Content_Type;
+                          Attribute_Name  : Content_Type := "*";
+                          Attribute_Value : Content_Type := "*") return State_Type
    with
       Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
+              Valid_Content (Attribute_Name'First, Attribute_Name'Last) and then
+              Valid_Content (Attribute_Value'First, Attribute_Value'Last) and then
               State.Result = Result_OK and then
               Is_Valid (Document, State) and then
                (Is_Open (Document, State) or
@@ -257,7 +261,7 @@ is
 
    function Find_Attribute (State           : State_Type;
                             Document        : Document_Type;
-                            Attribute_Name  : Content_Type;
+                            Attribute_Name  : Content_Type := "*";
                             Attribute_Value : Content_Type := "*") return State_Type
    with
       Pre => State.Result = Result_OK and then
@@ -269,6 +273,7 @@ is
    --  @param State           Current state
    --  @param Document        Document
    --  @param Attribute_Name  Name to search for
+   --  @param Attribute_Value Value to match for
    --  @return                Result of operation
 
    ----------
