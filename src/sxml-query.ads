@@ -156,12 +156,11 @@ is
 
    function Find_Sibling (State           : State_Type;
                           Document        : Document_Type;
-                          Sibling_Name    : Content_Type;
+                          Sibling_Name    : String := "*";
                           Attribute_Name  : String := "*";
                           Attribute_Value : String := "*") return State_Type
    with
-      Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
-              State.Result = Result_OK and then
+      Pre  => State.Result = Result_OK and then
               Is_Valid (Document, State) and then
                (Is_Open (Document, State) or
                 Is_Content (Document, State)),
