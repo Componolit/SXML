@@ -154,9 +154,11 @@ is
    -- Find_Sibling --
    ------------------
 
-   function Find_Sibling (State        : State_Type;
-                          Document     : Document_Type;
-                          Sibling_Name : Content_Type) return State_Type
+   function Find_Sibling (State           : State_Type;
+                          Document        : Document_Type;
+                          Sibling_Name    : Content_Type;
+                          Attribute_Name  : String := "*";
+                          Attribute_Value : String := "*") return State_Type
    with
       Pre  => Valid_Content (Sibling_Name'First, Sibling_Name'Last) and then
               State.Result = Result_OK and then
@@ -222,7 +224,9 @@ is
              State.Result = Result_OK and then
              Is_Valid (Document, State) and then
              Is_Attribute (Document, State) and then
-             Is_Valid_Value (State, Document);
+             Is_Valid_Value (State, Document),
+      Post => (if Result = Result_OK
+               then Last in Data'Range);
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -255,9 +259,10 @@ is
    -- Find_Attribute --
    --------------------
 
-   function Find_Attribute (State          : State_Type;
-                            Document       : Document_Type;
-                            Attribute_Name : Content_Type) return State_Type
+   function Find_Attribute (State           : State_Type;
+                            Document        : Document_Type;
+                            Attribute_Name  : String := "*";
+                            Attribute_Value : String := "*") return State_Type
    with
       Pre => State.Result = Result_OK and then
              Is_Valid (Document, State) and then
@@ -268,6 +273,7 @@ is
    --  @param State           Current state
    --  @param Document        Document
    --  @param Attribute_Name  Name to search for
+   --  @param Attribute_Value Value to match for
    --  @return                Result of operation
 
    ----------

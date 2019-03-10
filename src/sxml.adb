@@ -273,6 +273,9 @@ is
       N      : Node_Type  := Document (Pos);
 
    begin
+      Last   := 0;
+      Result := Result_Invalid;
+
       for D of Data
       loop
          D := Character'Val (0);
@@ -280,7 +283,6 @@ is
 
       if Len > Data'Length
       then
-         Last   := 0;
          Result := Result_Overflow;
          return;
       end if;
@@ -290,20 +292,33 @@ is
          pragma Loop_Invariant (Data'First <= Natural (Index_Type'Last) - Offset);
 
          --  FIXME: We can assume this already by the way we caluculated Length.
-         exit when Natural (N.Length) > Data'Length - Offset or
-            Offset > Natural'Last - Data'First - Natural (N.Length);
+         if Natural (N.Length) > Data'Length - Offset or
+            Offset > Natural'Last - Data'First - Natural (N.Length)
+         then
+            return;
+         end if;
+
          Data (Data'First + Offset .. Data'First + Offset + Natural (N.Length) - 1) :=
             N.Data (N.Data'First .. N.Data'First + Natural (N.Length) - 1);
          Offset := Offset + Natural (N.Length);
+
          exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
+
          Pos := Add (Pos, N.Next);
-         exit when not (Pos in Document'Range);
+         if not (Pos in Document'Range)
+         then
+            return;
+         end if;
          N := Document (Pos);
       end loop;
 
+      if Offset = 0 or Offset > Data'Length
+      then
+         return;
+      end if;
+
       Last   := Data'First + Offset - 1;
       Result := Result_OK;
-
    end Get_String;
 
    -------

@@ -13,8 +13,11 @@ all:
 test: SXML.gpr
 	$(CHECK)gnatcheck -P SXML
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 	@obj/tests
+
+prove:
+	@gnatprove $(GNATPROVE_OPTS) -P SXML
+	@gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 
 doc: doc/api/index.html
 

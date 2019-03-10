@@ -238,6 +238,88 @@ is
       Get_String (Document, Add (State.Offset, Val), Result, Data, Last);
    end Value;
 
+   -----------------
+   -- Split_Query --
+   -----------------
+
+   type Position_Type (Valid : Boolean) is
+   record
+      case Valid is
+         when True =>
+            Name_First  : Natural;
+            Name_Last   : Natural;
+            Value_First : Natural;
+            Value_Last  : Natural;
+         when others =>
+            null;
+      end case;
+   end record;
+
+   function Split_Query (Query_String :     String;
+                         First        :     Natural) return Position_Type
+    with
+       Pre => First > Query_String'First and
+              First <= Query_String'Last and
+              Query_String'Last < Natural'Last and
+              Query_String'Length > 0,
+       Post => (if Split_Query'Result.Valid
+                then Split_Query'Result.Name_First  >= Query_String'First and
+                     Split_Query'Result.Name_Last   <= Query_String'Last and
+                     Split_Query'Result.Value_First >= Query_String'First and
+                     Split_Query'Result.Value_Last  <= Query_String'Last);
+
+   function Split_Query (Query_String :     String;
+                         First        :     Natural) return Position_Type
+   is
+      Eq_Pos : Natural := Query_String'Last;
+      Len    : constant Natural := Query_String'Last - First + 1;
+   begin
+      --  Missing opening or closing bracket
+      if Len < 2 or else
+         Query_String (First) /= '[' or else
+         Query_String (Query_String'Last)  /= ']'
+      then
+         return (Valid => False);
+      end if;
+
+      --  Empty expression always matches
+      if Len = 2
+      then
+         return (Valid       => True,
+                 Name_First  => Query_String'Last,
+                 Name_Last   => Query_String'First,
+                 Value_First => Query_String'Last,
+                 Value_Last  => Query_String'First);
+      end if;
+
+      if Query_String (First + 1) /= '@'
+      then
+         return (Valid => False);
+      end if;
+
+      --  Find position and ensure single occurrence of '='
+      for I in First .. Query_String'Last
+      loop
+         pragma Loop_Invariant (Eq_Pos in Query_String'Range);
+         if Eq_Pos /= Query_String'Last and Query_String (I) = '='
+         then
+            return (Valid => False);
+         end if;
+         if Query_String (I) = '='
+         then
+            Eq_Pos := I;
+         end if;
+      end loop;
+
+      return
+         (Valid       => True,
+          Name_First  => First + 2,
+          Name_Last   => Eq_Pos - 1,
+          Value_First => Eq_Pos + 1,
+          Value_Last  => Query_String'Last - 1);
+
+   end Split_Query;
+
    ----------
    -- Path --
    ----------
@@ -248,6 +330,7 @@ is
    is
       First : Natural;
       Last  : Natural := Query_String'First - 1;
+      Pos_Valid : Boolean := False;
       Result_State : State_Type := State;
    begin
 
@@ -258,6 +341,7 @@ is
 
       loop
          exit when Last >= Query_String'Last - 1;
+         pragma Assert (Last < Query_String'Last - 1);
          First := Last + 2;
          Last  := First;
 
@@ -278,7 +362,9 @@ is
             pragma Loop_Invariant (Last <= Query_String'Last);
 
             exit when Last >= Query_String'Last or else
-                      Query_String (Last + 1) = '/';
+                      (Query_String (Last + 1) = '/' or
+                       Query_String (Last + 1) = '[' or
+                       Query_String (Last + 1) = ']');
             Last := Last + 1;
          end loop;
 
@@ -287,14 +373,34 @@ is
             exit;
          end if;
 
-         Result_State := Find_Sibling (Result_State, Document, Query_String (First .. Last));
+         if Last < Query_String'Last and then Query_String (Last + 1) = '['
+         then
+            declare
+               Pos : constant Position_Type := Split_Query (Query_String => Query_String,
+                                                            First        => Last + 1);
+            begin
+               if not Pos.Valid
+               then
+                  return (Result => Result_Invalid);
+               end if;
+               Result_State := Find_Sibling (State           => Result_State,
+                                             Document        => Document,
+                                             Sibling_Name    => Query_String (First .. Last),
+                                             Attribute_Name  => Query_String (Pos.Name_First .. Pos.Name_Last),
+                                             Attribute_Value => Query_String (Pos.Value_First .. Pos.Value_Last));
+               Pos_Valid := True;
+            end;
+         else
+            Result_State := Find_Sibling (Result_State, Document, Query_String (First .. Last));
+         end if;
+
          if Result_State.Result /= Result_OK
          then
             return (Result => Result_Not_Found);
          end if;
 
          --  Query string processed
-         if Last = Query_String'Last
+         if Pos_Valid or Last = Query_String'Last
          then
             return Result_State;
          end if;
@@ -313,14 +419,17 @@ is
    -- Find_Attribute --
    --------------------
 
-   function Find_Attribute (State          : State_Type;
-                            Document       : Document_Type;
-                            Attribute_Name : Content_Type) return State_Type
+   function Find_Attribute (State           : State_Type;
+                            Document        : Document_Type;
+                            Attribute_Name  : String := "*";
+                            Attribute_Value : String := "*") return State_Type
    is
-      Result         : Result_Type;
-      Result_State   : State_Type := Attribute (State, Document);
-      Last           : Natural;
-      Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
+      Result          : Result_Type;
+      Result_State    : State_Type := Attribute (State, Document);
+      Last            : Natural;
+      Scratch_Buffer  : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
+      Attribute_Found : Boolean;
+      Value_Matches   : Boolean;
    begin
       if Attribute_Name'Length > Scratch_Buffer'Length
       then
@@ -332,14 +441,45 @@ is
          pragma Loop_Variant (Increases => Offset (Result_State));
          pragma Loop_Invariant (Is_Valid (Document, Result_State));
          pragma Loop_Invariant (Is_Attribute (Document, Result_State));
-         pragma Assert (Valid_Content (1, Attribute_Name'Length));
+         pragma Loop_Invariant (Valid_Content (Scratch_Buffer'First, Scratch_Buffer'Last));
 
-         Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
-         if Result = Result_OK and then
-            Last = Attribute_Name'Length and then
-            Scratch_Buffer (1 .. Last) = Attribute_Name
+         if Attribute_Name = "*" or Attribute_Name = ""
          then
-            return Result_State;
+            Attribute_Found := True;
+         else
+            pragma Assert (Valid_Content (1, Attribute_Name'Length));
+            Name (Result_State, Document, Result, Scratch_Buffer (1 .. Attribute_Name'Length), Last);
+            Attribute_Found := Result = Result_OK and then
+               Last = Attribute_Name'Length and then
+               Scratch_Buffer (1 .. Last) = Attribute_Name;
+         end if;
+
+         if Attribute_Found
+         then
+            if Attribute_Value = "*" or Attribute_Value = ""
+            then
+               Value_Matches := True;
+            elsif not Is_Valid_Value (Result_State, Document)
+            then
+               Value_Matches := False;
+            else
+               declare
+                  R : Result_Type;
+                  L : Natural;
+               begin
+                  Value (State    => Result_State,
+                         Document => Document,
+                         Result   => R,
+                         Data     => Scratch_Buffer,
+                         Last     => L);
+                  Value_Matches := R = Result_OK and then
+                                   Scratch_Buffer (1 .. L) = Attribute_Value;
+               end;
+            end if;
+            if Value_Matches
+            then
+               return Result_State;
+            end if;
          end if;
          Result_State := Next_Attribute (Result_State, Document);
       end loop;
@@ -351,11 +491,14 @@ is
    -- Find_Sibling --
    ------------------
 
-   function Find_Sibling (State        : State_Type;
-                          Document     : Document_Type;
-                          Sibling_Name : Content_Type) return State_Type
+   function Find_Sibling (State           : State_Type;
+                          Document        : Document_Type;
+                          Sibling_Name    : Content_Type;
+                          Attribute_Name  : String := "*";
+                          Attribute_Value : String := "*") return State_Type
    is
       Result_State   : State_Type := State;
+      Attr_State     : State_Type;
       Result         : Result_Type;
       Last           : Natural;
       Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
@@ -367,6 +510,7 @@ is
 
       pragma Assert (Valid_Content (1, Sibling_Name'Length));
 
+      while Result_State.Result = Result_OK
       loop
          if Is_Open (Document, Result_State)
          then
@@ -375,17 +519,23 @@ is
                Last = Sibling_Name'Length and then
                Scratch_Buffer (1 .. Last) = Sibling_Name
             then
-               return Result_State;
+               Attr_State := Find_Attribute (Result_State, Document, Attribute_Name, Attribute_Value);
+               if ((Attribute_Name = "*" or Attribute_Name = "") and
+                   (Attribute_Value = "*"  or Attribute_Value = "")) or
+                  Attr_State.Result = Result_OK
+               then
+                  return Result_State;
+               end if;
             end if;
          end if;
-         Result_State := Sibling (Result_State, Document);
-         exit when Result_State.Result /= Result_OK;
 
          pragma Loop_Variant (Increases => Result_State.Offset);
-         pragma Loop_Invariant (Result_State.Result = Result_OK);
          pragma Loop_Invariant (Is_Valid (Document, Result_State));
-         pragma Loop_Invariant (Offset (Result_State) > Offset (Result_State'Loop_Entry));
+         pragma Loop_Invariant (Result_State.Result = Result_OK);
+         pragma Loop_Invariant (Offset (Result_State) >= Offset (Result_State'Loop_Entry));
          pragma Loop_Invariant (Is_Open (Document, Result_State) or Is_Content (Document, Result_State));
+
+         Result_State := Sibling (Result_State, Document);
       end loop;
 
       return (Result => Result_Not_Found);
