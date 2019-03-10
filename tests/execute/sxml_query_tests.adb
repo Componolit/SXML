@@ -447,7 +447,7 @@ package body SXML_Query_Tests is
       declare
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[", Position);
       begin
-         Assert (Elem.Result = Result_Invalid, "Expected Result_Invalid, got " & Elem.Result'Img);
+         Assert (Elem.Result = Result_Invalid, "Expected Result_Not_Found, got " & Elem.Result'Img);
       end;
 
       declare
@@ -465,6 +465,37 @@ package body SXML_Query_Tests is
          Assert (Value (Attr, Context.all) = "a", "Invalid value");
       end;
    end Test_Path_Query_With_Attribute;
+
+   ---------------------------------------------------------------------------
+
+   procedure Test_Path_Query_With_Multiple_Attributes (T : in out Test_Cases.Test_Case'Class)
+   is
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Position : Natural;
+   begin
+      declare
+         Elem : State_Type :=Path_Query (Context.all,
+                                         "tests/data/attribute_value.xml", "/root/child3/elem[@value=d]/subelem[@id=3]",
+                                         Position);
+         Attr : State_Type;
+      begin
+         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Attr := Find_Attribute (Elem, Context.all, "value");
+         Assert (Value (Attr, Context.all) = "43", "Invalid value, got: " & Value (Attr, Context.all));
+      end;
+
+      declare
+         Elem : State_Type :=Path_Query (Context.all,
+                                         "tests/data/attribute_value.xml", "/root/child3/elem[@value=e]/subelem[@id=7]",
+                                         Position);
+         Attr : State_Type;
+      begin
+         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Attr := Find_Attribute (Elem, Context.all, "value");
+         Assert (Value (Attr, Context.all) = "47", "Invalid value, got: " & Value (Attr, Context.all));
+      end;
+
+   end Test_Path_Query_With_Multiple_Attributes;
 
    ---------------------------------------------------------------------------
 
@@ -489,6 +520,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Attribute_Value'Access, "Attribute value");
       Register_Routine (T, Test_Find_Node_By_Attribute'Access, "Find node by attribute value");
       Register_Routine (T, Test_Path_Query_With_Attribute'Access, "Path query with attribute");
+      Register_Routine (T, Test_Path_Query_With_Multiple_Attributes'Access, "Path query with multiple attributes");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

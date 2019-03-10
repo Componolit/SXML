@@ -15,4 +15,21 @@
       <elem id="4" value="x" foo="bar" />
       <elem id="4" value="e"/>
    </child2>
+
+   <child3>
+      <elem id="1" value="a"/>
+      <elem id="2" value="b"/>
+      <elem id="3" value="c"/>
+      <elem id="4" value="d">
+         <subelem id="2" value="42"/>
+         <subelem id="3" value="43"/>
+         <subelem id="4" value="44"/>
+      </elem>
+      <elem id="4" value="x" foo="bar"/>
+      <elem id="4" value="e">
+         <subelem id="5" value="45"/>
+         <subelem id="6" value="46"/>
+         <subelem id="7" value="47"/>
+      </elem>
+   </child3>
 </root>

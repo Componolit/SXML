@@ -258,7 +258,7 @@ is
    function Split_Query (Query_String :     String;
                          First        :     Natural) return Position_Type
     with
-       Pre => First > Query_String'First and
+       Pre => First >= Query_String'First and
               First <= Query_String'Last and
               Query_String'Last < Natural'Last and
               Query_String'Length > 0,
@@ -320,6 +320,63 @@ is
 
    end Split_Query;
 
+   ------------------
+   -- Path_Segment --
+   ------------------
+
+   function Path_Segment (State    : State_Type;
+                          Document : Document_Type;
+                          Segment  : String) return State_Type
+   with
+      Pre => Valid_Content (Segment'First, Segment'Last) and then
+             State.Result = Result_OK and then
+             Is_Valid (Document, State) and then
+              (Is_Open (Document, State) or
+               Is_Content (Document, State)),
+      Post => (if Path_Segment'Result.Result = Result_OK
+               then Path_Segment'Result.Offset >= State.Offset and
+                    Path_Segment'Result.Offset < Document'Length);
+
+   function Path_Segment (State    : State_Type;
+                          Document : Document_Type;
+                          Segment  : String) return State_Type
+   is
+      Attr_Start : Natural := Segment'Last + 1;
+   begin
+      for I in Segment'Range
+      loop
+         pragma Loop_Invariant (Attr_Start >= Segment'First);
+         if Segment (I) = '['
+         then
+            Attr_Start := I;
+         end if;
+      end loop;
+
+      if Attr_Start > Segment'Last
+      then
+         return Find_Sibling (State           => State,
+                              Document        => Document,
+                              Sibling_Name    => Segment);
+      end if;
+
+      declare
+         Pos : constant Position_Type := Split_Query (Query_String => Segment (Attr_Start .. Segment'Last),
+                                                      First        => Attr_Start);
+      begin
+         if not Pos.Valid
+         then
+            return (Result => Result_Invalid);
+         end if;
+
+         return Find_Sibling (State           => State,
+                              Document        => Document,
+                              Sibling_Name    => Segment (Segment'First .. Attr_Start - 1),
+                              Attribute_Name  => Segment (Pos.Name_First .. Pos.Name_Last),
+                              Attribute_Value => Segment (Pos.Value_First .. Pos.Value_Last));
+      end;
+
+   end Path_Segment;
+
    ----------
    -- Path --
    ----------
@@ -330,7 +387,6 @@ is
    is
       First : Natural;
       Last  : Natural := Query_String'First - 1;
-      Pos_Valid : Boolean := False;
       Result_State : State_Type := State;
    begin
 
@@ -361,49 +417,21 @@ is
             pragma Loop_Invariant (Last >= Query_String'First);
             pragma Loop_Invariant (Last <= Query_String'Last);
 
-            exit when Last >= Query_String'Last or else
-                      (Query_String (Last + 1) = '/' or
-                       Query_String (Last + 1) = '[' or
-                       Query_String (Last + 1) = ']');
+            exit when Last >= Query_String'Last or else Query_String (Last + 1) = '/';
             Last := Last + 1;
          end loop;
 
-         if not Valid_Content (First, Last)
-         then
-            exit;
-         end if;
+         exit when not Valid_Content (First, Last);
 
-         if Last < Query_String'Last and then Query_String (Last + 1) = '['
-         then
-            declare
-               Pos : constant Position_Type := Split_Query (Query_String => Query_String,
-                                                            First        => Last + 1);
-            begin
-               if not Pos.Valid
-               then
-                  return (Result => Result_Invalid);
-               end if;
-               Result_State := Find_Sibling (State           => Result_State,
-                                             Document        => Document,
-                                             Sibling_Name    => Query_String (First .. Last),
-                                             Attribute_Name  => Query_String (Pos.Name_First .. Pos.Name_Last),
-                                             Attribute_Value => Query_String (Pos.Value_First .. Pos.Value_Last));
-               Pos_Valid := True;
-            end;
-         else
-            Result_State := Find_Sibling (Result_State, Document, Query_String (First .. Last));
-         end if;
-
+         Result_State := Path_Segment (Result_State, Document, Query_String (First .. Last));
          if Result_State.Result /= Result_OK
-         then
-            return (Result => Result_Not_Found);
-         end if;
-
-         --  Query string processed
-         if Pos_Valid or Last = Query_String'Last
          then
             return Result_State;
          end if;
+
+         exit when Last >= Query_String'Last;
+
+         pragma Assert (Result_State.Offset < Document'Length);
 
          Result_State := Child (Result_State, Document);
          if Result_State.Result /= Result_OK
@@ -493,7 +521,7 @@ is
 
    function Find_Sibling (State           : State_Type;
                           Document        : Document_Type;
-                          Sibling_Name    : Content_Type;
+                          Sibling_Name    : String := "*";
                           Attribute_Name  : String := "*";
                           Attribute_Value : String := "*") return State_Type
    is
@@ -508,12 +536,17 @@ is
          return (Result => Result_Overflow);
       end if;
 
-      pragma Assert (Valid_Content (1, Sibling_Name'Length));
-
       while Result_State.Result = Result_OK
       loop
          if Is_Open (Document, Result_State)
          then
+            if Sibling_Name = "*" or Sibling_Name = ""
+            then
+               return Result_State;
+            end if;
+
+            pragma Assert (Valid_Content (1, Sibling_Name'Length));
+
             Name (Result_State, Document, Result, Scratch_Buffer (1 .. Sibling_Name'Length), Last);
             if Result = Result_OK and then
                Last = Sibling_Name'Length and then
