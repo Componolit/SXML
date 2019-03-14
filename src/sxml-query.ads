@@ -290,10 +290,9 @@ is
               Query_String'Length > 1 and then
               (Is_Valid (Document, State) and then
                Is_Open (Document, State));
-   --  Query element by path beging at root of document. Only
-   --  simple path queries referencing element names are supported,
-   --  e.g. /root/parent/child/grandchild.
-   --  FIXME: Relative queries starting from state could be supported easily, add tests.
+   --  Query element by path beginning at State. Path queries may reference
+   --  element names, wildcards and attributes
+   --  e.g. /root/parent/*/grandchild[@attribute=value]
    --
    --  @param State         Current state
    --  @param Document      Document
