@@ -392,7 +392,7 @@ is
 
       if not Is_Open (Document, Result_State)
       then
-         return (Result => Result_Not_Found);
+         return (Result => Result_Invalid);
       end if;
 
       loop

@@ -27,9 +27,15 @@
       </elem>
       <elem id="4" value="x" foo="bar"/>
       <elem id="4" value="e">
-         <subelem id="5" value="45"/>
-         <subelem id="6" value="46"/>
-         <subelem id="7" value="47"/>
+         <subelem id="5" value="45">
+            <subsubelem id="10"/>
+         </subelem>
+         <subelem id="6" value="46">
+            <subsubelem id="11"/>
+         </subelem>
+         <subelem id="7" value="47">
+            <subsubelem id="12"/>
+         </subelem>
       </elem>
    </child3>
 </root>

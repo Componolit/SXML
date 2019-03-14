@@ -305,7 +305,7 @@ package body SXML_Query_Tests is
                      Position);
    begin
       Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
-      Assert (Name (State, Context.all) = "ClinicalDocument", "Invalid name");
+      Assert (Name (State, Context.all) = "ClinicalDocument", "Invalid name: " & Name (State, Context.all));
    end Test_Path_Query_Simple;
 
    ---------------------------------------------------------------------------
@@ -499,6 +499,23 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Relative_Path_Query (T : in out Test_Cases.Test_Case'Class)
+   is
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Position : Natural;
+      Attr     : State_Type;
+      State    : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child3", Position);
+   begin
+      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      State := Query.Path (State, Context.all, "/child3/elem[@value=e]/subelem/subsubelem");
+      Assert (State.Result = Result_OK, "Invalid relative query: " & State.Result'Img);
+      Attr := Find_Attribute (State, Context.all, "id");
+      Assert (Attr.Result = Result_OK, "Invalid attribute (1): " & Attr.Result'Img);
+      Assert (Value (Attr, Context.all) = "10", "Invalid value (1)");
+   end Test_Relative_Path_Query;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -521,6 +538,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Find_Node_By_Attribute'Access, "Find node by attribute value");
       Register_Routine (T, Test_Path_Query_With_Attribute'Access, "Path query with attribute");
       Register_Routine (T, Test_Path_Query_With_Multiple_Attributes'Access, "Path query with multiple attributes");
+      Register_Routine (T, Test_Relative_Path_Query'Access, "Query with relative path");
    end Register_Tests;
 
    ---------------------------------------------------------------------------
