@@ -233,40 +233,40 @@ is
    -- Get_String --
    ----------------
 
+   function String_Length (Doc    : Document_Type;
+                           Offset : Offset_Type) return Natural
+   is
+      Pos : Index_Type := Add (Doc'First, Offset);
+      N   : Node_Type  := Doc (Pos);
+      Len : Natural := 0;
+   begin
+      loop
+         pragma Loop_Variant (Decreases => Doc'Last - Pos);
+         if Len > Natural'Last - Natural (N.Length)
+         then
+            return 0;
+         end if;
+         Len := Len + Natural (N.Length);
+         exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
+         Pos := Add (Pos, N.Next);
+         exit when not (Pos in Doc'Range);
+         N := Doc (Pos);
+      end loop;
+      return (if Len <= Natural'Last - Chunk_Length
+              then Len
+              else 0);
+   end String_Length;
+
+   ----------------
+   -- Get_String --
+   ----------------
+
    procedure Get_String (Document : Document_Type;
                          Start    : Offset_Type;
                          Result   : out Result_Type;
                          Data     : out Content_Type;
                          Last     : out Natural)
    is
-      function String_Length (Doc    : Document_Type;
-                              Offset : Offset_Type) return Natural
-      with
-         Pre      => Offset < Doc'Length,
-         Annotate => (Gnatprove, Terminating);
-
-      function String_Length (Doc    : Document_Type;
-                              Offset : Offset_Type) return Natural
-      is
-         Pos : Index_Type := Add (Doc'First, Offset);
-         N   : Node_Type  := Doc (Pos);
-         Len : Natural := 0;
-      begin
-         loop
-            pragma Loop_Variant (Decreases => Doc'Last - Pos);
-            if Len > Natural'Last - Natural (N.Length)
-            then
-               return 0;
-            end if;
-            Len := Len + Natural (N.Length);
-            exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
-            Pos := Add (Pos, N.Next);
-            exit when not (Pos in Doc'Range);
-            N := Doc (Pos);
-         end loop;
-         return Len;
-      end String_Length;
-
       Len    : constant Natural := String_Length (Document, Start);
       Offset : Natural := 0;
       Pos    : Index_Type := Add (Document'First, Start);

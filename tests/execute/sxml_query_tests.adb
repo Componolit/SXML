@@ -516,6 +516,29 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Simplified_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
+   is
+      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Position : Natural;
+      State : State_Type :=
+         Path_Query (Context.all,
+                     "tests/data/attribute_value.xml",
+                     "/root/child/elem",
+                     Position);
+   begin
+      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
+
+      Assert (Has_Attribute (State, Context.all, "value")
+              and then Attribute (State, Context.all, "value") = "a",
+              "Invalid attribute: " & Attribute (State, Context.all, "value")'Length'Img);
+
+      Assert (not Has_Attribute (State, Context.all, "nonexistent"), "Unexpected attribute");
+
+   end Test_Simplified_Attribute_Value;
+
+   ---------------------------------------------------------------------------
+
    procedure Register_Tests (T: in out Test_Case) is
       use AUnit.Test_Cases.Registration;
    begin
@@ -539,6 +562,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Path_Query_With_Attribute'Access, "Path query with attribute");
       Register_Routine (T, Test_Path_Query_With_Multiple_Attributes'Access, "Path query with multiple attributes");
       Register_Routine (T, Test_Relative_Path_Query'Access, "Query with relative path");
+      Register_Routine (T, Test_Simplified_Attribute_Value'Access, "Simplified attribute value");
    end Register_Tests;
 
    ---------------------------------------------------------------------------

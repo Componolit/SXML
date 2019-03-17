@@ -171,8 +171,11 @@ is
       end if;
 
       Tmp_State := Add (State.Offset, Attributes);
+
       if Tmp_State >= Document'Length or else
-         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
+         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute or else
+         Overflow (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) or else
+         Add (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) >= Document'Length
       then
          return (Result => Result_Invalid);
       end if;
@@ -204,7 +207,9 @@ is
 
       Tmp_State := Add (State.Offset, Next);
       if Tmp_State >= Document'Length or else
-         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute
+         Document (Add (Document'First, Tmp_State)).Kind /= Kind_Attribute or else
+         Overflow (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) or else
+         Add (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) >= Document'Length
       then
          return (Result => Result_Invalid);
       end if;
@@ -470,6 +475,7 @@ is
          pragma Loop_Invariant (Is_Valid (Document, Result_State));
          pragma Loop_Invariant (Is_Attribute (Document, Result_State));
          pragma Loop_Invariant (Valid_Content (Scratch_Buffer'First, Scratch_Buffer'Last));
+         pragma Loop_Invariant (Is_Valid_Value (Result_State, Document));
 
          if Attribute_Name = "*" or Attribute_Name = ""
          then
@@ -573,5 +579,47 @@ is
 
       return (Result => Result_Not_Found);
    end Find_Sibling;
+
+   -------------------
+   -- Has_Attribute --
+   -------------------
+
+   function Has_Attribute (State          : State_Type;
+                           Document       : Document_Type;
+                           Attribute_Name : String) return Boolean is
+      (Find_Attribute (State, Document, Attribute_Name).Result = Result_OK);
+
+   ---------------
+   -- Attribute --
+   ---------------
+
+   function Attribute (State          : State_Type;
+                       Document       : Document_Type;
+                       Attribute_Name : String) return String is
+      Result_State : constant State_Type := Find_Attribute (State, Document, Attribute_Name);
+      Result       : Result_Type;
+      Unused       : Natural;
+      pragma Unreferenced (Unused);
+   begin
+      if Result_State.Result /= Result_OK then
+         return "";
+      end if;
+
+      declare
+         Val           : constant Relative_Index_Type := Document (Add (Document'First, Result_State.Offset)).Value;
+         Result_Length : constant Natural := String_Length (Document, Add (Result_State.Offset, Val));
+         Result_String : String (1 .. Result_Length);
+      begin
+         if Result_Length = 0
+         then
+            return "";
+         end if;
+
+         pragma Assert (Valid_Content (Result_String'First, Result_String'Last));
+         Value (Result_State, Document, Result, Result_String, Unused);
+         return (if Result = Result_OK then Result_String else "");
+      end;
+
+   end Attribute;
 
 end SXML.Query;

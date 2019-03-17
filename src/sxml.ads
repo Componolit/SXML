@@ -270,6 +270,22 @@ is
    --  @param Offset   Document offset to write attribute to
    --  @param Document Document to write attribute to
 
+   -------------------
+   -- String_Length --
+   -------------------
+
+   function String_Length (Doc    : Document_Type;
+                           Offset : Offset_Type) return Natural
+   with
+      Pre      => Offset < Doc'Length,
+      Post     => String_Length'Result <= Natural'Last - Chunk_Length,
+      Annotate => (Gnatprove, Terminating);
+   --  Return length of string at given offset
+   --
+   --  @param Document Source document
+   --  @param Offset   Offset of string
+   --  @param Result   String length
+
    ----------------
    -- Get_String --
    ----------------

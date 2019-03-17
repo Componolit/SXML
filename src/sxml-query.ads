@@ -186,13 +186,50 @@ is
               Is_Valid (Document, State) and then
               Is_Open (Document, State),
       Post => (if Attribute'Result.Result = Result_OK
-               then (Is_Valid (Document, Attribute'Result) and then
-                     Is_Attribute (Document, Attribute'Result)));
+               then (Is_Valid (Document, Attribute'Result)
+                     and then Is_Attribute (Document, Attribute'Result)
+                     and then Is_Valid_Value (Attribute'Result, Document)));
    --  Get first attribute of opening element
    --
    --  @param State     Current state
    --  @param Document  Document
    --  @return          Result of operation
+
+   -------------------
+   -- Has_Attribute --
+   -------------------
+
+   function Has_Attribute (State          : State_Type;
+                           Document       : Document_Type;
+                           Attribute_Name : String) return Boolean
+   with
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
+              Is_Open (Document, State);
+   --  Check whether node has an attribute
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Name      Name of attribute
+   --  @return          Result of operation
+
+   ---------------
+   -- Attribute --
+   ---------------
+
+   function Attribute (State          : State_Type;
+                       Document       : Document_Type;
+                       Attribute_Name : String) return String
+   with
+      Pre  => State.Result = Result_OK and then
+              Is_Valid (Document, State) and then
+              Is_Open (Document, State) and then
+              Has_Attribute (State, Document, Attribute_Name);
+   --  Get first attribute of opening element
+   --
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @return          Value of attribute
 
    --------------------
    -- Is_Valid_Value --
@@ -225,7 +262,8 @@ is
              Is_Attribute (Document, State) and then
              Is_Valid_Value (State, Document),
       Post => (if Result = Result_OK
-               then Last in Data'Range);
+               then Last in Data'Range
+                    and Is_Valid_Value (State, Document));
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -245,9 +283,10 @@ is
              Is_Valid (Document, State) and then
              Is_Attribute (Document, State),
       Post => (if Next_Attribute'Result.Result = Result_OK
-               then Offset (Next_Attribute'Result) > Offset (State) and then
-                     (Is_Valid (Document, Next_Attribute'Result) and then
-                      Is_Attribute (Document, Next_Attribute'Result)));
+               then Offset (Next_Attribute'Result) > Offset (State)
+                    and then (Is_Valid (Document, Next_Attribute'Result)
+                    and then Is_Attribute (Document, Next_Attribute'Result)
+                    and then Is_Valid_Value (Next_Attribute'Result, Document)));
    --  Get next attribute
    --
    --  @param State     Current state
@@ -266,7 +305,10 @@ is
       Pre => State.Result = Result_OK and then
              Is_Valid (Document, State) and then
              Is_Open (Document, State),
-      Post => Is_Valid (Document, Find_Attribute'Result);
+      Post => Is_Valid (Document, Find_Attribute'Result)
+              and (if Find_Attribute'Result.Result = Result_OK
+                   then Is_Attribute (Document, Find_Attribute'Result)
+                        and Is_Valid_Value (Find_Attribute'Result, Document));
    --  Find attribute by name
    --
    --  @param State           Current state
