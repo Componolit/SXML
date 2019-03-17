@@ -170,10 +170,12 @@ is
                      Is_Open (Document, Find_Sibling'Result)));
    --  Find sibling by name
    --
-   --  @param State         Current state
-   --  @param Document      Document
-   --  @param Sibling_Name  Name of sibling
-   --  @return              Result of operation
+   --  @param State           Current state
+   --  @param Document        Document
+   --  @param Sibling_Name    Name of sibling
+   --  @param Attribute_Name  Attribute name to match for
+   --  @param Attribute_Value Attribute valur to match for
+   --  @return                Result of operation
 
    ---------------
    -- Attribute --
@@ -208,10 +210,9 @@ is
               Is_Open (Document, State);
    --  Check whether node has an attribute
    --
-   --  @param State     Current state
-   --  @param Document  Document
-   --  @param Name      Name of attribute
-   --  @return          Result of operation
+   --  @param State           Current state
+   --  @param Document        Document
+   --  @param Attribute_Name  Name of attribute
 
    ---------------
    -- Attribute --
@@ -225,11 +226,12 @@ is
               Is_Valid (Document, State) and then
               Is_Open (Document, State) and then
               Has_Attribute (State, Document, Attribute_Name);
-   --  Get first attribute of opening element
+   --  Get first attribute by name
    --
-   --  @param State     Current state
-   --  @param Document  Document
-   --  @return          Value of attribute
+   --  @param State          Current state
+   --  @param Document       Document
+   --  @param Attribute_Name Name to match for
+   --  @return               Value of attribute
 
    --------------------
    -- Is_Valid_Value --

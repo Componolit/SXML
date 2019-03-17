@@ -233,15 +233,15 @@ is
    -- Get_String --
    ----------------
 
-   function String_Length (Doc    : Document_Type;
-                           Offset : Offset_Type) return Natural
+   function String_Length (Document : Document_Type;
+                           Offset   : Offset_Type) return Natural
    is
-      Pos : Index_Type := Add (Doc'First, Offset);
-      N   : Node_Type  := Doc (Pos);
+      Pos : Index_Type := Add (Document'First, Offset);
+      N   : Node_Type  := Document (Pos);
       Len : Natural := 0;
    begin
       loop
-         pragma Loop_Variant (Decreases => Doc'Last - Pos);
+         pragma Loop_Variant (Decreases => Document'Last - Pos);
          if Len > Natural'Last - Natural (N.Length)
          then
             return 0;
@@ -249,8 +249,8 @@ is
          Len := Len + Natural (N.Length);
          exit when N.Next = Invalid_Relative_Index or N.Next >= Sub (Index_Type'Last, Pos);
          Pos := Add (Pos, N.Next);
-         exit when not (Pos in Doc'Range);
-         N := Doc (Pos);
+         exit when not (Pos in Document'Range);
+         N := Document (Pos);
       end loop;
       return (if Len <= Natural'Last - Chunk_Length
               then Len

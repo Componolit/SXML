@@ -274,17 +274,16 @@ is
    -- String_Length --
    -------------------
 
-   function String_Length (Doc    : Document_Type;
-                           Offset : Offset_Type) return Natural
+   function String_Length (Document : Document_Type;
+                           Offset   : Offset_Type) return Natural
    with
-      Pre      => Offset < Doc'Length,
+      Pre      => Offset < Document'Length,
       Post     => String_Length'Result <= Natural'Last - Chunk_Length,
       Annotate => (Gnatprove, Terminating);
    --  Return length of string at given offset
    --
    --  @param Document Source document
    --  @param Offset   Offset of string
-   --  @param Result   String length
 
    ----------------
    -- Get_String --
