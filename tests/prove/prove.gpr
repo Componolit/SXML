@@ -1,4 +1,4 @@
-with "../../SXML";
+with "../../build/SXML";
 
 project Prove is
    for Source_Dirs use (".");
