@@ -57,10 +57,12 @@ is
    type Node_Type is private;
    Null_Node : constant Node_Type;
 
-   type Document_Type is array (Index_Type range <>) of Node_Type
+   type Document_Base_Type is array (Index_Type range <>) of Node_Type;
+   Null_Document : constant Document_Base_Type;
+
+   subtype Document_Type is Document_Base_Type
    with
       Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
-   Null_Document : constant Document_Type;
 
    ---------
    -- Add --
@@ -421,7 +423,7 @@ private
                                       Next   => Invalid_Relative_Index,
                                       Data   => Null_Data,
                                       Length => 0);
-   Null_Document : constant Document_Type := (1 .. 0 => Null_Node);
+   Null_Document : constant Document_Base_Type := (1 .. 0 => Null_Node);
 
    --------------
    -- Is_Valid --

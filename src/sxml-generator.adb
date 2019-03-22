@@ -18,7 +18,7 @@ is
    ------------------
 
    overriding
-   function Num_Elements (Attributes : Attributes_Type) return Offset_Type
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
    is (Attributes'Length);
 
    -------
@@ -27,7 +27,7 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Document_Type) return Document_Type
+               Children   : Document_Base_Type) return Document_Type
    is
       Len : constant Index_Type :=
          Index_Type (Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children));

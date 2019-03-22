@@ -13,14 +13,16 @@ package SXML.Generator
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generator);
 
-   type Attributes_Type (<>) is private;
-   Null_Attributes : constant Attributes_Type;
+   type Attributes_Base_Type (<>) is private;
+   Null_Attributes : constant Attributes_Base_Type;
+
+   subtype Attributes_Type is Attributes_Base_Type;
 
    ------------------
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (Attributes : Attributes_Type) return Offset_Type
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
    with
       Annotate => (GNATprove, Terminating);
    --  Number of elements required for attributes
@@ -31,8 +33,8 @@ is
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Left  : Attributes_Type;
-                      Right : Attributes_Type) return Boolean
+   function Is_Valid (Left  : Attributes_Base_Type;
+                      Right : Attributes_Base_Type) return Boolean
    with Ghost;
 
    ---------
@@ -48,7 +50,7 @@ is
    --  @param Left  First document
    --  @param Right Second document
 
-   function "+" (Left, Right : Attributes_Type) return Attributes_Type
+   function "+" (Left, Right : Attributes_Base_Type) return Attributes_Base_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
@@ -63,7 +65,7 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Document_Type) return Document_Type
+               Children   : Document_Base_Type) return Document_Type
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
       Post     => E'Result /= Null_Document and
@@ -149,8 +151,8 @@ is
 
 private
 
-   type Attributes_Type is new Document_Type;
-   Null_Attributes : constant Attributes_Type := Attributes_Type (Null_Document);
+   type Attributes_Base_Type is new Document_Base_Type;
+   Null_Attributes : constant Attributes_Base_Type := Attributes_Base_Type (Null_Document);
 
    --------------
    -- Is_Valid --
