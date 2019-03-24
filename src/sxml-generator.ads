@@ -41,7 +41,8 @@ is
    -- "+" --
    ---------
 
-   function "+" (Left, Right : Document_Type) return Document_Type
+   function "+" (Left  : Document_Base_Type;
+                 Right : Document_Base_Type) return Document_Base_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
@@ -50,7 +51,8 @@ is
    --  @param Left  First document
    --  @param Right Second document
 
-   function "+" (Left, Right : Attributes_Base_Type) return Attributes_Base_Type
+   function "+" (Left  : Attributes_Base_Type;
+                 Right : Attributes_Base_Type) return Attributes_Base_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
@@ -78,7 +80,7 @@ is
    --  @param Children    Child documents
 
    function E (Name       : Content_Type;
-               Children   : Document_Type) return Document_Type
+               Children   : Document_Base_Type) return Document_Type
    is (E (Name, Null_Attributes, Children))
    with
       Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
@@ -124,7 +126,7 @@ is
    -------
 
    function A (Name  : Content_Type;
-               Value : Content_Type) return Attributes_Type
+               Value : String) return Attributes_Type
    with
       Pre  => Num_Elements (Name) < Offset_Type'Last and then
               Num_Elements (Value) <= Offset_Type (Index_Type'Last - Add (1, Num_Elements (Name))),

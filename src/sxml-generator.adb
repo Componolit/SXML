@@ -66,7 +66,7 @@ is
    -------
 
    function A (Name  : Content_Type;
-               Value : Content_Type) return Attributes_Type
+               Value : String) return Attributes_Type
    is
       Result : Document_Type (1 .. Sub (Add (Add (1, Num_Elements (Name)), Num_Elements (Value)), 1));
       Offset : Offset_Type := 0;
@@ -97,7 +97,8 @@ is
    -- "+"--
    ---------
 
-   function "+" (Left, Right : Document_Type) return Document_Type
+   function "+" (Left  : Document_Base_Type;
+                 Right : Document_Base_Type) return Document_Base_Type
    is
       Result : Document_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
    begin
@@ -115,7 +116,8 @@ is
    -- "+" --
    ---------
 
-   function "+" (Left, Right : Attributes_Type) return Attributes_Type
+   function "+" (Left  : Attributes_Base_Type;
+                 Right : Attributes_Base_Type) return Attributes_Base_Type
    is
       Result : Attributes_Type (1 .. Left'Length + Right'Length);
       I      : Relative_Index_Type := 0;
