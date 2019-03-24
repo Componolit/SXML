@@ -19,6 +19,11 @@ is
       Dynamic_Predicate => Stack_Type'First <= Stack_Type'Last and
                            Stack_Type'Length > 3;
 
+   procedure Initialize (S : out Stack_Type);
+   --  Initialize stack
+   --
+   --  @param S  Stack to initialize
+
    ---------------
    -- To_String --
    ---------------
