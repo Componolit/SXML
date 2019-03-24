@@ -15,6 +15,16 @@ package body SXML.Serialize
 is
    pragma Annotate (GNATprove, Terminating, SXML.Serialize);
 
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize (S : out Stack_Type)
+   is
+   begin
+      S := (others => Null_Traversal);
+   end Initialize;
+
    ---------
    -- Put --
    ---------
@@ -404,8 +414,9 @@ is
                         Last     : out Natural;
                         Result   : out Result_Type)
    is
-      Stack_Buffer : Stack_Type (1 .. 1000) := (others => Null_Traversal);
+      Stack_Buffer : Stack_Type (1 .. 1000);
    begin
+      Initialize (Stack_Buffer);
       To_String (Document, Data, Last, Result, Stack_Buffer);
       pragma Unreferenced (Stack_Buffer);
    end To_String;
