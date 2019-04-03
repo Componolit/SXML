@@ -26,8 +26,8 @@ is
 
       Parse_Internal_Depth : constant := 100;
 
-      subtype Document_Index_Type is Index_Type
-      with Predicate => Document_Index_Type in Document'Range;
+      subtype Document_Index_Type is Index_Type with
+        Predicate => Document_Index_Type in Document'Range;
 
       Document_Index : Document_Index_Type := Document'First;
       Offset         : Natural    := 0;
@@ -290,7 +290,7 @@ is
                                     Start  : out Index_Type;
                                     Result : out Boolean)
       is
-         NE : constant Offset_Type := Num_Elements (Value);
+         NE : constant Offset_Type := Length (Value);
       begin
          Result := False;
          Start  := Invalid_Index;
@@ -472,12 +472,13 @@ is
       procedure Parse_Attribute (Start : out Index_Type;
                                  Match : out Match_Type)
       is
-         Old_Offset      : constant Natural := Offset;
-         Attribute_Name  : Range_Type;
-         Attribute_Value : Range_Type;
-         Match_Tmp       : Match_Type;
-         Separator       : Character;
-         Off             : Offset_Type;
+         Old_Offset          : constant Natural := Offset;
+         Attribute_Name      : Range_Type;
+         Attribute_Value     : Range_Type;
+         Match_Tmp           : Match_Type;
+         Separator           : Character;
+         Off                 : Offset_Type;
+         Attr_Value_Elements : Offset_Type;
       begin
 
          Start := Invalid_Index;
@@ -547,11 +548,14 @@ is
 
          pragma Assert (Valid_Content (Attribute_Name.First, Attribute_Name.Last));
 
+         Attr_Value_Elements := (if Attribute_Value = Null_Range then 0
+                                 else Length (Data (Attribute_Value.First .. Attribute_Value.Last)));
+
          if Off > Document'Length -
-                  Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) -
-                  Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) or else
-            Off + Num_Elements (Data (Attribute_Name.First .. Attribute_Name.Last)) +
-               Num_Attr_Elements (Data (Attribute_Value.First .. Attribute_Value.Last)) >= Document'Length
+                  Length (Data (Attribute_Name.First .. Attribute_Name.Last)) -
+                  Attr_Value_Elements or else
+            Off + Length (Data (Attribute_Name.First .. Attribute_Name.Last)) + Attr_Value_Elements
+            >= Document'Length
          then
             Restore_Offset (Old_Offset);
             return;

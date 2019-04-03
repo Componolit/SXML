@@ -24,24 +24,25 @@ is
    function Valid_Content (First : Integer;
                            Last  : Integer) return Boolean is
       (First >= 0 and then
-       Last >= 0 and then
        First <= Last and then
-       Last <= Natural'Last - Chunk_Length and then
-       Last - First + 1 > 0);
+       Last <= Natural'Last - Chunk_Length);
    --  Check validity of the range of a content type
    --
    --  @param First  First index
    --  @param Last   Last index
 
-   subtype Content_Type is String
+   subtype Content_Base_Type is String
    with
-      Predicate => Valid_Content (Content_Type'First, Content_Type'Last);
+      Predicate => Content_Base_Type'First >= 0
+                   and then Content_Base_Type'Last <= Natural'Last - Chunk_Length;
+   Empty_Content : constant Content_Base_Type := "";
 
-   subtype Attr_Data_Type is String
+   subtype Content_Type is Content_Base_Type
    with
-      Predicate => Attr_Data_Type'Last <= Natural'Last - Chunk_Length;
+      Predicate => Content_Type'Length > 0
+                   and then Content_Type'First <= Content_Type'Last;
 
-   type Index_Type is range 1 .. Natural'Last;
+   type Index_Type is range 1 .. Natural'Last - 1;
    Invalid_Index : constant Index_Type := Index_Type'Last;
 
    type Relative_Index_Type is range 0 .. Natural'Last;
@@ -54,15 +55,26 @@ is
    --  Natural subtype that is useful for arrays, as we can use 'Length without
    --  having to show that 'Last is < Natural'Last.
 
-   type Node_Type is private;
-   Null_Node : constant Node_Type;
+   type Kind_Type is (Kind_Invalid,
+                      Kind_Element_Open,
+                      Kind_Content,
+                      Kind_Attribute,
+                      Kind_Data);
+
+   type Node_Type (Kind : Kind_Type := Kind_Invalid) is private;
+   Null_Node : constant Node_Type (Kind => Kind_Invalid);
 
    type Document_Base_Type is array (Index_Type range <>) of Node_Type;
    Null_Document : constant Document_Base_Type;
 
-   subtype Document_Type is Document_Base_Type
-   with
-      Dynamic_Predicate => Document_Type'First > 0 and Document_Type'Length > 0;
+   function Valid_Document (Document : Document_Base_Type) return Boolean is
+      (Document'First > 0 and then Document'Length > 0) with
+      Ghost;
+
+   subtype Document_Type is Document_Base_Type with
+     Dynamic_Predicate => Document_Type'First > 0
+                          and Document_Type'Length > 0
+                          and Document_Type'Last < Index_Type'Last;
 
    ---------
    -- Add --
@@ -73,7 +85,8 @@ is
    is (Left + Offset_Type (Right))
    with
       Pre      => Offset_Type (Right) <= Offset_Type'Last - Left,
-      Annotate => (GNATprove, Terminating);
+      Annotate => (GNATprove, Terminating),
+      Annotate => (GNATprove, Inline_For_Proof);
    --  Add relative index to offset
    --
    --  @param Left   Offset
@@ -84,7 +97,8 @@ is
    is (Index_Type (Natural (Left) + Natural (Right)))
    with
       Pre      => Right <= Offset_Type (Index_Type'Last - Left),
-      Annotate => (GNATprove, Terminating);
+      Annotate => (GNATprove, Terminating),
+      Annotate => (GNATprove, Inline_For_Proof);
    --  Add offset to index
    --
    --  @param Left   Index
@@ -95,7 +109,8 @@ is
    is (Index_Type (Natural (Left) + Natural (Right)))
    with
       Pre      => Right <= Relative_Index_Type (Index_Type'Last - Left),
-      Annotate => (GNATprove, Terminating);
+      Annotate => (GNATprove, Terminating),
+      Annotate => (GNATprove, Inline_For_Proof);
    --  Add relative index to index
    --
    --  @param Left   Index
@@ -190,15 +205,17 @@ is
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Left, Right : Document_Type) return Boolean
-   with
-      Ghost;
+   function Is_Valid (Left, Right : Document_Base_Type) return Boolean with
+     Ghost,
+     Annotate => (GNATprove, Inline_For_Proof);
 
    -------------
    -- Is_Open --
    -------------
 
-   function Is_Open (Node : Node_Type) return Boolean;
+   function Is_Open (Node : Node_Type) return Boolean
+   with
+      Post => (if Is_Open'Result then Node.Kind = Kind_Element_Open);
    --  Node is an opening element
    --
    --  @param Node  Document node
@@ -207,7 +224,9 @@ is
    -- Is_Invalid --
    ----------------
 
-   function Is_Invalid (Node : Node_Type) return Boolean;
+   function Is_Invalid (Node : Node_Type) return Boolean
+   with
+      Post => (if Is_Invalid'Result then Node.Kind = Kind_Invalid);
    --  Node is an invalid element
    --
    --  @param Node  Document node
@@ -240,12 +259,7 @@ is
                           Offset   : Offset_Type;
                           Value    : Content_Type)
    with
-      Pre => Offset < Offset_Type (Index_Type'Last) and then
-             Document'First <= Sub (Index_Type'Last, Offset) and then
-             Natural (Num_Elements (Value)) <= Document'Length - Natural (Offset) and then
-             Add (Document'First, Offset) <= Document'Last and then
-             Num_Elements (Value) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-             Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Elements (Value));
+      Pre => Has_Space (Document, Offset, Value);
    --  Write content to a document at the specified offset
    --
    --  @param Document Document to write content into
@@ -257,14 +271,10 @@ is
    ---------------
 
    procedure Attribute (Name     : Content_Type;
-                        Data     : Attr_Data_Type;
+                        Data     : Content_Base_Type;
                         Offset   : in out Offset_Type;
-                        Document : in out Document_Type)
-   with
-      Pre => Offset <= Document'Length - Num_Elements (Name) - Num_Attr_Elements (Data) and then
-             Offset + Num_Elements (Name) + Num_Attr_Elements (Data) < Document'Length and then
-             Num_Attr_Elements (Data) <= Offset_Type (Index_Type'Last -
-                                                      Add (Add (Document'First, Offset), Num_Elements (Name)));
+                        Document : in out Document_Type) with
+     Pre => Offset <= Offset_Type (Document'Length) - Length (Data) - Length (Name);
    --  Write attribute to document at the specified offset
    --
    --  @param Name     Attribute name
@@ -314,25 +324,20 @@ is
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (D : Content_Type) return Offset_Type
+   function Length (D : Content_Base_Type) return Offset_Type
    with
-      Post     => Num_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
-      Annotate => (GNATprove, Terminating);
+      Post     => Length'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
+      Annotate => (GNATprove, Terminating),
+      Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements to store content
    --
    --  @param D  Element content
 
-   function Num_Attr_Elements (D : Attr_Data_Type) return Offset_Type
-   with
-      Post => Num_Attr_Elements'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
-      Annotate => (GNATprove, Terminating);
-   --  Number of elements required to store attribute data
-   --  @param D  Attribute content
-
-   function Num_Elements (Document : Document_Type) return Offset_Type
+   function Num_Elements (Document : Document_Base_Type) return Offset_Type
    with
       Post     => Num_Elements'Result = (if Document = Null_Document then 0 else Document'Length),
-      Annotate => (GNATprove, Terminating);
+      Annotate => (GNATprove, Terminating),
+      Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements in document
    --
    --  @param Document  Document
@@ -343,12 +348,9 @@ is
 
    function Has_Space (Document : Document_Type;
                        Offset   : Offset_Type;
-                       Name     : Attr_Data_Type) return Boolean
-   is (Offset < Document'Length and then
-       Offset < Offset_Type (Index_Type'Last) and then
-       Num_Attr_Elements (Name) < Offset_Type (Sub (Index_Type'Last, Offset)) and then
-       Document'First <= Sub (Sub (Index_Type'Last, Offset), Num_Attr_Elements (Name)) and then
-       Natural (Document'Length) - Natural (Offset) >= Natural (Num_Attr_Elements (Name)));
+                       Name     : Content_Base_Type) return Boolean is
+     (Offset <= Offset_Type (Document'Length) - Length (Name));
+
    --  Check whether document has sufficient space to store name at offset
    --
    --  @param Document  Document to calculate space for
@@ -364,12 +366,11 @@ is
                    Position : in out Index_Type;
                    Start    : out Index_Type)
    with
-      Pre  => (Position in Document'Range and
-               Position < Index_Type'Last) and then
+      Pre  => Position in Document'Range and then
               Has_Space (Document, Sub (Position, Document'First), Name),
       Post => Start in Document'Range and
               Is_Open (Document (Start)) and
-              Position = Add (Position'Old, Num_Elements (Name));
+              Position = Add (Position'Old, Length (Name));
    --  Write open element to document
    --
    --  @param Name      Content to write to document
@@ -392,12 +393,6 @@ private
    type Length_Type is range 0 .. Chunk_Length;
    subtype Data_Type is String (1 .. Natural (Length_Type'Last));
    Null_Data : constant Data_Type := (others => Character'Val (0));
-
-   type Kind_Type is (Kind_Invalid,
-                      Kind_Element_Open,
-                      Kind_Content,
-                      Kind_Attribute,
-                      Kind_Data);
 
    type Node_Type (Kind : Kind_Type := Kind_Invalid) is
    record
@@ -429,9 +424,9 @@ private
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Left, Right : Document_Type) return Boolean
+   function Is_Valid (Left, Right : Document_Base_Type) return Boolean
    is
       ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
-       Left'Length <= Index_Type'Last - Right'Length);
+       Num_Elements (Left) < Offset_Type (Index_Type'Last) - Num_Elements (Right));
 
 end SXML;
