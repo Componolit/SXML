@@ -16,15 +16,16 @@ is
    type Attributes_Base_Type (<>) is private;
    Null_Attributes : constant Attributes_Base_Type;
 
-   subtype Attributes_Type is Attributes_Base_Type;
+   subtype Attributes_Type is Attributes_Base_Type with
+     Dynamic_Predicate => Attributes_Type'Last < Index_Type'Last;
 
    ------------------
    -- Num_Elements --
    ------------------
 
-   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
-   with
-      Annotate => (GNATprove, Terminating);
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type with
+     Annotate => (GNATprove, Terminating),
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements required for attributes
    --
    --  @param Attributes  Attributes
@@ -34,15 +35,16 @@ is
    --------------
 
    function Is_Valid (Left  : Attributes_Base_Type;
-                      Right : Attributes_Base_Type) return Boolean
-   with Ghost;
+                      Right : Attributes_Base_Type) return Boolean with
+     Ghost,
+     Annotate => (GNATprove, Inline_For_Proof);
 
    ---------
    -- "+" --
    ---------
 
-   function "+" (Left  : Document_Base_Type;
-                 Right : Document_Base_Type) return Document_Base_Type
+   function "+" (Left  : Document_Type;
+                 Right : Document_Type) return Document_Type
    with
       Pre  => Is_Valid (Left, Right),
       Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
@@ -51,11 +53,10 @@ is
    --  @param Left  First document
    --  @param Right Second document
 
-   function "+" (Left  : Attributes_Base_Type;
-                 Right : Attributes_Base_Type) return Attributes_Base_Type
-   with
-      Pre  => Is_Valid (Left, Right),
-      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+   function "+" (Left  : Attributes_Type;
+                 Right : Attributes_Type) return Attributes_Type with
+     Pre  => Is_Valid (Left, Right),
+     Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
    --  Concatenate attributes
    --
    --  @param Left  First attributes
@@ -69,9 +70,11 @@ is
                Attributes : Attributes_Type;
                Children   : Document_Base_Type) return Document_Type
    with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Children),
-      Post     => E'Result /= Null_Document and
-                  E'Result'Length = Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children),
+      Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes) - Num_Elements (Children),
+      Post => Valid_Document (E'Result)
+              and then E'Result'Length = Length (Name)
+                                         + Num_Elements (Attributes)
+                                         + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
    --  Construct element with attributes and child document
    --
@@ -83,10 +86,9 @@ is
                Children   : Document_Base_Type) return Document_Type
    is (E (Name, Null_Attributes, Children))
    with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Children),
-      Post     => E'Result /= Null_Document and
-                  Num_Elements (E'Result) =
-                     Num_Elements (Name) + Num_Elements (Null_Attributes) + Num_Elements (Children),
+      Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Children),
+      Post => Valid_Document (E'Result)
+              and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Children),
       Annotate => (GNATprove, Terminating);
    --  Construct element with child document and without attributes
    --
@@ -95,14 +97,11 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type) return Document_Type
-   is (E (Name, Attributes, Null_Document))
-   with
-      Pre      => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Attributes) - Num_Elements (Null_Document),
-      Post     => E'Result /= Null_Document and
-                  Num_Elements (E'Result) = Num_Elements (Name) +
-                                            Num_Elements (Attributes) +
-                                            Num_Elements (Null_Document),
-      Annotate => (GNATprove, Terminating);
+   is (E (Name, Attributes, Null_Document)) with
+     Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes),
+     Post => Valid_Document (E'Result)
+             and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Attributes),
+     Annotate => (GNATprove, Terminating);
    --  Construct element with attributes and without child document
    --
    --  @param Name        Name of element
@@ -111,11 +110,8 @@ is
    function E (Name : Content_Type) return Document_Type
    is (E (Name, Null_Attributes, Null_Document))
    with
-      Pre  => Num_Elements (Name) < Offset_Type'Last - Num_Elements (Null_Attributes) - Num_Elements (Null_Document),
-      Post => E'Result /= Null_Document and
-      Num_Elements (E'Result) = Num_Elements (Name) +
-                                Num_Elements (Null_Attributes) +
-                                Num_Elements (Null_Document),
+      Pre  => Length (Name) < Offset_Type (Index_Type'Last),
+      Post => Valid_Document (E'Result) and then Num_Elements (E'Result) = Length (Name),
       Annotate => (GNATprove, Terminating);
    --  Construct element without attributes and without child document
    --
@@ -126,12 +122,12 @@ is
    -------
 
    function A (Name  : Content_Type;
-               Value : String) return Attributes_Type
+               Value : Content_Type) return Attributes_Type
    with
-      Pre  => Num_Elements (Name) < Offset_Type'Last and then
-              Num_Elements (Value) <= Offset_Type (Index_Type'Last - Add (1, Num_Elements (Name))),
+      Pre  => Length (Name) < Offset_Type'Last and then
+              Length (Value) <= Offset_Type (Index_Type'Last - Add (1, Length (Name))),
       Post => A'Result /= Null_Attributes and
-              Num_Elements (A'Result) = Num_Elements (Name) + Num_Elements (Value),
+              Num_Elements (A'Result) = Length (Name) + Length (Value),
       Annotate => (GNATproof, Terminating);
    --  Construct attribute from string value
    --
@@ -145,7 +141,7 @@ is
    function C (Value : Content_Type) return Document_Type
    with
       Post => C'Result /= Null_Document and
-              C'Result'Length = Num_Elements (Value),
+              C'Result'Length = Length (Value),
       Annotate => (GNATprove, Terminating);
    --  Construct content value
    --
@@ -161,8 +157,16 @@ private
    --------------
 
    overriding
-   function Is_Valid (Left  : Attributes_Type;
-                      Right : Attributes_Type) return Boolean
-   is (Is_Valid (Document_Type (Left), Document_Type (Right)));
+   function Is_Valid (Left  : Attributes_Base_Type;
+                      Right : Attributes_Base_Type) return Boolean
+   is (Is_Valid (Document_Base_Type (Left), Document_Base_Type (Right)));
+
+   ------------------
+   -- Num_Elements --
+   ------------------
+
+   overriding
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
+   is (Attributes'Length);
 
 end SXML.Generator;

@@ -13,14 +13,6 @@ package body SXML.Generator
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generator);
 
-   ------------------
-   -- Num_Elements --
-   ------------------
-
-   overriding
-   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
-   is (Attributes'Length);
-
    -------
    -- E --
    -------
@@ -30,21 +22,22 @@ is
                Children   : Document_Base_Type) return Document_Type
    is
       Len : constant Index_Type :=
-         Index_Type (Num_Elements (Name) + Num_Elements (Attributes) + Num_Elements (Children));
+         Index_Type (Length (Name) + Num_Elements (Attributes) + Num_Elements (Children));
 
       Result   : Document_Type (1 .. Len) := (others => Null_Node);
       Position : Index_Type := Result'First;
       Start    : Index_Type;
    begin
       Open (Name, Result, Position, Start);
+      pragma Assert (Position = Add ((Result'First), Length (Name)));
       Result (Start).Attributes :=
          (if Attributes = Null_Attributes
           then Invalid_Relative_Index
-          else Relative_Index_Type (Num_Elements (Name)));
+          else Relative_Index_Type (Length (Name)));
       Result (Start).Children :=
          (if Children = Null_Document
           then Invalid_Relative_Index
-          else Relative_Index_Type (Num_Elements (Name) + Num_Elements (Attributes)));
+          else Relative_Index_Type (Length (Name) + Num_Elements (Attributes)));
 
       if Attributes /= Null_Attributes
       then
@@ -66,12 +59,13 @@ is
    -------
 
    function A (Name  : Content_Type;
-               Value : String) return Attributes_Type
+               Value : Content_Type) return Attributes_Type
    is
-      Result : Document_Type (1 .. Sub (Add (Add (1, Num_Elements (Name)), Num_Elements (Value)), 1));
+      Result : Document_Type (1 .. Sub (Add (Add (1, Length (Name)), Length (Value)), 1));
       Offset : Offset_Type := 0;
    begin
       Result := (others => Null_Node);
+      pragma Assert (Length (Name) + Length (Value) <= Result'Length);
       SXML.Attribute (Name     => Name,
                       Data     => Value,
                       Offset   => Offset,
@@ -86,7 +80,7 @@ is
 
    function C (Value : Content_Type) return Document_Type
    is
-      Result : Document_Type (1 .. Add (1, Num_Elements (Value) - 1)) :=
+      Result : Document_Type (1 .. Add (1, Length (Value) - 1)) :=
          (others => Null_Node);
    begin
       Put_Content (Result, 0, Value);
@@ -97,8 +91,8 @@ is
    -- "+"--
    ---------
 
-   function "+" (Left  : Document_Base_Type;
-                 Right : Document_Base_Type) return Document_Base_Type
+   function "+" (Left  : Document_Type;
+                 Right : Document_Type) return Document_Type
    is
       Result : Document_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
    begin
@@ -116,21 +110,15 @@ is
    -- "+" --
    ---------
 
-   function "+" (Left  : Attributes_Base_Type;
-                 Right : Attributes_Base_Type) return Attributes_Base_Type
+   function "+" (Left  : Attributes_Type;
+                 Right : Attributes_Type) return Attributes_Type
    is
       Result : Attributes_Type (1 .. Left'Length + Right'Length);
       I      : Relative_Index_Type := 0;
       N      : Index_Type;
    begin
-      --  This yields a SPARK bug box (cf. RA06-002)
-      --  Result := (Result'Range => Null_Node);
-
+      Result := (Result'Range => Null_Node);
       Result (1 .. Left'Length) := Left;
-
-      pragma Annotate (GNATprove, False_Positive, """Result"" might not be initialized",
-                      "Aggregate initialization yields a bug box, cf. RA06 - 002");
-
       Result (Left'Length + 1 .. Left'Length + Right'Length) := Right;
 
       pragma Assert (Num_Elements (Result) = Num_Elements (Left) + Num_Elements (Right));
