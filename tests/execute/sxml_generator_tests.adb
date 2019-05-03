@@ -76,26 +76,6 @@ package body SXML_Generator_Tests is
 
    ---------------------------------------------------------------------------
 
-   procedure Test_Integer_Attribute (T : in out Test_Cases.Test_Case'Class)
-   is
-      use SXML;
-      Doc : Document_Type := E ("config", E ("child", A ("attr", 42)));
-   begin
-      Expect (Doc, "<config><child attr=""42""/></config>");
-	end Test_Integer_Attribute;
-
-   ---------------------------------------------------------------------------
-
-   procedure Test_Float_Attribute (T : in out Test_Cases.Test_Case'Class)
-   is
-      use SXML;
-      Doc : Document_Type := E ("config", E ("child", A ("attr", 3.14)));
-   begin
-      Expect (Doc, "<config><child attr=""3.14000E+00""/></config>");
-	end Test_Float_Attribute;
-
-   ---------------------------------------------------------------------------
-
    procedure Long_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
@@ -250,8 +230,6 @@ package body SXML_Generator_Tests is
       Register_Routine (T, Test_Generate_Single_Node_Attrib'Access, "Generate single node with attribute");
       Register_Routine (T, Test_Generate_Nodes'Access, "Generate nodes");
       Register_Routine (T, Test_String_Attribute'Access, "String attribute");
-      Register_Routine (T, Test_Integer_Attribute'Access, "Integer attribute");
-      Register_Routine (T, Test_Float_Attribute'Access, "Float attribute");
       Register_Routine (T, Long_Tag_Name'Access, "Long tag name");
       Register_Routine (T, Long_Attribute_Name'Access, "Long attribute name");
       Register_Routine (T, Long_Attribute_Value'Access, "Long attribute value");
