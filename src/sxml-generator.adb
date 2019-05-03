@@ -21,41 +21,6 @@ is
    function Num_Elements (Attributes : Attributes_Type) return Offset_Type
    is (Attributes'Length);
 
-   ---------------
-   -- To_String --
-   ---------------
-
-   function To_String (Value : Float) return Content_Type
-   with
-      SPARK_Mode => Off
-   is
-   begin
-      if Value >= 0.0
-      then
-         --  Remove leading space
-         return Value'Img (2 .. Value'Img'Last);
-      else
-         return Value'Img;
-      end if;
-   end To_String;
-
-   ---------------
-   -- To_String --
-   ---------------
-
-   function To_String (Value : Integer) return Content_Type
-   with
-      SPARK_Mode => Off
-   is
-   begin
-      if Value >= 0
-      then
-         return Value'Img (2 .. Value'Img'Last);
-      else
-         return Value'Img;
-      end if;
-   end To_String;
-
    -------
    -- E --
    -------
@@ -95,28 +60,6 @@ is
 
       return Result;
    end E;
-
-   -------
-   -- A --
-   -------
-
-   function A (Name  : Content_Type;
-               Value : Integer) return Attributes_Type
-   is
-   begin
-      return A (Name, To_String (Value));
-   end A;
-
-   -------
-   -- A --
-   -------
-
-   function A (Name  : Content_Type;
-               Value : Float) return Attributes_Type
-   is
-   begin
-      return A (Name, To_String (Value));
-   end A;
 
    -------
    -- A --
