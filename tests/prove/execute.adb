@@ -114,7 +114,7 @@ is
       Doc : Document_Type :=
        E ("config",
          E ("report",
-           A ("delay_ms", 500)
+           A ("delay_ms", "500")
          ) +
          E ("parent-provides",
            E ("service", A ("name", "CAP")) +
@@ -129,7 +129,7 @@ is
          ) +
          E ("start",
             A ("name", Program) +
-            A ("caps", 500),
+            A ("caps", "500"),
             E ("binary",
                A ("name", Program)) +
             E ("resource",

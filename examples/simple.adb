@@ -36,14 +36,16 @@ is
    -- 	</start>
    -- </config>
 
+   function Image (Val : Integer) return String is (Val'Img (Val'Img'First + 1 .. Val'Img'Last));
+
    Doc : Document_Type :=
    E ("config",
-     E ("report", A ("delay_ms", 500)) +
+     E ("report", A ("delay_ms", Image (500))) +
      E ("parent-provides",
        E ("service", A ("name", "CAP")) +
        E ("service", A ("name", "CPU"))
      ) +
-     E ("start", A ("name", "myprog") + A ("caps", 500),
+     E ("start", A ("name", "myprog") + A ("caps", Image (500)),
         E ("binary", A ("name", "myprog")) +
         E ("resource", A ("name", "RAM") + A ("quantum", "16MB")) +
         E ("config",
@@ -57,7 +59,7 @@ is
            ) +
            E ("libc", A ("stdout", "/dev/log") + A ("stderr", "/dev/log") + A ("rtc", "/dev/rtc"))
         ) +
-        E ("route", A ("foo", 54.1234),
+        E ("route", A ("foo", "54.1234"),
            E ("any-service",
               E ("parent")
            )
