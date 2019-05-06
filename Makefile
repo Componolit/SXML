@@ -2,7 +2,7 @@ MODE ?= strict
 CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
 GPRBUILD_OPTS = -s -p -XMode=$(MODE)
-WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --waitretry=30 --random-wait --no-clobber
+WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 --waitretry=5 --random-wait --no-clobber
 CHECK = \#
 
 all:
