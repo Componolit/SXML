@@ -31,14 +31,19 @@ testonly: SXML.gpr
 	@time obj/tests
 
 testbulk: export SXML_BULK_TESTS ?= 1
-testbulk: SXML.gpr bulkdata
+testbulk: SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@time obj/tests
 
 testinsane: export SXML_INSANE_TESTS ?= 1
-testinsane: SXML.gpr insanedata
+testinsane: SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@time obj/tests
+
+rawdata:
+	@rm -rf obj/rawdata
+	@cp -a tests/rawdata obj/rawdata
+	@find obj/rawdata -type f -name '*.xz' -print0 | xargs --null unxz
 
 check:
 	@gnatcheck -P SXML
@@ -53,12 +58,6 @@ stack: MODE=stack
 stack: SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P SXML
 	gnatstack $(GPRBUILD_OPTS) -P SXML
-
-bulkdata:
-	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_urls.txt
-
-insanedata:
-	-wget $(WGET_OPTS) --directory-prefix=obj/document --input-file=tests/data/bulk_insane_urls.txt
 
 obj/fuzzdriver::
 	gprbuild $(GPRBUILD_OPTS) -P examples/fuzzdriver
