@@ -199,8 +199,7 @@ is
              and (Current in Document'Range
                   and then Valid_Element (Document, Current, Mode)),
      Post => (if Position'Old < 0 then Position < 0)
-             and (if Position >= 0 and Document (Current).Length > 0 then Position > Position'Old),
-     Annotate => (GNATprove, Terminating);
+             and (if Position >= 0 and Document (Current).Length > 0 then Position > Position'Old);
 
    procedure Serialize_Element (Document :        Document_Type;
                                 Current  :        Index_Type;
