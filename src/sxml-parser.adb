@@ -17,10 +17,10 @@ is
    -- Parse --
    -----------
 
-   procedure Parse (Data         : Content_Type;
+   procedure Parse (Data         :        Content_Type;
                     Document     : in out Document_Type;
-                    Parse_Result : out Match_Type;
-                    Position     : out Natural)
+                    Parse_Result :    out Match_Type;
+                    Position     :    out Natural)
    is
       Unused : Index_Type;
 
@@ -30,51 +30,47 @@ is
         Predicate => Document_Index_Type in Document'Range;
 
       Document_Index : Document_Index_Type := Document'First;
-      Offset         : Natural    := 0;
-      Error_Index    : Natural    := 0;
+      Offset         : Natural := 0;
+      Error_Index    : Natural := 0;
 
       type Range_Type is
          record
             First : Natural;
             Last  : Natural;
          end record
-      with
-         Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last) or
-                      (Range_Type.First = Natural'Last and Range_Type.Last = 0);
+       with
+         Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last)
+                      or (Range_Type.First = Natural'Last and Range_Type.Last = 0);
       Null_Range : constant Range_Type := (Natural'Last, 0);
 
-      function Is_Valid (R : Range_Type) return Boolean
-      is (R.Last < Natural'Last and R.Last >= R.First);
+      function Is_Valid (R : Range_Type) return Boolean is
+        (R.Last < Natural'Last and R.Last >= R.First);
 
-      function Length (R : Range_Type) return Natural
-      is (R.Last - R.First + 1)
-      with
-         Pre => Is_Valid (R);
+      function Length (R : Range_Type) return Natural is
+        (R.Last - R.First + 1)
+        with
+          Pre => Is_Valid (R);
 
-      type Set_Type is new String
-      with
-         Predicate => Set_Type'First >= 0 and
-                      Set_Type'Last < Natural'Last and
-                      Set_Type'First <= Set_Type'Last;
+      type Set_Type is new String with
+        Predicate => Set_Type'First >= 0
+                     and then Set_Type'Last < Natural'Last
+                     and then Set_Type'First <= Set_Type'Last;
       Empty_Set : constant Set_Type := (1 => Character'Val (0));
 
       Whitespace : constant Set_Type :=
-        Character'Val (16#20#) &
-        Character'Val (16#9#)  &
-        Character'Val (16#D#)  &
-        Character'Val (16#A#);
+        Character'Val (16#20#)
+        & Character'Val (16#9#)
+        & Character'Val (16#D#)
+        & Character'Val (16#A#);
 
       --------------------
       -- Restore_Offset --
       --------------------
 
-      procedure Restore_Offset (Old_Offset : Natural)
-      with
-         Post => Offset = Old_Offset,
-         Annotate => (GNATprove, Terminating);
+      procedure Restore_Offset (Old_Offset : Natural) with
+        Post => Offset = Old_Offset;
 
-      procedure Restore_Offset (Old_Offset : Natural)
-      is
+      procedure Restore_Offset (Old_Offset : Natural) is
       begin
          if Offset > Error_Index
          then
@@ -87,13 +83,10 @@ is
       -- Restore_Context --
       ---------------------
 
-      procedure Restore_Context (Old_Index : Document_Index_Type)
-      with
-         Post => Document_Index = Old_Index,
-         Annotate => (GNATprove, Terminating);
+      procedure Restore_Context (Old_Index : Document_Index_Type) with
+        Post => Document_Index = Old_Index;
 
-      procedure Restore_Context (Old_Index : Document_Index_Type)
-      is
+      procedure Restore_Context (Old_Index : Document_Index_Type) is
       begin
          Document_Index := Old_Index;
       end Restore_Context;
@@ -102,16 +95,19 @@ is
       -- In_Range --
       --------------
 
-      function In_Range (R : Range_Type) return Boolean
-      is (R.First >= Data'First and R.Last <= Data'Last and R.First <= R.Last and Valid_Content (R.First, R.Last));
+      function In_Range (R : Range_Type) return Boolean is
+         (R.First >= Data'First
+          and then R.Last <= Data'Last
+          and then R.First <= R.Last
+          and then Valid_Content (R.First, R.Last));
 
       -------------------
       -- Data_Overflow --
       -------------------
 
       function Data_Overflow return Boolean is
-        (Data'First > Natural'Last - Offset or
-           Offset > Data'Length - 1);
+        (Data'First > Natural'Last - Offset
+         or Offset > Data'Length - 1);
 
       ---------------
       -- Match_Set --
@@ -119,17 +115,15 @@ is
 
       function Match_Set (Valid   : Set_Type;
                           Invalid : Set_Type;
-                          Value   : Character) return Match_Type
-      with
-         Pre  => Offset < Data'Length,
-         Post => (case Match_Set'Result is
-                     when Match_OK      => (for some E of Valid   => E = Value) and
-                                           (for all E of Invalid  => E /= Value),
-                     when Match_Invalid => (for some E of Invalid => E = Value),
-                     when Match_None    => (for all E of Invalid  => E /= Value) and
-                                           (for all E of Valid    => E /= Value),
-                     when others        => False),
-         Annotate => (GNATprove, Terminating);
+                          Value   : Character) return Match_Type with
+        Pre  => Offset < Data'Length,
+        Post => (case Match_Set'Result is
+                 when Match_OK      => (for some E of Valid   => E = Value)
+                                       and (for all E of Invalid  => E /= Value),
+                 when Match_Invalid => (for some E of Invalid => E = Value),
+                 when Match_None    => (for all E of Invalid  => E /= Value)
+                                       and (for all E of Valid => E /= Value),
+                 when others        => False);
 
       function Match_Set (Valid   : Set_Type;
                           Invalid : Set_Type;
@@ -158,26 +152,24 @@ is
       -- Match_Set --
       ---------------
 
-      procedure Match_Set (Valid   : Set_Type;
-                           Invalid : Set_Type;
+      procedure Match_Set (Valid   :     Set_Type;
+                           Invalid :     Set_Type;
                            Match   : out Match_Type;
-                           Value   : out Character)
-      with
-         Pre  => Offset < Data'Length,
-         Post => (case Match is
-                     when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old)) and
-                                           (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
-                                           (for all E of Valid    => E /= Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when others        => False),
-         Annotate => (GNATprove, Terminating);
+                           Value   : out Character) with
+        Pre  => Offset < Data'Length,
+        Post => (case Match is
+                 when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old))
+                                       and (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
+                                       and Offset > Offset'Old,
+                 when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old))
+                                       and Offset > Offset'Old,
+                 when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
+                                       and (for all E of Valid    => E /= Data (Data'First + Offset'Old))
+                                       and Offset > Offset'Old,
+                 when others        => False);
 
-      procedure Match_Set (Valid   : Set_Type;
-                           Invalid : Set_Type;
+      procedure Match_Set (Valid   :     Set_Type;
+                           Invalid :     Set_Type;
                            Match   : out Match_Type;
                            Value   : out Character)
       is
@@ -185,15 +177,13 @@ is
          Match := Match_Invalid;
          Value := Character'Val (0);
 
-         if Data_Overflow
-         then
+         if Data_Overflow then
             return;
          end if;
 
          Match := Match_Set (Valid, Invalid, Data (Data'First + Offset));
 
-         if Match = Match_OK
-         then
+         if Match = Match_OK then
             Value  := Data (Data'First + Offset);
          end if;
 
@@ -201,25 +191,24 @@ is
 
       end Match_Set;
 
-      procedure Match_Set (Valid   : Set_Type;
-                           Invalid : Set_Type;
+      procedure Match_Set (Valid   :     Set_Type;
+                           Invalid :     Set_Type;
                            Match   : out Match_Type)
       with
-         Pre    => Offset < Data'Length,
+         Pre  => Offset < Data'Length,
          Post => (case Match is
-                     when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old)) and
-                                           (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old)) and
-                                           (for all E of Valid    => E /= Data (Data'First + Offset'Old)) and
-                                           Offset > Offset'Old,
-                     when others        => False),
-         Annotate => (GNATprove, Terminating);
+                  when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old))
+                                        and (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
+                                        and Offset > Offset'Old,
+                  when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old))
+                                        and Offset > Offset'Old,
+                  when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
+                                        and (for all E of Valid    => E /= Data (Data'First + Offset'Old))
+                                        and Offset > Offset'Old,
+                  when others        => False);
 
-      procedure Match_Set (Valid   : Set_Type;
-                           Invalid : Set_Type;
+      procedure Match_Set (Valid   :     Set_Type;
+                           Invalid :     Set_Type;
                            Match   : out Match_Type)
       is
          Result_Unused : Character;
@@ -233,30 +222,26 @@ is
       ------------------
 
       procedure Match_String (Text  : String;
-                              Match : out Match_Type)
-      with
-         Pre  => Text'Length > 0,
-         Post => (if Match /= Match_OK
-                  then Offset = Offset'Old
-                  else Offset > Offset'Old),
-         Annotate => (GNATprove, Terminating);
+                              Match : out Match_Type) with
+        Pre  => Text'Length > 0,
+        Post => (if Match /= Match_OK
+                 then Offset = Offset'Old
+                 else Offset > Offset'Old);
 
-      procedure Match_String (Text  : String;
+      procedure Match_String (Text  :     String;
                               Match : out Match_Type)
       is
          Old_Offset : constant Natural := Offset;
       begin
          for C of Text
          loop
-            if Data_Overflow
-            then
+            if Data_Overflow then
                Match  := Match_Invalid;
                Restore_Offset (Old_Offset);
                return;
             end if;
 
-            if Data (Data'First + Offset) /= C
-            then
+            if Data (Data'First + Offset) /= C then
                Match  := Match_None;
                Restore_Offset (Old_Offset);
                return;
@@ -280,13 +265,11 @@ is
       -- Context_Put_String --
       ------------------------
 
-      procedure Context_Put_String (Value  : Content_Type;
+      procedure Context_Put_String (Value  :     Content_Type;
                                     Start  : out Index_Type;
-                                    Result : out Boolean)
-      with
-         Annotate => (GNATprove, Terminating);
+                                    Result : out Boolean);
 
-      procedure Context_Put_String (Value  : Content_Type;
+      procedure Context_Put_String (Value  :     Content_Type;
                                     Start  : out Index_Type;
                                     Result : out Boolean)
       is
@@ -295,9 +278,9 @@ is
          Result := False;
          Start  := Invalid_Index;
 
-         if (Underflow (Document'Last, NE) or else
-             Document_Index > Sub (Document'Last, NE)) or
-            Underflow (Document_Index, Document'First)
+         if
+            (Underflow (Document'Last, NE) or else Document_Index > Sub (Document'Last, NE))
+            or Underflow (Document_Index, Document'First)
          then
             return;
          end if;
@@ -312,15 +295,13 @@ is
       -- Match_Until_Text --
       ----------------------
 
-      procedure Match_Until_String (End_String : String;
-                                    Text       : out Range_Type)
-      with
-         Pre  => End_String'Length > 0 and
-                 not Data_Overflow,
-         Post => (if Text /= Null_Range then Offset > Offset'Old else Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Match_Until_String (End_String :     String;
+                                    Text       : out Range_Type) with
+        Pre  => End_String'Length > 0
+                and not Data_Overflow,
+        Post => (if Text /= Null_Range then Offset > Offset'Old else Offset = Offset'Old);
 
-      procedure Match_Until_String (End_String : String;
+      procedure Match_Until_String (End_String :     String;
                                     Text       : out Range_Type)
       is
          Old_Offset : constant Natural := Offset;
@@ -330,8 +311,9 @@ is
          Text := Null_Range;
 
          loop
-            if Data_Overflow or
-              Offset = Natural'Last
+            if
+               Data_Overflow
+               or Offset = Natural'Last
             then
                Restore_Offset (Old_Offset);
                return;
@@ -349,8 +331,9 @@ is
 
          end loop;
 
-         if Old_Offset > Offset - End_String'Length - 1 or
-            Data'First > Natural'Last - Offset
+         if
+            Old_Offset > Offset - End_String'Length - 1
+            or Data'First > Natural'Last - Offset
          then
             Restore_Offset (Old_Offset);
             return;
@@ -364,22 +347,21 @@ is
       -- Match_Until_Set --
       ---------------------
 
-      procedure Match_Until_Set (End_Set     : Set_Type;
-                                 Invalid_Set : Set_Type;
+      procedure Match_Until_Set (End_Set     :     Set_Type;
+                                 Invalid_Set :     Set_Type;
                                  Match       : out Match_Type;
-                                 Result      : out Range_Type)
-      with
-         Pre  => Data'First <= Data'Last - Offset,
-         Post => (case Match is
-                     when Match_OK   => In_Range (Result) and
-                                        Valid_Content (Result.First, Result.Last) and
-                                        Offset > Offset'Old,
-                     when Match_None => Result = Null_Range and Offset >= Offset'Old,
-                     when others     => Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+                                 Result      : out Range_Type) with
+        Pre  => Data'First <= Data'Last - Offset,
+        Post => (case Match is
+                 when Match_OK   => In_Range (Result)
+                                    and Valid_Content (Result.First, Result.Last)
+                                    and Offset > Offset'Old,
+                 when Match_None => Result = Null_Range
+                                    and Offset >= Offset'Old,
+                 when others     => Offset = Offset'Old);
 
-      procedure Match_Until_Set (End_Set     : Set_Type;
-                                 Invalid_Set : Set_Type;
+      procedure Match_Until_Set (End_Set     :     Set_Type;
+                                 Invalid_Set :     Set_Type;
                                  Match       : out Match_Type;
                                  Result      : out Range_Type)
       is
@@ -392,8 +374,7 @@ is
          Result := Null_Range;
 
          loop
-            if Data_Overflow
-            then
+            if Data_Overflow then
                Restore_Offset (Old_Offset);
                return;
             end if;
@@ -405,8 +386,9 @@ is
             pragma Loop_Invariant (Offset > Old_Offset);
          end loop;
 
-         if Tmp_Match /= Match_OK or
-            Data'First > Data'Last - Offset + 1
+         if
+            Tmp_Match /= Match_OK
+            or Data'First > Data'Last - Offset + 1
          then
             Restore_Offset (Old_Offset);
             return;
@@ -415,8 +397,7 @@ is
          Offset := Offset - 1;
          Last   := Data'First + Offset - 1;
 
-         if Old_Offset <= Offset - 1
-         then
+         if Old_Offset <= Offset - 1 then
             Result := (First, Last);
             Match  := Match_OK;
          else
@@ -430,10 +411,8 @@ is
       -- Skip --
       ----------
 
-      procedure Skip (Skip_Set : Set_Type)
-      with
-         Post => Offset >= Offset'Old,
-         Annotate => (GNATprove, Terminating);
+      procedure Skip (Skip_Set : Set_Type) with
+        Post => Offset >= Offset'Old;
 
       procedure Skip (Skip_Set : Set_Type)
       is
@@ -445,8 +424,7 @@ is
          loop
             pragma Loop_Variant (Increases => Offset);
             pragma Loop_Invariant (Offset >= Offset'Loop_Entry);
-            if Data_Overflow
-            then
+            if Data_Overflow then
                return;
             end if;
 
@@ -462,12 +440,10 @@ is
       ---------------------
 
       procedure Parse_Attribute (Start : out Index_Type;
-                                 Match : out Match_Type)
-      with
-         Post => (if Match = Match_OK
-                  then Offset > Offset'Old
-                  else Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+                                 Match : out Match_Type) with
+        Post => (if Match = Match_OK
+                 then Offset > Offset'Old
+                 else Offset = Offset'Old);
 
       procedure Parse_Attribute (Start : out Index_Type;
                                  Match : out Match_Type)
@@ -483,60 +459,56 @@ is
 
          Start := Invalid_Index;
 
-         if Context_Overflow
-         then
-            Match  := Match_Out_Of_Memory;
+         if Context_Overflow then
+            Match := Match_Out_Of_Memory;
             return;
          end if;
 
          Match := Match_Invalid;
 
          Skip (Whitespace);
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Until_Set (Whitespace & "=", ">", Match_Tmp, Attribute_Name);
-         if Match_Tmp /= Match_OK
-         then
+         if Match_Tmp /= Match_OK then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Skip (Whitespace);
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Set ("=", ">", Match_Tmp);
-         if Match_Tmp /= Match_OK
-         then
+         if Match_Tmp /= Match_OK then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Skip (Whitespace);
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Set ("""'", ">", Match_Tmp, Separator);
-         if Match_Tmp /= Match_OK or
-           Data_Overflow
+         if
+            Match_Tmp /= Match_OK
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Until_Set ((1 => Separator), "<", Match_Tmp, Attribute_Value);
-         if (Match_Tmp /= Match_OK and Match_Tmp /= Match_None) or
-           Data_Overflow
+         if
+            (Match_Tmp /= Match_OK and Match_Tmp /= Match_None)
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
@@ -544,18 +516,20 @@ is
          Offset := Offset + 1;
 
          Start := Document_Index;
-         Off := Sub (Document_Index, Document'First);
+         Off   := Sub (Document_Index, Document'First);
 
          pragma Assert (Valid_Content (Attribute_Name.First, Attribute_Name.Last));
 
-         Attr_Value_Elements := (if Attribute_Value = Null_Range then 0
-                                 else Length (Data (Attribute_Value.First .. Attribute_Value.Last)));
+         Attr_Value_Elements := (if Attribute_Value /= Null_Range
+                                 then Length (Data (Attribute_Value.First .. Attribute_Value.Last))
+                                 else 0);
 
-         if Off > Document'Length -
-                  Length (Data (Attribute_Name.First .. Attribute_Name.Last)) -
-                  Attr_Value_Elements or else
-            Off + Length (Data (Attribute_Name.First .. Attribute_Name.Last)) + Attr_Value_Elements
-            >= Document'Length
+         if
+            Off > Document'Length
+                  - Length (Data (Attribute_Name.First .. Attribute_Name.Last))
+                  - Attr_Value_Elements
+            or else Off + Length (Data (Attribute_Name.First .. Attribute_Name.Last)) + Attr_Value_Elements
+                    >= Document'Length
          then
             Restore_Offset (Old_Offset);
             return;
@@ -567,8 +541,9 @@ is
             Offset   => Off,
             Document => Document);
 
-         if Off > Offset_Type (Index_Type'Last - Document'First) or
-            Off >= Document'Length
+         if
+            Off > Offset_Type (Index_Type'Last - Document'First)
+            or Off >= Document'Length
          then
             Restore_Offset (Old_Offset);
             return;
@@ -585,43 +560,40 @@ is
 
       function Is_Valid_Attribute_Link (Next     : Index_Type;
                                         Parent   : Index_Type;
-                                        Previous : Index_Type) return Boolean
-      with
-         Annotate => (GNATprove, Terminating);
+                                        Previous : Index_Type) return Boolean;
 
       function Is_Valid_Attribute_Link (Next     : Index_Type;
                                         Parent   : Index_Type;
-                                        Previous : Index_Type) return Boolean
-      is ((if Next /= Invalid_Index and then
-              Previous = Invalid_Index
-           then Parent in Document'Range and then
-                Next > Parent and then
-                (Document (Parent).Kind = Kind_Element_Open)
-           else Previous in Document'Range and then
-                Next > Previous and then
-                (Document (Previous).Kind = Kind_Attribute)));
+                                        Previous : Index_Type) return Boolean is
+        (if
+            Next /= Invalid_Index
+            and then Previous = Invalid_Index
+         then
+            Parent in Document'Range
+            and then Next > Parent
+            and then (Document (Parent).Kind = Kind_Element_Open)
+         else
+            Previous in Document'Range
+            and then Next > Previous
+            and then (Document (Previous).Kind = Kind_Attribute));
 
       --------------------
       -- Link_Attribute --
       --------------------
 
-      procedure Link_Attribute (Next     : Index_Type;
-                                Parent   : Index_Type;
-                                Previous : in out Index_Type)
-      with
-         Pre  => Is_Valid_Attribute_Link (Next, Parent, Previous),
-         Post => (if Next /= Invalid_Index then Previous = Next),
-         Annotate => (GNATprove, Terminating);
+      procedure Link_Attribute (Next     :        Index_Type;
+                                Parent   :        Index_Type;
+                                Previous : in out Index_Type) with
+        Pre  => Is_Valid_Attribute_Link (Next, Parent, Previous),
+        Post => (if Next /= Invalid_Index then Previous = Next);
 
-      procedure Link_Attribute (Next     : Index_Type;
-                                Parent   : Index_Type;
+      procedure Link_Attribute (Next     :        Index_Type;
+                                Parent   :        Index_Type;
                                 Previous : in out Index_Type)
       is
       begin
-         if Next /= Invalid_Index
-         then
-            if Previous = Invalid_Index
-            then
+         if Next /= Invalid_Index then
+            if Previous = Invalid_Index then
                Document (Parent).Attributes := Sub (Next, Parent);
             else
                Document (Previous).Next_Attribute := Sub (Next, Previous);
@@ -637,12 +609,10 @@ is
       procedure Parse_Opening_Tag (Match : out Match_Type;
                                    Name  : out Range_Type;
                                    Start : out Index_Type;
-                                   Done  : out Boolean)
-      with
-         Post => (if Match = Match_OK
-                  then In_Range (Name) and Offset > Offset'Old
-                  else Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+                                   Done  : out Boolean) with
+        Post => (if Match = Match_OK
+                 then In_Range (Name) and Offset > Offset'Old
+                 else Offset = Offset'Old);
 
       procedure Parse_Opening_Tag (Match : out Match_Type;
                                    Name  : out Range_Type;
@@ -661,23 +631,22 @@ is
          Done  := False;
          Start := Invalid_Index;
 
-         if Context_Overflow
-         then
+         if Context_Overflow then
             Match := Match_Out_Of_Memory;
             return;
          end if;
 
          Skip (Whitespace);
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          --  Match opening '<'
          Match_Set ("<", Empty_Set, Match_Tmp);
-         if Match_Tmp /= Match_OK or
-            Data_Overflow
+         if
+            Match_Tmp /= Match_OK
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
@@ -685,9 +654,10 @@ is
 
          --  Match tag name
          Match_Until_Set (Whitespace & ">/", Empty_Set, Match_Tmp, Name);
-         if Match_Tmp /= Match_OK or else
-            not (Document_Index in Document'Range) or else
-            not Has_Space (Document, Offset_Type (Document_Index) + 1, Data (Name.First .. Name.Last))
+         if
+            Match_Tmp /= Match_OK
+            or else not (Document_Index in Document'Range)
+            or else not Has_Space (Document, Offset_Type (Document_Index) + 1, Data (Name.First .. Name.Last))
          then
             Restore_Offset (Old_Offset);
             return;
@@ -702,8 +672,7 @@ is
             Parse_Attribute (Attribute_Start, Match_Attr);
             exit when Match_Attr /= Match_OK;
 
-            if not Is_Valid_Attribute_Link (Attribute_Start, Start, Previous_Attribute)
-            then
+            if not Is_Valid_Attribute_Link (Attribute_Start, Start, Previous_Attribute) then
                Restore_Offset (Old_Offset);
                return;
             end if;
@@ -718,12 +687,10 @@ is
          --  Short form node?
          Skip (Whitespace);
          Match_String ("/>", Match_Tmp);
-         if Match_Tmp = Match_OK
-         then
+         if Match_Tmp = Match_OK then
             Done := True;
          else
-            if Data_Overflow
-            then
+            if Data_Overflow then
                Restore_Offset (Old_Offset);
                Restore_Context (Old_Index);
                return;
@@ -731,8 +698,7 @@ is
 
             --  Match closing '>'
             Match_Set (">", Empty_Set, Match_Tmp);
-            if Match_Tmp /= Match_OK
-            then
+            if Match_Tmp /= Match_OK then
                Restore_Offset (Old_Offset);
                Restore_Context (Old_Index);
                return;
@@ -747,13 +713,11 @@ is
       -- Parse_Closing_Tag --
       -----------------------
 
-      procedure Parse_Closing_Tag (Name  : String;
-                                   Match : out Match_Type)
-      with
-         Post => (if Match = Match_OK then Offset > Offset'Old else Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Closing_Tag (Name  :     String;
+                                   Match : out Match_Type) with
+        Post => (if Match = Match_OK then Offset > Offset'Old else Offset = Offset'Old);
 
-      procedure Parse_Closing_Tag (Name  : String;
+      procedure Parse_Closing_Tag (Name  :     String;
                                    Match : out Match_Type)
       is
          Old_Offset   : constant Natural := Offset;
@@ -762,15 +726,13 @@ is
       begin
          Match := Match_Invalid;
 
-         if Context_Overflow
-         then
+         if Context_Overflow then
             Restore_Offset (Old_Offset);
             Match := Match_Out_Of_Memory;
             return;
          end if;
 
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
@@ -778,16 +740,18 @@ is
          Skip (Whitespace);
 
          Match_String ("</", Match_Tmp);
-         if Match_Tmp /= Match_OK or
-           Data_Overflow
+         if
+            Match_Tmp /= Match_OK
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Until_Set (Whitespace & ">", Empty_Set, Match_Tmp, Closing_Name);
-         if Match_Tmp /= Match_OK or
-           Data_Overflow
+         if
+            Match_Tmp /= Match_OK
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
@@ -796,21 +760,18 @@ is
          --  Match closing tag
          Skip (Whitespace);
 
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Set (">", Empty_Set, Match_Tmp);
-         if Match_Tmp /= Match_OK
-         then
+         if Match_Tmp /= Match_OK then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
-         if Data (Closing_Name.First .. Closing_Name.Last) /= Name
-         then
+         if Data (Closing_Name.First .. Closing_Name.Last) /= Name then
             Restore_Offset (Old_Offset);
             Match := Match_None_Wellformed;
             return;
@@ -824,19 +785,15 @@ is
       -- Parse_Section --
       -------------------
 
-      procedure Parse_Sections (Start_Tag : String;
-                                End_Tag   : String;
-                                Result    : out Range_Type)
-      with
-         Pre  => Start_Tag'Length > 0 and
-                 End_Tag'Length > 0,
-         Post => (if Result /= Null_Range
-                  then Offset > Offset'Old
-                  else Offset >= Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Sections (Start_Tag :     String;
+                                End_Tag   :     String;
+                                Result    : out Range_Type) with
+        Pre  => Start_Tag'Length > 0 and
+                End_Tag'Length > 0,
+        Post => (if Result /= Null_Range then Offset > Offset'Old else Offset >= Offset'Old);
 
-      procedure Parse_Sections (Start_Tag : String;
-                                End_Tag   : String;
+      procedure Parse_Sections (Start_Tag :     String;
+                                End_Tag   :     String;
                                 Result    : out Range_Type)
       is
          Old_Offset : Natural;
@@ -845,24 +802,23 @@ is
          Result := Null_Range;
          loop
             Old_Offset := Offset;
-            if Data_Overflow
-            then
+            if Data_Overflow then
                Restore_Offset (Old_Offset);
                return;
             end if;
 
             Skip (Whitespace);
             Match_String (Start_Tag, Tmp_Result);
-            if Tmp_Result /= Match_OK or
-              Data_Overflow
+            if
+               Tmp_Result /= Match_OK
+               or Data_Overflow
             then
                Restore_Offset (Old_Offset);
                return;
             end if;
 
             Match_Until_String (End_Tag, Result);
-            if Result = Null_Range
-            then
+            if Result = Null_Range then
                Restore_Offset (Old_Offset);
                return;
             end if;
@@ -876,10 +832,8 @@ is
       -- Parse_Comment --
       -------------------
 
-      procedure Parse_Comment (Result : out Match_Type)
-      with
-         Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Comment (Result : out Match_Type) with
+        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_Comment (Result : out Match_Type)
       is
@@ -893,10 +847,8 @@ is
       -- Parse_Processing_Information --
       ----------------------------------
 
-      procedure Parse_Processing_Information (Result : out Match_Type)
-      with
-         Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Processing_Information (Result : out Match_Type) with
+        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_Processing_Information (Result : out Match_Type)
       is
@@ -910,37 +862,37 @@ is
       -- Parse_Doctype --
       -------------------
 
-      procedure Parse_Doctype (Result : out Match_Type)
-      with
-         Post => (if Result = Match_OK then Offset > Offset'Old else Offset = Offset'Old),
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Doctype (Result : out Match_Type) with
+        Post => (if Result = Match_OK then Offset > Offset'Old else Offset = Offset'Old);
 
       procedure Parse_Doctype (Result : out Match_Type)
       is
          Old_Offset   : constant Natural := Offset;
          Tmp_Result   : Match_Type;
-         Unused_Range, Text : Range_Type;
+         Unused_Range : Range_Type;
+         Text         : Range_Type;
       begin
          Result := Match_Invalid;
          Skip (Whitespace);
          Match_String ("<!DOCTYPE", Tmp_Result);
-         if Tmp_Result /= Match_OK or
-           Data_Overflow
+         if
+            Tmp_Result /= Match_OK
+            or Data_Overflow
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Until_Set ("[", ">", Tmp_Result, Unused_Range);
-         if Tmp_Result = Match_OK
-         then
-            if Data_Overflow
-            then
+         if Tmp_Result = Match_OK then
+            if Data_Overflow then
                Restore_Offset (Old_Offset);
                return;
             end if;
             Match_Until_Set ("]", Empty_Set, Tmp_Result, Unused_Range);
-            if Tmp_Result /= Match_OK or Data_Overflow
+            if
+               Tmp_Result /= Match_OK
+               or Data_Overflow
             then
                Restore_Offset (Old_Offset);
                return;
@@ -949,15 +901,13 @@ is
          pragma Unreferenced (Unused_Range);
 
          Skip (Whitespace);
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Match_Until_String (">", Text);
-         if Text = Null_Range
-         then
+         if Text = Null_Range then
             Restore_Offset (Old_Offset);
             return;
          end if;
@@ -968,25 +918,22 @@ is
       -- Parse_Section --
       -------------------
 
-      procedure Parse_Sections
-      with
-         Post => Offset >= Offset'Old,
-         Annotate => (GNATprove, Terminating);
+      procedure Parse_Sections with
+        Post => Offset >= Offset'Old;
 
       procedure Parse_Sections
       is
-         Match_Doctype, Match_Comment, Match_PI : Match_Type;
-         Old_Offset : constant Natural := Offset with Ghost;
+         Match_Doctype : Match_Type;
+         Match_Comment : Match_Type;
+         Match_PI      : Match_Type;
+         Old_Offset    : constant Natural := Offset with Ghost;
       begin
          loop
             Parse_Doctype (Match_Doctype);
             Parse_Comment (Match_Comment);
             Parse_Processing_Information (Match_PI);
 
-            exit when
-               Match_Doctype /= Match_OK and
-               Match_Comment /= Match_OK and
-               Match_PI /= Match_OK;
+            exit when Match_Doctype /= Match_OK and Match_Comment /= Match_OK and Match_PI /= Match_OK;
 
             pragma Loop_Variant (Increases => Offset);
             pragma Loop_Invariant (Offset >= Old_Offset);
@@ -1000,12 +947,8 @@ is
 
       procedure Parse_Internal (Match  : out Match_Type;
                                 Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
-        with
-           Post => (if Match = Match_OK
-                    then Offset > Offset'Old
-                    else Offset >= Offset'Old),
-           Annotate => (GNATprove, Terminating);
+                                Level  :     Natural := Parse_Internal_Depth) with
+          Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       -----------------
       -- Parse_CDATA --
@@ -1014,8 +957,7 @@ is
       procedure Parse_CDATA (Result : out Match_Type;
                              Start  : out Index_Type)
       with
-         Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old),
-         Annotate => (GNATprove, Terminating);
+         Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_CDATA (Result : out Match_Type;
                              Start  : out Index_Type)
@@ -1028,16 +970,16 @@ is
          Start  := Invalid_Index;
 
          Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
-         if Tmp_Result /= Null_Range and then
-            Tmp_Result.First >= Data'First and then
-            Tmp_Result.Last <= Data'Last and then
-            Valid_Content (Tmp_Result.First, Tmp_Result.Last)
+         if
+            Tmp_Result /= Null_Range
+            and then Tmp_Result.First >= Data'First
+            and then Tmp_Result.Last <= Data'Last
+            and then Valid_Content (Tmp_Result.First, Tmp_Result.Last)
          then
             Context_Put_String (Value  => Data (Tmp_Result.First .. Tmp_Result.Last),
                                 Start  => Tmp_Start,
                                 Result => Valid);
-            if Valid
-            then
+            if Valid then
                Start  := Tmp_Start;
                Result := Match_OK;
             else
@@ -1054,8 +996,7 @@ is
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
       with
-         Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old),
-         Annotate => (GNATprove, Terminating);
+         Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
@@ -1069,44 +1010,40 @@ is
       begin
          Start := Invalid_Index;
          Match := Match_Invalid;
-         if Data_Overflow
-         then
+         if Data_Overflow then
             return;
          end if;
 
          Match := Match_OK;
 
          Parse_CDATA (Match_CDATA, Start);
-         if Match_CDATA = Match_OK
-         then
+         if Match_CDATA = Match_OK then
             return;
          end if;
 
          Parse_Comment (Match_Comment);
-         if Match_Comment = Match_OK
-         then
+         if Match_Comment = Match_OK then
             return;
          end if;
 
          Parse_Processing_Information (Match_PI);
-         if Match_PI = Match_OK
-         then
+         if Match_PI = Match_OK then
             return;
          end if;
 
-         if Data_Overflow
-         then
+         if Data_Overflow then
             return;
          end if;
 
          Match_Until_Set ("<", Empty_Set, Match_Content, Content_Range);
-         if Match_Content = Match_OK and then Length (Content_Range) > 0
+         if
+            Match_Content = Match_OK
+            and then Length (Content_Range) > 0
          then
             Context_Put_String (Value  => Data (Content_Range.First .. Content_Range.Last),
                                 Start  => Start,
                                 Result => Valid);
-            if not Valid
-            then
+            if not Valid then
                Match := Match_Invalid;
             end if;
             return;
@@ -1123,45 +1060,42 @@ is
 
       function Is_Valid_Link (Child    : Index_Type;
                               Parent   : Index_Type;
-                              Previous : Index_Type) return Boolean
-      with
-         Annotate => (GNATprove, Terminating);
+                              Previous : Index_Type) return Boolean;
 
       function Is_Valid_Link (Child    : Index_Type;
                               Parent   : Index_Type;
-                              Previous : Index_Type) return Boolean
-      is ((if Child /= Invalid_Index and then
-              Previous = Invalid_Index
-           then Parent in Document'Range and then
-                Child > Parent and then
-                (Document (Parent).Kind = Kind_Element_Open or
-                 Document (Parent).Kind = Kind_Content)
-           else Previous in Document'Range and then
-                Child > Previous and then
-                (Document (Previous).Kind = Kind_Element_Open or
-                 Document (Previous).Kind = Kind_Content)));
+                              Previous : Index_Type) return Boolean is
+         (if
+            Child /= Invalid_Index
+            and then Previous = Invalid_Index
+          then
+            Parent in Document'Range
+            and then Child > Parent
+            and then (Document (Parent).Kind = Kind_Element_Open
+                      or Document (Parent).Kind = Kind_Content)
+          else
+            Previous in Document'Range
+            and then Child > Previous
+            and then (Document (Previous).Kind = Kind_Element_Open
+                      or Document (Previous).Kind = Kind_Content));
 
       ----------------
       -- Link_Child --
       ----------------
 
-      procedure Link_Child (Child    : Index_Type;
-                            Parent   : Index_Type;
-                            Previous : in out Index_Type)
-      with
-         Pre  => Is_Valid_Link (Child, Parent, Previous),
-         Post => (if Child /= Invalid_Index then Previous = Child),
-         Annotate => (GNATprove, Terminating);
+      procedure Link_Child (Child    :        Index_Type;
+                            Parent   :        Index_Type;
+                            Previous : in out Index_Type) with
+        Pre  => Is_Valid_Link (Child, Parent, Previous),
+        Post => (if Child /= Invalid_Index then Previous = Child);
 
-      procedure Link_Child (Child    : Index_Type;
-                            Parent   : Index_Type;
+      procedure Link_Child (Child    :        Index_Type;
+                            Parent   :        Index_Type;
                             Previous : in out Index_Type)
       is
       begin
-         if Child /= Invalid_Index
-         then
-            if Previous = Invalid_Index
-            then
+         if Child /= Invalid_Index then
+            if Previous = Invalid_Index then
                Document (Parent).Children := Sub (Child, Parent);
             else
                Document (Previous).Siblings := Sub (Child, Previous);
@@ -1176,7 +1110,7 @@ is
 
       procedure Parse_Internal (Match  : out Match_Type;
                                 Start  : out Index_Type;
-                                Level  : Natural := Parse_Internal_Depth)
+                                Level  :     Natural := Parse_Internal_Depth)
       is
          Old_Offset     : constant Natural := Offset;
          Done           : Boolean;
@@ -1190,16 +1124,13 @@ is
          Match := Match_Invalid;
          Start := Invalid_Index;
 
-         if Level = 0
-         then
+         if Level = 0 then
             return;
          end if;
 
-         if Level < Parse_Internal_Depth
-         then
+         if Level < Parse_Internal_Depth then
             Parse_Content (Sub_Match, Start);
-            if Sub_Match = Match_OK
-            then
+            if Sub_Match = Match_OK then
                Match := Match_OK;
                return;
             end if;
@@ -1207,15 +1138,13 @@ is
 
          Parse_Sections;
 
-         if Data_Overflow
-         then
+         if Data_Overflow then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
          Parse_Opening_Tag (Sub_Match, Name, Start, Done);
-         if Sub_Match /= Match_OK
-         then
+         if Sub_Match /= Match_OK then
             Restore_Offset (Old_Offset);
             Match := Match_None;
             return;
@@ -1223,8 +1152,7 @@ is
 
          Parent := Start;
 
-         if Context_Overflow
-         then
+         if Context_Overflow then
             Restore_Offset (Old_Offset);
             Match := Match_Out_Of_Memory;
             return;
@@ -1232,8 +1160,7 @@ is
 
          Parse_Sections;
 
-         if Done
-         then
+         if Done then
             Match := Match_OK;
             return;
          end if;
@@ -1242,8 +1169,7 @@ is
             Parse_Internal (Sub_Match, Child_Start, Level - 1);
             exit when Sub_Match /= Match_OK;
 
-            if not Is_Valid_Link (Child_Start, Parent, Previous_Child)
-            then
+            if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
                return;
             end if;
 
@@ -1255,8 +1181,7 @@ is
          end loop;
 
          Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
-         if Sub_Match /= Match_OK
-         then
+         if Sub_Match /= Match_OK then
             Restore_Offset (Old_Offset);
             return;
          end if;
@@ -1270,25 +1195,23 @@ is
       -- Skip_Byte_Order_Mark --
       --------------------------
 
-      procedure Skip_Byte_Order_Mark
-      with
-         Annotate => (GNATprove, Terminating);
+      procedure Skip_Byte_Order_Mark;
 
       procedure Skip_Byte_Order_Mark
       is
       begin
          --  Too little space for BOM
-         if Offset > Data'Length - 3 or else
-            Data'First > Data'Last - Offset - 3
+         if
+            Offset > Data'Length - 3
+            or else Data'First > Data'Last - Offset - 3
          then
             return;
          end if;
 
          --  We only support UTF-8 BOM
-         if Data (Data'First + Offset .. Data'First + Offset + 2) =
-           Character'Val (16#ef#) &
-           Character'Val (16#bb#) &
-           Character'Val (16#bf#)
+         if
+            Data (Data'First + Offset .. Data'First + Offset + 2)
+            = Character'Val (16#ef#) & Character'Val (16#bb#) & Character'Val (16#bf#)
          then
             Offset := Offset + 3;
          end if;
@@ -1301,10 +1224,8 @@ is
       pragma Unreferenced (Unused);
       Skip (Whitespace);
 
-      if Parse_Result = Match_OK
-      then
-         if Offset < Data'Length
-         then
+      if Parse_Result = Match_OK then
+         if Offset < Data'Length then
             Parse_Result := Match_Trailing_Data;
          end if;
          Position := Offset;

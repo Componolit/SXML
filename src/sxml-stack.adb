@@ -19,36 +19,35 @@ is
    -- Level --
    -----------
 
-   function Level return Natural
-   is (Index);
+   function Level return Natural is
+     (Index);
 
    --------------
    -- Is_Valid --
    --------------
 
-   function Is_Valid return Boolean
-   is (Index >= S'First and Index <= S'Last);
+   function Is_Valid return Boolean is
+     (Index >= S'First and Index <= S'Last);
 
    --------------
    -- Is_Empty --
    --------------
 
-   function Is_Empty return Boolean
-   is (Index = S'First);
+   function Is_Empty return Boolean is
+     (Index = S'First);
 
    -------------
    -- Is_Full --
    -------------
 
-   function Is_Full return Boolean
-   is (Index >= S'Last);
+   function Is_Full return Boolean is
+     (Index >= S'Last);
 
    ----------
    -- Push --
    ----------
 
-   procedure Push (E : Element_Type)
-   is
+   procedure Push (E : Element_Type) is
    begin
       S (Index) := E;
       Index := Index + 1;
@@ -58,8 +57,7 @@ is
    -- Pop --
    ---------
 
-   procedure Pop (E : out Element_Type)
-   is
+   procedure Pop (E : out Element_Type) is
    begin
       Index := Index - 1;
       E := S (Index);
@@ -69,8 +67,7 @@ is
    -- Drop --
    ----------
 
-   procedure Drop
-   is
+   procedure Drop is
    begin
       Index := Index - 1;
    end Drop;
@@ -79,8 +76,7 @@ is
    -- Reset --
    -----------
 
-   procedure Reset
-   is
+   procedure Reset is
    begin
       Index := S'First;
    end Reset;

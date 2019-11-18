@@ -19,8 +19,7 @@ is
    -- Initialize --
    ----------------
 
-   procedure Initialize (S : out Stack_Type)
-   is
+   procedure Initialize (S : out Stack_Type) is
    begin
       S := (others => Null_Traversal);
    end Initialize;
@@ -29,22 +28,23 @@ is
    -- Put --
    ---------
 
-   procedure Put (Value    : String;
+   procedure Put (Value    :        String;
                   Data     : in out String;
                   Position : in out Integer)
    with
       Pre  => Value'Length > 0,
-      Post => (if Position'Old < 0 then Position < 0) and
-              (if Position >= 0 then Position > Position'Old);
+      Post => (if Position'Old < 0 then Position < 0)
+              and (if Position >= 0 then Position > Position'Old);
 
-   procedure Put (Value    : String;
+   procedure Put (Value    :        String;
                   Data     : in out String;
                   Position : in out Integer)
    is
    begin
-      if Position < 0 or else
-         Value'Length > Data'Length - Position or else
-         Data'First > Data'Last - Position - Value'Length
+      if
+         Position < 0
+         or else Value'Length > Data'Length - Position
+         or else Data'First > Data'Last - Position - Value'Length
       then
          Position := -1;
          return;
@@ -58,39 +58,38 @@ is
    -- Put_Escaped --
    -----------------
 
-   procedure Put_Escaped (Document : Document_Type;
-                          Start    : Index_Type;
+   procedure Put_Escaped (Document :        Document_Type;
+                          Start    :        Index_Type;
                           Data     : in out String;
                           Position : in out Integer)
    with
       Pre  => Start in Document'Range,
-      Post => (if Position'Old < 0 then Position < 0) and
-              (if Position >= 0 and Document (Start).Length > 0
-               then Position > Position'Old);
+      Post => (if Position'Old < 0 then Position < 0)
+              and (if Position >= 0 and Document (Start).Length > 0 then Position > Position'Old);
 
-   procedure Put_Escaped (Document : Document_Type;
-                          Start    : Index_Type;
+   procedure Put_Escaped (Document :        Document_Type;
+                          Start    :        Index_Type;
                           Data     : in out String;
                           Position : in out Integer)
    is
-      procedure Put_Escaped_Char (Char : Character;
+      procedure Put_Escaped_Char (Char :        Character;
                                   D    : in out String;
                                   P    : in out Integer)
       with
-         Post => (if P'Old < 0 then P < 0) and
-                 (if P >= 0 then P > P'Old);
+         Post => (if P'Old < 0 then P < 0)
+                 and (if P >= 0 then P > P'Old);
 
-      procedure Put_Escaped_Char (Char : Character;
+      procedure Put_Escaped_Char (Char :        Character;
                                   D    : in out String;
                                   P    : in out Integer)
       is
       begin
          case Char is
-            when '"' => Put ("&quot;", D, P);
-            when ''' => Put ("&apos;", D, P);
-            when '&' => Put ("&amp;", D, P);
-            when '>' => Put ("&gt;", D, P);
-            when '<' => Put ("&lt;", D, P);
+            when '"'    => Put ("&quot;", D, P);
+            when '''    => Put ("&apos;", D, P);
+            when '&'    => Put ("&amp;", D, P);
+            when '>'    => Put ("&gt;", D, P);
+            when '<'    => Put ("&lt;", D, P);
             when others => Put ((1 => Char), D, P);
          end case;
       end Put_Escaped_Char;
@@ -105,17 +104,16 @@ is
          for C of N.Data (1 .. Natural (N.Length))
          loop
             Put_Escaped_Char (C, Data, Position);
-            if Position < 0
-            then
+            if Position < 0 then
                return;
             end if;
             pragma Loop_Invariant (Position > Position'Loop_Entry);
          end loop;
 
          exit when
-           N.Length = 0 or
-           N.Next = Invalid_Relative_Index or
-           Overflow (Pos, N.Next);
+           N.Length = 0
+           or N.Next = Invalid_Relative_Index
+           or Overflow (Pos, N.Next);
 
          Pos := Add (Pos, N.Next);
          exit when not (Pos in Document'Range);
@@ -130,20 +128,20 @@ is
    -- Serialize_Data --
    --------------------
 
-   procedure Serialize_Data (Document : Document_Type;
-                             Start    : Index_Type;
+   procedure Serialize_Data (Document :        Document_Type;
+                             Start    :        Index_Type;
                              Data     : in out String;
                              Position : in out Integer)
    with
       Pre  => Start in Document'Range,
-      Post => (if Position'Old < 0 then Position < 0) and
-              (if Position >= 0 then
-                 (if Document (Start).Length > 0
-                  then Position > Position'Old
-                  else Position = Position'Old));
+      Post => (if Position'Old < 0 then Position < 0)
+              and (if Position >= 0 then
+                   (if Document (Start).Length > 0
+                    then Position > Position'Old
+                    else Position = Position'Old));
 
-   procedure Serialize_Data (Document : Document_Type;
-                             Start    : Index_Type;
+   procedure Serialize_Data (Document :        Document_Type;
+                             Start    :        Index_Type;
                              Data     : in out String;
                              Position : in out Integer)
    is
@@ -153,20 +151,18 @@ is
 
       loop
          N := Document (Pos);
-         if N.Length = 0
-         then
+         if N.Length = 0 then
             return;
          end if;
 
          Put (N.Data (1 .. Natural (N.Length)), Data, Position);
-         if Position < 0
-         then
+         if Position < 0 then
             return;
          end if;
 
          exit when
-           N.Next = Invalid_Relative_Index or
-           Overflow (Pos, N.Next);
+           N.Next = Invalid_Relative_Index
+           or Overflow (Pos, N.Next);
 
          Pos := Add (Pos, N.Next);
          exit when not (Pos in Document'Range);
@@ -183,59 +179,59 @@ is
 
    function Valid_Element (Document : Document_Type;
                            Current  : Index_Type;
-                           Mode     : Mode_Type) return Boolean
-   is ((Mode = Mode_Open and Document (Current).Kind = Kind_Content) or
-       ((Document (Current).Kind = Kind_Element_Open or Document (Current).Kind = Kind_Content) and then
-       ((Mode = Mode_Close and Document (Current).Children /= Invalid_Relative_Index) or
-       Mode = Mode_Open)))
-   with
-      Pre => Current in Document'Range;
+                           Mode     : Mode_Type) return Boolean is
+      ((Mode = Mode_Open and Document (Current).Kind = Kind_Content)
+       or ((Document (Current).Kind = Kind_Element_Open or Document (Current).Kind = Kind_Content)
+           and then ((Mode = Mode_Close and Document (Current).Children /= Invalid_Relative_Index)
+                     or Mode = Mode_Open))) with
+     Pre => Current in Document'Range;
 
    -----------------------
    -- Serialize_Element --
    -----------------------
 
-   procedure Serialize_Element (Document : Document_Type;
-                                Current  : Index_Type;
-                                Mode     : Mode_Type;
+   procedure Serialize_Element (Document :        Document_Type;
+                                Current  :        Index_Type;
+                                Mode     :        Mode_Type;
                                 Data     : in out String;
-                                Position : in out Integer)
-   with
-      Pre  => Data'Length > 0 and
-              (Current in Document'Range and then
-               Valid_Element (Document, Current, Mode)),
-      Post => (if Position'Old < 0 then Position < 0) and
-              (if Position >= 0  and Document (Current).Length > 0
-               then Position > Position'Old),
-      Annotate => (GNATprove, Terminating);
+                                Position : in out Integer) with
+     Pre  => Data'Length > 0
+             and (Current in Document'Range
+                  and then Valid_Element (Document, Current, Mode)),
+     Post => (if Position'Old < 0 then Position < 0)
+             and (if Position >= 0 and Document (Current).Length > 0 then Position > Position'Old),
+     Annotate => (GNATprove, Terminating);
 
-   procedure Serialize_Element (Document : Document_Type;
-                                Current  : Index_Type;
-                                Mode     : Mode_Type;
+   procedure Serialize_Element (Document :        Document_Type;
+                                Current  :        Index_Type;
+                                Mode     :        Mode_Type;
                                 Data     : in out String;
                                 Position : in out Integer)
    is
-      Attr  : Index_Type;
-      Value : Index_Type;
-      Pos   : Relative_Index_Type;
+      Attr         : Index_Type;
+      Value        : Index_Type;
+      Pos          : Relative_Index_Type;
       Position_Old : constant Integer := Position with Ghost;
    begin
-      if Document (Current).Kind = Kind_Content and
-         Mode = Mode_Open
+      if
+         Document (Current).Kind = Kind_Content
+         and Mode = Mode_Open
       then
          Put_Escaped (Document, Current, Data, Position);
          return;
       end if;
 
-      if Document (Current).Kind /= Kind_Element_Open and
-         Document (Current).Kind /= Kind_Content
+      if
+         Document (Current).Kind /= Kind_Element_Open
+         and Document (Current).Kind /= Kind_Content
       then
          Position := -1;
          return;
       end if;
 
-      if Mode = Mode_Close and
-         Document (Current).Children /= Invalid_Relative_Index
+      if
+         Mode = Mode_Close
+         and Document (Current).Children /= Invalid_Relative_Index
       then
          Put ("</", Data, Position);
          Serialize_Data (Document, Current, Data, Position);
@@ -247,13 +243,13 @@ is
          Pos  := Document (Current).Attributes;
          Attr := Current;
 
-         while Pos /= Invalid_Relative_Index and
-               not Overflow (Attr, Pos)
+         while Pos /= Invalid_Relative_Index and not Overflow (Attr, Pos)
          loop
             Attr := Add (Attr, Pos);
-            exit when not (Attr in Document'Range) or else
-                      Document (Attr).Kind /= Kind_Attribute or else
-                      Overflow (Attr, Document (Attr).Value);
+            exit when
+               not (Attr in Document'Range)
+               or else Document (Attr).Kind /= Kind_Attribute
+               or else Overflow (Attr, Document (Attr).Value);
 
             Put (" ", Data, Position);
             Serialize_Data (Document, Attr, Data, Position);
@@ -274,8 +270,7 @@ is
                                     else Position >= Position_Old)));
          end loop;
 
-         if Document (Current).Children = Invalid_Relative_Index
-         then
+         if Document (Current).Children = Invalid_Relative_Index then
             Put ("/", Data, Position);
          end if;
          Put (">", Data, Position);
@@ -286,10 +281,10 @@ is
    -- To_String --
    ---------------
 
-   procedure To_String (Document : Document_Type;
-                        Data     : out String;
-                        Last     : out Natural;
-                        Result   : out Result_Type;
+   procedure To_String (Document :        Document_Type;
+                        Data     :    out String;
+                        Last     :    out Natural;
+                        Result   :    out Result_Type;
                         Buffer   : in out Stack_Type)
    is
       Child    : Relative_Index_Type;
@@ -299,10 +294,10 @@ is
       Position : Integer := 0;
       Count    : Natural := 0;
 
-      package S   is new SXML.Stack (Traversal_Type,
-                                     Stack_Type,
-                                     Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1),
-                                     Null_Traversal);
+      package S is new SXML.Stack (Traversal_Type,
+                                   Stack_Type,
+                                   Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1),
+                                   Null_Traversal);
 
       package Rev is new SXML.Stack (Traversal_Type,
                                      Stack_Type,
@@ -326,50 +321,46 @@ is
 
          S.Pop (Current);
 
-         if Count = Natural'Last or
-            not (Current.Index in Document'Range)
+         if
+            Count = Natural'Last
+            or not (Current.Index in Document'Range)
          then
             Result := Result_Overflow;
             return;
          end if;
          Count := Count + 1;
 
-         if Valid_Element (Document, Current.Index, Current.Mode)
-         then
+         if Valid_Element (Document, Current.Index, Current.Mode) then
             Serialize_Element (Document, Current.Index, Current.Mode, Data, Position);
-            if Position < 0
-            then
+            if Position < 0 then
                return;
             end if;
          end if;
 
-         if Current.Mode = Mode_Open
-         then
-            if S.Is_Full
-            then
+         if Current.Mode = Mode_Open then
+            if S.Is_Full then
                return;
             end if;
             S.Push ((Current.Index, Mode_Close));
 
             Element := Current.Index;
-            if not (Element in Document'Range) or else
-              (Document (Element).Kind /= Kind_Element_Open and
-               Document (Element).Kind /= Kind_Content)
+            if
+               not (Element in Document'Range)
+               or else (Document (Element).Kind /= Kind_Element_Open
+                        and Document (Element).Kind /= Kind_Content)
             then
                return;
             end if;
 
             Child := Document (Element).Children;
             loop
-               exit when
-                 Child = Invalid_Relative_Index or
-                 Overflow (Element, Child);
+               exit when Child = Invalid_Relative_Index or Overflow (Element, Child);
 
                Element := Add (Element, Child);
-               if (Rev.Is_Full or
-                   not (Element in Document'Range)) or else
-                  (Document (Element).Kind /= Kind_Element_Open and
-                   Document (Element).Kind /= Kind_Content)
+               if
+                  (Rev.Is_Full or not (Element in Document'Range))
+                  or else (Document (Element).Kind /= Kind_Element_Open
+                           and Document (Element).Kind /= Kind_Content)
                then
                   return;
                end if;
@@ -391,8 +382,7 @@ is
                pragma Loop_Invariant (Rev.Is_Valid);
                pragma Loop_Invariant (not Rev.Is_Empty);
                Rev.Pop (Tmp);
-               if S.Is_Full
-               then
+               if S.Is_Full then
                   return;
                end if;
                S.Push ((Tmp.Index, Mode_Open));
@@ -402,14 +392,14 @@ is
       end loop;
 
       Result := Result_OK;
-      Last := Position;
+      Last   := Position;
    end To_String;
 
    ---------------
    -- To_String --
    ---------------
 
-   procedure To_String (Document : Document_Type;
+   procedure To_String (Document :     Document_Type;
                         Data     : out String;
                         Last     : out Natural;
                         Result   : out Result_Type)

@@ -24,7 +24,6 @@ is
    ------------------
 
    function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type with
-     Annotate => (GNATprove, Terminating),
      Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements required for attributes
    --
@@ -44,10 +43,9 @@ is
    ---------
 
    function "+" (Left  : Document_Type;
-                 Right : Document_Type) return Document_Type
-   with
-      Pre  => Is_Valid (Left, Right),
-      Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
+                 Right : Document_Type) return Document_Type with
+     Pre  => Is_Valid (Left, Right),
+     Post => Num_Elements ("+"'Result) = Num_Elements (Left) + Num_Elements (Right);
    --  Concatenate documents
    --
    --  @param Left  First document
@@ -68,51 +66,45 @@ is
 
    function E (Name       : Content_Type;
                Attributes : Attributes_Type;
-               Children   : Document_Base_Type) return Document_Type
-   with
-      Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes) - Num_Elements (Children),
-      Post => Valid_Document (E'Result)
-              and then E'Result'Length = Length (Name)
-                                         + Num_Elements (Attributes)
-                                         + Num_Elements (Children),
-      Annotate => (GNATprove, Terminating);
+               Children   : Document_Base_Type) return Document_Type with
+     Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes) - Num_Elements (Children),
+     Post => Valid_Document (E'Result)
+             and then E'Result'Length = Length (Name) + Num_Elements (Attributes) + Num_Elements (Children);
    --  Construct element with attributes and child document
    --
    --  @param Name        Name of element
    --  @param Attributes  Attribute data
    --  @param Children    Child documents
 
-   function E (Name       : Content_Type;
-               Children   : Document_Base_Type) return Document_Type
-   is (E (Name, Null_Attributes, Children))
-   with
-      Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Children),
-      Post => Valid_Document (E'Result)
-              and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Children),
-      Annotate => (GNATprove, Terminating);
+   function E (Name     : Content_Type;
+               Children : Document_Base_Type) return Document_Type is
+     (E (Name, Null_Attributes, Children))
+     with
+       Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Children),
+       Post => Valid_Document (E'Result)
+               and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Children);
    --  Construct element with child document and without attributes
    --
    --  @param Name        Name of element
    --  @param Children    Child documents
 
    function E (Name       : Content_Type;
-               Attributes : Attributes_Type) return Document_Type
-   is (E (Name, Attributes, Null_Document)) with
-     Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes),
-     Post => Valid_Document (E'Result)
-             and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Attributes),
-     Annotate => (GNATprove, Terminating);
+               Attributes : Attributes_Type) return Document_Type is
+     (E (Name, Attributes, Null_Document))
+     with
+       Pre  => Length (Name) < Offset_Type (Index_Type'Last) - Num_Elements (Attributes),
+       Post => Valid_Document (E'Result)
+               and then Num_Elements (E'Result) = Length (Name) + Num_Elements (Attributes);
    --  Construct element with attributes and without child document
    --
    --  @param Name        Name of element
    --  @param Attributes  Attribute data
 
-   function E (Name : Content_Type) return Document_Type
-   is (E (Name, Null_Attributes, Null_Document))
-   with
-      Pre  => Length (Name) < Offset_Type (Index_Type'Last),
-      Post => Valid_Document (E'Result) and then Num_Elements (E'Result) = Length (Name),
-      Annotate => (GNATprove, Terminating);
+   function E (Name : Content_Type) return Document_Type is
+     (E (Name, Null_Attributes, Null_Document))
+     with
+       Pre  => Length (Name) < Offset_Type (Index_Type'Last),
+       Post => Valid_Document (E'Result) and then Num_Elements (E'Result) = Length (Name);
    --  Construct element without attributes and without child document
    --
    --  @param Name  Name of element
@@ -122,13 +114,11 @@ is
    -------
 
    function A (Name  : Content_Type;
-               Value : Content_Type) return Attributes_Type
-   with
-      Pre  => Length (Name) < Offset_Type'Last and then
-              Length (Value) <= Offset_Type (Index_Type'Last - Add (1, Length (Name))),
-      Post => A'Result /= Null_Attributes and
-              Num_Elements (A'Result) = Length (Name) + Length (Value),
-      Annotate => (GNATproof, Terminating);
+               Value : Content_Type) return Attributes_Type with
+     Pre  => Length (Name) < Offset_Type'Last
+             and then Length (Value) <= Offset_Type (Index_Type'Last - Add (1, Length (Name))),
+     Post => A'Result /= Null_Attributes
+             and Num_Elements (A'Result) = Length (Name) + Length (Value);
    --  Construct attribute from string value
    --
    --  @param Name  Name of attribute
@@ -138,11 +128,9 @@ is
    -- C --
    -------
 
-   function C (Value : Content_Type) return Document_Type
-   with
-      Post => C'Result /= Null_Document and
-              C'Result'Length = Length (Value),
-      Annotate => (GNATprove, Terminating);
+   function C (Value : Content_Type) return Document_Type with
+     Post => C'Result /= Null_Document
+             and C'Result'Length = Length (Value);
    --  Construct content value
    --
    --  @param Value String value of content
@@ -158,15 +146,15 @@ private
 
    overriding
    function Is_Valid (Left  : Attributes_Base_Type;
-                      Right : Attributes_Base_Type) return Boolean
-   is (Is_Valid (Document_Base_Type (Left), Document_Base_Type (Right)));
+                      Right : Attributes_Base_Type) return Boolean is
+     (Is_Valid (Document_Base_Type (Left), Document_Base_Type (Right)));
 
    ------------------
    -- Num_Elements --
    ------------------
 
    overriding
-   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type
-   is (Attributes'Length);
+   function Num_Elements (Attributes : Attributes_Base_Type) return Offset_Type is
+     (Attributes'Length);
 
 end SXML.Generator;

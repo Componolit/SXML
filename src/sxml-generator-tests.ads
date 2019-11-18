@@ -15,15 +15,13 @@ package SXML.Generator.Tests is
 
    --  Element with attributes
    T007 : constant Document_Type := E ("elem1", A ("attr1", "value1"));
-   T008 : constant Document_Type := E ("elem1", A ("attr1", "value1") +
-                                               A ("attr2", "value2"));
-   T009 : constant Document_Type := E ("elem1", A ("attr1", "value1") +
-                                               A ("attr2", "value2") +
-                                               A ("attr3", "value3"));
+   T008 : constant Document_Type := E ("elem1", A ("attr1", "value1") + A ("attr2", "value2"));
+   T009 : constant Document_Type := E ("elem1", A ("attr1", "value1") + A ("attr2", "value2") + A ("attr3", "value3"));
 
    --  Element with children and attributes
    T010 : constant Document_Type := E ("elem1", A ("attr1", "value1"), E ("child1"));
-   T011 : constant Document_Type := E ("elem1", A ("attr1", "value1") + A ("attr2", "value2"),
-                                               E ("child1") + E ("child2"));
+   T011 : constant Document_Type := E ("elem1",
+                                       A ("attr1", "value1") + A ("attr2", "value2"),
+                                       E ("child1") + E ("child2"));
 
 end SXML.Generator.Tests;

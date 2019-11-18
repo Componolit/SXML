@@ -17,11 +17,10 @@ generic
 package SXML.Stack is
 
    function Level return Natural;
-   --  Numver of elements on stack
+   --  Number of elements on stack
 
-   function Is_Valid return Boolean
-   with
-      Ghost;
+   function Is_Valid return Boolean with
+     Ghost;
    --  Stack buffer is valid
 
    function Is_Empty return Boolean;
@@ -30,36 +29,31 @@ package SXML.Stack is
    function Is_Full return Boolean;
    --  Stack is full
 
-   procedure Push (E : Element_Type)
-   with
-      Pre  => Is_Valid and not Is_Full,
-      Post => Is_Valid and not Is_Empty and Level = Level'Old + 1;
+   procedure Push (E : Element_Type) with
+     Pre  => Is_Valid and not Is_Full,
+     Post => Is_Valid and not Is_Empty and Level = Level'Old + 1;
    --  Push element onto stack
    --
    --  @param E  Element to push onto stack
 
-   procedure Pop (E : out Element_Type)
-   with
-      Pre  => Is_Valid and not Is_Empty,
-      Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
+   procedure Pop (E : out Element_Type) with
+     Pre  => Is_Valid and not Is_Empty,
+     Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
    --  Pop an element off the stack
    --
    --  @param E  Result element
 
-   procedure Drop
-   with
-      Pre  => Is_Valid and not Is_Empty,
-      Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
+   procedure Drop with
+     Pre  => Is_Valid and not Is_Empty,
+     Post => Is_Valid and not Is_Full and Level = Level'Old - 1;
    --  Drop an element from stack
 
-   procedure Reset
-   with
-      Post => Is_Valid and Is_Empty and not Is_Full;
+   procedure Reset with
+     Post => Is_Valid and Is_Empty and not Is_Full;
    --  Reset stack without erasing data
 
-   procedure Init
-   with
-      Post => Is_Valid and Is_Empty and not Is_Full;
+   procedure Init with
+     Post => Is_Valid and Is_Empty and not Is_Full;
    --  Initialize stack and clear stack buffer
 
 end SXML.Stack;
