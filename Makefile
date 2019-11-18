@@ -31,7 +31,7 @@ testonly: build/SXML.gpr
 	@time obj/tests
 
 testbulk: export SXML_BULK_TESTS ?= 1
-testbulk: build/SXML.gpr bulkdata
+testbulk: build/SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@time obj/tests
 
