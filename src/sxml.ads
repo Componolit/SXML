@@ -11,6 +11,8 @@
 
 package SXML
 is
+   pragma Annotate (GNATprove, Terminating, SXML);
+
    Chunk_Length : constant := 8;
 
    type Result_Type is
@@ -23,24 +25,22 @@ is
 
    function Valid_Content (First : Integer;
                            Last  : Integer) return Boolean is
-      (First >= 0 and then
-       First <= Last and then
-       Last <= Natural'Last - Chunk_Length);
+     (First >= 0 and then
+      First <= Last and then
+      Last <= Natural'Last - Chunk_Length);
    --  Check validity of the range of a content type
    --
    --  @param First  First index
    --  @param Last   Last index
 
-   subtype Content_Base_Type is String
-   with
-      Predicate => Content_Base_Type'First >= 0
-                   and then Content_Base_Type'Last <= Natural'Last - Chunk_Length;
+   subtype Content_Base_Type is String with
+     Predicate => Content_Base_Type'First >= 0
+                  and then Content_Base_Type'Last <= Natural'Last - Chunk_Length;
    Empty_Content : constant Content_Base_Type := "";
 
-   subtype Content_Type is Content_Base_Type
-   with
-      Predicate => Content_Type'Length > 0
-                   and then Content_Type'First <= Content_Type'Last;
+   subtype Content_Type is Content_Base_Type with
+     Predicate => Content_Type'Length > 0
+                  and then Content_Type'First <= Content_Type'Last;
 
    type Index_Type is range 1 .. Natural'Last - 1;
    Invalid_Index : constant Index_Type := Index_Type'Last;
@@ -68,8 +68,9 @@ is
    Null_Document : constant Document_Base_Type;
 
    function Valid_Document (Document : Document_Base_Type) return Boolean is
-      (Document'First > 0 and then Document'Length > 0) with
-      Ghost;
+     (Document'First > 0 and then Document'Length > 0)
+     with
+       Ghost;
 
    subtype Document_Type is Document_Base_Type with
      Dynamic_Predicate => Document_Type'First > 0
@@ -82,11 +83,9 @@ is
 
    function Add (Left  : Offset_Type;
                  Right : Relative_Index_Type) return Offset_Type
-   is (Left + Offset_Type (Right))
-   with
-      Pre      => Offset_Type (Right) <= Offset_Type'Last - Left,
-      Annotate => (GNATprove, Terminating),
-      Annotate => (GNATprove, Inline_For_Proof);
+   is (Left + Offset_Type (Right)) with
+     Pre      => Offset_Type (Right) <= Offset_Type'Last - Left,
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Add relative index to offset
    --
    --  @param Left   Offset
@@ -94,11 +93,9 @@ is
 
    function Add (Left  : Index_Type;
                  Right : Offset_Type) return Index_Type
-   is (Index_Type (Natural (Left) + Natural (Right)))
-   with
-      Pre      => Right <= Offset_Type (Index_Type'Last - Left),
-      Annotate => (GNATprove, Terminating),
-      Annotate => (GNATprove, Inline_For_Proof);
+   is (Index_Type (Natural (Left) + Natural (Right))) with
+     Pre      => Right <= Offset_Type (Index_Type'Last - Left),
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Add offset to index
    --
    --  @param Left   Index
@@ -106,11 +103,9 @@ is
 
    function Add (Left  : Index_Type;
                  Right : Relative_Index_Type) return Index_Type
-   is (Index_Type (Natural (Left) + Natural (Right)))
-   with
-      Pre      => Right <= Relative_Index_Type (Index_Type'Last - Left),
-      Annotate => (GNATprove, Terminating),
-      Annotate => (GNATprove, Inline_For_Proof);
+   is (Index_Type (Natural (Left) + Natural (Right))) with
+     Pre      => Right <= Relative_Index_Type (Index_Type'Last - Left),
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Add relative index to index
    --
    --  @param Left   Index
@@ -121,24 +116,24 @@ is
    --------------
 
    function Overflow (Left  : Offset_Type;
-                      Right : Relative_Index_Type) return Boolean
-   is (Offset_Type (Right) > Offset_Type'Last - Left);
+                      Right : Relative_Index_Type) return Boolean is
+     (Offset_Type (Right) > Offset_Type'Last - Left);
    --  Check whether adding a relative index would overflow an offset
    --
    --  @param Left   Offset
    --  @param Right  Relative index
 
    function Overflow (Left  : Index_Type;
-                      Right : Relative_Index_Type) return Boolean
-   is (Right > Relative_Index_Type (Index_Type'Last - Left));
+                      Right : Relative_Index_Type) return Boolean is
+     (Right > Relative_Index_Type (Index_Type'Last - Left));
    --  Check whether adding a relative index would overflow an index
    --
    --  @param Left   Index
    --  @param Right  Relative index
 
    function Overflow (Left  : Index_Type;
-                      Right : Offset_Type) return Boolean
-   is (Right > Offset_Type (Index_Type'Last - Left));
+                      Right : Offset_Type) return Boolean is
+     (Right > Offset_Type (Index_Type'Last - Left));
    --  Check whether adding an index would overflow an index
    --
    --  @param Left   Index
@@ -149,33 +144,30 @@ is
    ---------
 
    function Sub (Left  : Index_Type;
-                 Right : Index_Type) return Relative_Index_Type
-   is (Relative_Index_Type (Left - Right))
-   with
-      Pre      => Left >= Right,
-      Annotate => (GNATprove, Terminating);
+                 Right : Index_Type) return Relative_Index_Type is
+     (Relative_Index_Type (Left - Right))
+     with
+       Pre => Left >= Right;
    --  Substract index from index yielding realtive index
    --
    --  @param Left   Index
    --  @param Right  Index
 
    function Sub (Left  : Index_Type;
-                 Right : Index_Type) return Offset_Type
-   is (Offset_Type (Left - Right))
-   with
-      Pre      => Left >= Right,
-      Annotate => (GNATprove, Terminating);
+                 Right : Index_Type) return Offset_Type is
+     (Offset_Type (Left - Right))
+     with
+       Pre => Left >= Right;
    --  Substract index from index yielding offset
    --
    --  @param Left   Index
    --  @param Right  Index
 
    function Sub (Left  : Index_Type;
-                 Right : Offset_Type) return Index_Type
-   is (Index_Type (Offset_Type (Left) - Right))
-   with
-      Pre      => Offset_Type (Left) > Right,
-      Annotate => (GNATprove, Terminating);
+                 Right : Offset_Type) return Index_Type is
+     (Index_Type (Offset_Type (Left) - Right))
+     with
+       Pre => Offset_Type (Left) > Right;
    --  Substract offset from index yielding index
    --
    --  @param Left   Index
@@ -186,16 +178,16 @@ is
    ---------------
 
    function Underflow (Left  : Index_Type;
-                       Right : Offset_Type) return Boolean
-   is (Right >= Offset_Type (Left));
+                       Right : Offset_Type) return Boolean is
+     (Right >= Offset_Type (Left));
    --  Check whether subtracting an offset would underflow an index
    --
    --  @param Left   Index
    --  @param Right  Offset
 
    function Underflow (Left  : Index_Type;
-                       Right : Index_Type) return Boolean
-   is (Right > Left);
+                       Right : Index_Type) return Boolean is
+     (Right > Left);
    --  Check whether subtracting an index would underflow an index
    --
    --  @param Left   Index
@@ -213,9 +205,8 @@ is
    -- Is_Open --
    -------------
 
-   function Is_Open (Node : Node_Type) return Boolean
-   with
-      Post => (if Is_Open'Result then Node.Kind = Kind_Element_Open);
+   function Is_Open (Node : Node_Type) return Boolean with
+     Post => (if Is_Open'Result then Node.Kind = Kind_Element_Open);
    --  Node is an opening element
    --
    --  @param Node  Document node
@@ -224,9 +215,8 @@ is
    -- Is_Invalid --
    ----------------
 
-   function Is_Invalid (Node : Node_Type) return Boolean
-   with
-      Post => (if Is_Invalid'Result then Node.Kind = Kind_Invalid);
+   function Is_Invalid (Node : Node_Type) return Boolean with
+     Post => (if Is_Invalid'Result then Node.Kind = Kind_Invalid);
    --  Node is an invalid element
    --
    --  @param Node  Document node
@@ -237,14 +227,12 @@ is
 
    procedure Append (Left   : in out Document_Type;
                      Offset :        Offset_Type;
-                     Right  :        Document_Type)
-   with
-      Pre => Offset < Offset_Type (Index_Type'Last) and then
-             Offset < Left'Length and then
-             Left'Length - Offset <= Right'Length and then
-             Right'Length <= Offset_Type'Last - Offset and then
-             Right'Length <= Left'Length - Offset,
-      Annotate => (GNATprove, Terminating);
+                     Right  :        Document_Type) with
+     Pre => Offset < Offset_Type (Index_Type'Last)
+            and then Offset < Left'Length
+            and then Left'Length - Offset <= Right'Length
+            and then Right'Length <= Offset_Type'Last - Offset
+            and then Right'Length <= Left'Length - Offset;
    --  Append a document inplace
    --
    --  @param Left    Document to append to
@@ -256,10 +244,9 @@ is
    -----------------
 
    procedure Put_Content (Document : in out Document_Type;
-                          Offset   : Offset_Type;
-                          Value    : Content_Type)
-   with
-      Pre => Has_Space (Document, Offset, Value);
+                          Offset   :        Offset_Type;
+                          Value    :        Content_Type) with
+     Pre => Has_Space (Document, Offset, Value);
    --  Write content to a document at the specified offset
    --
    --  @param Document Document to write content into
@@ -270,8 +257,8 @@ is
    -- Attribute --
    ---------------
 
-   procedure Attribute (Name     : Content_Type;
-                        Data     : Content_Base_Type;
+   procedure Attribute (Name     :        Content_Type;
+                        Data     :        Content_Base_Type;
                         Offset   : in out Offset_Type;
                         Document : in out Document_Type) with
      Pre => Offset <= Offset_Type (Document'Length) - Length (Data) - Length (Name);
@@ -287,11 +274,9 @@ is
    -------------------
 
    function String_Length (Document : Document_Type;
-                           Offset   : Offset_Type) return Natural
-   with
-      Pre      => Offset < Document'Length,
-      Post     => String_Length'Result <= Natural'Last - Chunk_Length,
-      Annotate => (Gnatprove, Terminating);
+                           Offset   : Offset_Type) return Natural with
+     Pre  => Offset < Document'Length,
+     Post => String_Length'Result <= Natural'Last - Chunk_Length;
    --  Return length of string at given offset
    --
    --  @param Document Source document
@@ -301,17 +286,15 @@ is
    -- Get_String --
    ----------------
 
-   procedure Get_String (Document : Document_Type;
-                         Start    : Offset_Type;
+   procedure Get_String (Document :     Document_Type;
+                         Start    :     Offset_Type;
                          Result   : out Result_Type;
                          Data     : out Content_Type;
-                         Last     : out Natural)
-   with
-      Pre      => Start < Document'Length and
-                  Valid_Content (Data'First, Data'Last),
-      Post     => (if Result = Result_OK
-                   then Last in Data'Range),
-      Annotate => (Gnatprove, Terminating);
+                         Last     : out Natural) with
+     Pre  => Start < Document'Length
+             and Valid_Content (Data'First, Data'Last),
+     Post => (if Result = Result_OK
+              then Last in Data'Range);
    --  Extract string at given position
    --
    --  @param Document Source document
@@ -324,20 +307,16 @@ is
    -- Num_Elements --
    ------------------
 
-   function Length (D : Content_Base_Type) return Offset_Type
-   with
-      Post     => Length'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
-      Annotate => (GNATprove, Terminating),
-      Annotate => (GNATprove, Inline_For_Proof);
+   function Length (D : Content_Base_Type) return Offset_Type with
+     Post     => Length'Result = (D'Length + (Chunk_Length - 1)) / Chunk_Length,
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements to store content
    --
    --  @param D  Element content
 
-   function Num_Elements (Document : Document_Base_Type) return Offset_Type
-   with
-      Post     => Num_Elements'Result = (if Document = Null_Document then 0 else Document'Length),
-      Annotate => (GNATprove, Terminating),
-      Annotate => (GNATprove, Inline_For_Proof);
+   function Num_Elements (Document : Document_Base_Type) return Offset_Type with
+     Post     => Num_Elements'Result = (if Document = Null_Document then 0 else Document'Length),
+     Annotate => (GNATprove, Inline_For_Proof);
    --  Number of elements in document
    --
    --  @param Document  Document
@@ -361,16 +340,15 @@ is
    -- Open --
    ----------
 
-   procedure Open (Name     : Content_Type;
+   procedure Open (Name     :        Content_Type;
                    Document : in out Document_Type;
                    Position : in out Index_Type;
-                   Start    : out Index_Type)
-   with
-      Pre  => Position in Document'Range and then
-              Has_Space (Document, Sub (Position, Document'First), Name),
-      Post => Start in Document'Range and
-              Is_Open (Document (Start)) and
-              Position = Add (Position'Old, Length (Name));
+                   Start    :    out Index_Type) with
+     Pre  => Position in Document'Range and then
+             Has_Space (Document, Sub (Position, Document'First), Name),
+     Post => Start in Document'Range and
+             Is_Open (Document (Start)) and
+             Position = Add (Position'Old, Length (Name));
    --  Write open element to document
    --
    --  @param Name      Content to write to document
@@ -424,9 +402,8 @@ private
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Left, Right : Document_Base_Type) return Boolean
-   is
-      ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0) and
-       Num_Elements (Left) < Offset_Type (Index_Type'Last) - Num_Elements (Right));
+   function Is_Valid (Left, Right : Document_Base_Type) return Boolean is
+     ((Num_Elements (Left) > 0 or Num_Elements (Right) > 0)
+      and Num_Elements (Left) < Offset_Type (Index_Type'Last) - Num_Elements (Right));
 
 end SXML;

@@ -20,28 +20,25 @@ is
    -- Offset --
    ------------
 
-   function Offset (State : State_Type) return Offset_Type
-   with
-      Pre => State.Result = Result_OK,
-      Ghost;
+   function Offset (State : State_Type) return Offset_Type with
+     Pre => State.Result = Result_OK,
+     Ghost;
 
    --------------
    -- Is_Valid --
    --------------
 
    function Is_Valid (Document : Document_Type;
-                      State    : State_Type) return Boolean
-   with
-      Ghost;
+                      State    : State_Type) return Boolean with
+     Ghost;
 
    -------------
    -- Is_Open --
    -------------
 
    function Is_Open (Document : Document_Type;
-                     State    : State_Type) return Boolean
-   with
-      Pre => State.Result = Result_OK and Is_Valid (Document, State);
+                     State    : State_Type) return Boolean with
+     Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to open element in document
    --
    --  @param Document  Document
@@ -52,10 +49,9 @@ is
    ----------------
 
    function Is_Content (Document : Document_Type;
-                        State    : State_Type) return Boolean
-   with
-      Ghost,
-      Pre => State.Result = Result_OK and Is_Valid (Document, State);
+                        State    : State_Type) return Boolean with
+     Ghost,
+     Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to content element in document
    --
    --  @param Document  Document
@@ -66,10 +62,9 @@ is
    ------------------
 
    function Is_Attribute (Document : Document_Type;
-                          State    : State_Type) return Boolean
-   with
-      Ghost,
-      Pre => State.Result = Result_OK and Is_Valid (Document, State);
+                          State    : State_Type) return Boolean with
+     Ghost,
+     Pre => State.Result = Result_OK and Is_Valid (Document, State);
    --  Current state points to attribute element in document
    --
    --  @param Document  Document
@@ -79,9 +74,8 @@ is
    -- Init --
    ----------
 
-   function Init (Document : Document_Type) return State_Type
-   with
-      Post => Is_Valid (Document, Init'Result);
+   function Init (Document : Document_Type) return State_Type with
+     Post => Is_Valid (Document, Init'Result);
    --  Initialize state
    --
    --  @param Document  Document to initialize state for
@@ -90,16 +84,15 @@ is
    -- Name --
    ----------
 
-   procedure Name (State    : State_Type;
-                   Document : Document_Type;
+   procedure Name (State    :     State_Type;
+                   Document :     Document_Type;
                    Result   : out Result_Type;
                    Data     : out Content_Type;
-                   Last     : out Natural)
-   with
-      Pre => Valid_Content (Data'First, Data'Last) and then
-             State.Result = Result_OK and then
-             (Is_Valid (Document, State) and then
-              (Is_Open (Document, State) or Is_Attribute (Document, State)));
+                   Last     : out Natural) with
+     Pre => Valid_Content (Data'First, Data'Last)
+            and then State.Result = Result_OK
+            and then (Is_Valid (Document, State)
+            and then (Is_Open (Document, State) or Is_Attribute (Document, State)));
    --  Return name for current node
    --
    --  @param State     Current state
@@ -113,15 +106,14 @@ is
    -----------
 
    function Child (State    : State_Type;
-                   Document : Document_Type) return State_Type
-   with
-      Pre  => State.Result = Result_OK and then
-              Is_Valid (Document, State),
-      Post => (if Child'Result.Result = Result_OK
-               then Offset (Child'Result) > Offset (State) and then
-                    (Is_Valid (Document, Child'Result) and then
-                      (Is_Open (Document, Child'Result) or
-                       Is_Content (Document, Child'Result))));
+                   Document : Document_Type) return State_Type with
+     Pre  => State.Result = Result_OK
+             and then Is_Valid (Document, State),
+     Post => (if Child'Result.Result = Result_OK
+              then Offset (Child'Result) > Offset (State)
+                   and then (Is_Valid (Document, Child'Result)
+                             and then (Is_Open (Document, Child'Result)
+                                       or Is_Content (Document, Child'Result))));
    --  Get child
    --
    --  @param State     Current state
@@ -133,17 +125,16 @@ is
    -------------
 
    function Sibling (State    : State_Type;
-                     Document : Document_Type) return State_Type
-   with
-      Pre => State.Result = Result_OK and then
-             Is_Valid (Document, State) and then
-              (Is_Open (Document, State) or
-               Is_Content (Document, State)),
-      Post => (if Sibling'Result.Result = Result_OK
-               then  Offset (Sibling'Result) > Offset (State) and then
-                     (Is_Valid (Document, Sibling'Result) and then
-                       (Is_Open (Document, Sibling'Result) or
-                        Is_Content (Document, Sibling'Result))));
+                     Document : Document_Type) return State_Type with
+     Pre => State.Result = Result_OK
+            and then Is_Valid (Document, State)
+            and then (Is_Open (Document, State)
+                      or Is_Content (Document, State)),
+     Post => (if Sibling'Result.Result = Result_OK
+              then Offset (Sibling'Result) > Offset (State)
+                   and then (Is_Valid (Document, Sibling'Result)
+                             and then (Is_Open (Document, Sibling'Result)
+                                       or Is_Content (Document, Sibling'Result))));
    --  Get next sibling
    --
    --  @param State     Current state
@@ -158,16 +149,15 @@ is
                           Document        : Document_Type;
                           Sibling_Name    : String := "*";
                           Attribute_Name  : String := "*";
-                          Attribute_Value : String := "*") return State_Type
-   with
-      Pre  => State.Result = Result_OK and then
-              Is_Valid (Document, State) and then
-               (Is_Open (Document, State) or
-                Is_Content (Document, State)),
-      Post => (if Find_Sibling'Result.Result = Result_OK
-               then Offset (Find_Sibling'Result) >= Offset (State) and then
-                    (Is_Valid (Document, Find_Sibling'Result) and then
-                     Is_Open (Document, Find_Sibling'Result)));
+                          Attribute_Value : String := "*") return State_Type with
+     Pre  => State.Result = Result_OK
+             and then Is_Valid (Document, State)
+             and then (Is_Open (Document, State)
+                       or Is_Content (Document, State)),
+     Post => (if Find_Sibling'Result.Result = Result_OK
+              then Offset (Find_Sibling'Result) >= Offset (State)
+                   and then (Is_Valid (Document, Find_Sibling'Result)
+                             and then Is_Open (Document, Find_Sibling'Result)));
    --  Find sibling by name
    --
    --  @param State           Current state
@@ -182,15 +172,14 @@ is
    ---------------
 
    function Attribute (State    : State_Type;
-                       Document : Document_Type) return State_Type
-   with
-      Pre  => State.Result = Result_OK and then
-              Is_Valid (Document, State) and then
-              Is_Open (Document, State),
-      Post => (if Attribute'Result.Result = Result_OK
-               then (Is_Valid (Document, Attribute'Result)
-                     and then Is_Attribute (Document, Attribute'Result)
-                     and then Is_Valid_Value (Attribute'Result, Document)));
+                       Document : Document_Type) return State_Type with
+     Pre  => State.Result = Result_OK
+             and then Is_Valid (Document, State)
+             and then Is_Open (Document, State),
+     Post => (if Attribute'Result.Result = Result_OK
+              then (Is_Valid (Document, Attribute'Result)
+                    and then Is_Attribute (Document, Attribute'Result)
+                    and then Is_Valid_Value (Attribute'Result, Document)));
    --  Get first attribute of opening element
    --
    --  @param State     Current state
@@ -203,11 +192,10 @@ is
 
    function Has_Attribute (State          : State_Type;
                            Document       : Document_Type;
-                           Attribute_Name : String) return Boolean
-   with
-      Pre  => State.Result = Result_OK and then
-              Is_Valid (Document, State) and then
-              Is_Open (Document, State);
+                           Attribute_Name : String) return Boolean with
+     Pre  => State.Result = Result_OK
+             and then Is_Valid (Document, State)
+             and then Is_Open (Document, State);
    --  Check whether node has an attribute
    --
    --  @param State           Current state
@@ -220,12 +208,11 @@ is
 
    function Attribute (State          : State_Type;
                        Document       : Document_Type;
-                       Attribute_Name : String) return String
-   with
-      Pre  => State.Result = Result_OK and then
-              Is_Valid (Document, State) and then
-              Is_Open (Document, State) and then
-              Has_Attribute (State, Document, Attribute_Name);
+                       Attribute_Name : String) return String with
+     Pre  => State.Result = Result_OK
+             and then Is_Valid (Document, State)
+             and then Is_Open (Document, State)
+             and then Has_Attribute (State, Document, Attribute_Name);
    --  Get first attribute by name
    --
    --  @param State          Current state
@@ -238,11 +225,10 @@ is
    --------------------
 
    function Is_Valid_Value (State    : State_Type;
-                            Document : Document_Type) return Boolean
-   with
-      Pre => State.Result = Result_OK and then
-             Is_Valid (Document, State) and then
-             Is_Attribute (Document, State);
+                            Document : Document_Type) return Boolean with
+     Pre => State.Result = Result_OK
+            and then Is_Valid (Document, State)
+            and then Is_Attribute (Document, State);
    --  Check if current attribute has valid value
    --
    --  @param State     Current state
@@ -252,20 +238,19 @@ is
    -- Value --
    -----------
 
-   procedure Value (State    : State_Type;
-                    Document : Document_Type;
+   procedure Value (State    :     State_Type;
+                    Document :     Document_Type;
                     Result   : out Result_Type;
                     Data     : out Content_Type;
-                    Last     : out Natural)
-   with
-      Pre => Valid_Content (Data'First, Data'Last) and then
-             State.Result = Result_OK and then
-             Is_Valid (Document, State) and then
-             Is_Attribute (Document, State) and then
-             Is_Valid_Value (State, Document),
-      Post => (if Result = Result_OK
-               then Last in Data'Range
-                    and Is_Valid_Value (State, Document));
+                    Last     : out Natural) with
+     Pre => Valid_Content (Data'First, Data'Last)
+            and then State.Result = Result_OK
+            and then Is_Valid (Document, State)
+            and then Is_Attribute (Document, State)
+            and then Is_Valid_Value (State, Document),
+     Post => (if Result = Result_OK
+              then Last in Data'Range
+                   and Is_Valid_Value (State, Document));
    --  Return value for current attribute
    --
    --  @param State     Current state
@@ -279,16 +264,15 @@ is
    --------------------
 
    function Next_Attribute (State    : State_Type;
-                            Document : Document_Type) return State_Type
-   with
-      Pre => State.Result = Result_OK and then
-             Is_Valid (Document, State) and then
-             Is_Attribute (Document, State),
-      Post => (if Next_Attribute'Result.Result = Result_OK
-               then Offset (Next_Attribute'Result) > Offset (State)
-                    and then (Is_Valid (Document, Next_Attribute'Result)
-                    and then Is_Attribute (Document, Next_Attribute'Result)
-                    and then Is_Valid_Value (Next_Attribute'Result, Document)));
+                            Document : Document_Type) return State_Type with
+     Pre => State.Result = Result_OK
+            and then Is_Valid (Document, State)
+            and then Is_Attribute (Document, State),
+     Post => (if Next_Attribute'Result.Result = Result_OK
+              then Offset (Next_Attribute'Result) > Offset (State)
+                   and then (Is_Valid (Document, Next_Attribute'Result)
+                             and then Is_Attribute (Document, Next_Attribute'Result)
+                             and then Is_Valid_Value (Next_Attribute'Result, Document)));
    --  Get next attribute
    --
    --  @param State     Current state
@@ -302,15 +286,14 @@ is
    function Find_Attribute (State           : State_Type;
                             Document        : Document_Type;
                             Attribute_Name  : String := "*";
-                            Attribute_Value : String := "*") return State_Type
-   with
-      Pre => State.Result = Result_OK and then
-             Is_Valid (Document, State) and then
-             Is_Open (Document, State),
-      Post => Is_Valid (Document, Find_Attribute'Result)
-              and (if Find_Attribute'Result.Result = Result_OK
-                   then Is_Attribute (Document, Find_Attribute'Result)
-                        and Is_Valid_Value (Find_Attribute'Result, Document));
+                            Attribute_Value : String := "*") return State_Type with
+     Pre => State.Result = Result_OK
+            and then Is_Valid (Document, State)
+            and then Is_Open (Document, State),
+     Post => Is_Valid (Document, Find_Attribute'Result)
+             and then (if Find_Attribute'Result.Result = Result_OK
+                       then Is_Attribute (Document, Find_Attribute'Result)
+                            and then Is_Valid_Value (Find_Attribute'Result, Document));
    --  Find attribute by name
    --
    --  @param State           Current state
@@ -325,15 +308,14 @@ is
 
    function Path (State        : State_Type;
                   Document     : Document_Type;
-                  Query_String : String) return State_Type
-   with
-       Pre => State.Result = Result_OK and then
-              Query_String'First > 0 and then
-              Query_String'First <= Query_String'Last and then
-              Query_String'Last < Natural'Last and then
-              Query_String'Length > 1 and then
-              (Is_Valid (Document, State) and then
-               Is_Open (Document, State));
+                  Query_String : String) return State_Type with
+      Pre => State.Result = Result_OK
+             and then Query_String'First > 0
+             and then Query_String'First <= Query_String'Last
+             and then Query_String'Last < Natural'Last
+             and then Query_String'Length > 1
+             and then (Is_Valid (Document, State)
+                       and then Is_Open (Document, State));
    --  Query element by path beginning at State. Path queries may reference
    --  element names, wildcards and attributes
    --  e.g. /root/parent/*/grandchild[@attribute=value]
@@ -346,14 +328,14 @@ is
 private
 
    type State_Type (Result : Result_Type := Result_Invalid) is
-   record
-      case Result is
-         when Result_OK =>
-            Offset : Offset_Type;
-         when others =>
-            null;
-      end case;
-   end record;
+      record
+         case Result is
+            when Result_OK =>
+               Offset : Offset_Type;
+            when others =>
+               null;
+         end case;
+      end record;
 
    Invalid_State : constant State_Type := (Result => Result_Invalid);
 

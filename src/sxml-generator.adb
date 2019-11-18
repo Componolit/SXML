@@ -21,8 +21,7 @@ is
                Attributes : Attributes_Type;
                Children   : Document_Base_Type) return Document_Type
    is
-      Len : constant Index_Type :=
-         Index_Type (Length (Name) + Num_Elements (Attributes) + Num_Elements (Children));
+      Len : constant Index_Type := Index_Type (Length (Name) + Num_Elements (Attributes) + Num_Elements (Children));
 
       Result   : Document_Type (1 .. Len) := (others => Null_Node);
       Position : Index_Type := Result'First;
@@ -30,25 +29,21 @@ is
    begin
       Open (Name, Result, Position, Start);
       pragma Assert (Position = Add ((Result'First), Length (Name)));
-      Result (Start).Attributes :=
-         (if Attributes = Null_Attributes
-          then Invalid_Relative_Index
-          else Relative_Index_Type (Length (Name)));
-      Result (Start).Children :=
-         (if Children = Null_Document
-          then Invalid_Relative_Index
-          else Relative_Index_Type (Length (Name) + Num_Elements (Attributes)));
+      Result (Start).Attributes := (if Attributes = Null_Attributes
+                                    then Invalid_Relative_Index
+                                    else Relative_Index_Type (Length (Name)));
+      Result (Start).Children := (if Children = Null_Document
+                                  then Invalid_Relative_Index
+                                  else Relative_Index_Type (Length (Name) + Num_Elements (Attributes)));
 
-      if Attributes /= Null_Attributes
-      then
+      if Attributes /= Null_Attributes then
          Result (Position .. Add (Position, Num_Elements (Attributes)) - 1) := Document_Type (Attributes);
       end if;
 
-      if Children /= Null_Document
-      then
+      if Children /= Null_Document then
          pragma Assert (Children'Length = Num_Elements (Children));
-         Result (Add (Position, Num_Elements (Attributes)) ..
-                 Add (Add (Position, Num_Elements (Attributes)), Num_Elements (Children)) - 1) := Children;
+         Result (Add (Position, Num_Elements (Attributes))
+                 ..  Add (Add (Position, Num_Elements (Attributes)), Num_Elements (Children)) - 1) := Children;
       end if;
 
       return Result;
@@ -80,8 +75,7 @@ is
 
    function C (Value : Content_Type) return Document_Type
    is
-      Result : Document_Type (1 .. Add (1, Length (Value) - 1)) :=
-         (others => Null_Node);
+      Result : Document_Type (1 .. Add (1, Length (Value) - 1)) := (others => Null_Node);
    begin
       Put_Content (Result, 0, Value);
       return Result;
@@ -96,8 +90,7 @@ is
    is
       Result : Document_Type (1 .. Index_Type (Num_Elements (Left) + Num_Elements (Right))) := (others => Null_Node);
    begin
-      if Right'Length = 0
-      then
+      if Right'Length = 0 then
          return Left;
       end if;
 
@@ -125,15 +118,15 @@ is
 
       --  Find last attibute
       loop
-         if Overflow (Result'First, I)
-         then
+         if Overflow (Result'First, I) then
             return Result;
          end if;
 
          N :=  Add (Result'First, I);
-         if I > Left'Length or
-            (not (N in Result'Range) or else
-             Result (N).Kind /= Kind_Attribute)
+         if
+            I > Left'Length
+            or (N not in Result'Range
+                or else Result (N).Kind /= Kind_Attribute)
          then
             return Result;
          end if;
@@ -145,8 +138,7 @@ is
 
          exit when Result (N).Next_Attribute = Invalid_Relative_Index;
 
-         if Result (N).Next_Attribute > Relative_Index_Type'Last - I
-         then
+         if Result (N).Next_Attribute > Relative_Index_Type'Last - I then
             return Result;
          end if;
 
