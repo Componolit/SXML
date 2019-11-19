@@ -15,9 +15,10 @@ is
       Pre => Value'Length <= Arg_Type'Length;
       
    
-   procedure Execute (Program   : String;
+   procedure Execute (Program   : SXML.Content_Type;
                       Arguments : Args_Type)
    with
-      Global => (In_Out => Output);
+      Global => (In_Out => Output),
+      Pre => Arguments'Length > 0 and Arguments'Length < 100;
 
 end Execute;
