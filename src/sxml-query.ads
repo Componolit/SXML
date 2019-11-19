@@ -309,13 +309,10 @@ is
    function Path (State        : State_Type;
                   Document     : Document_Type;
                   Query_String : String) return State_Type with
-      Pre => State.Result = Result_OK
-             and then Query_String'First > 0
-             and then Query_String'First <= Query_String'Last
-             and then Query_String'Last < Natural'Last
-             and then Query_String'Length > 1
-             and then (Is_Valid (Document, State)
-                       and then Is_Open (Document, State));
+     Pre => Query_String'First > 0
+            and then Query_String'Length > 0
+            and then State.Result = Result_OK
+            and then Is_Valid (Document, State);
    --  Query element by path beginning at State. Path queries may reference
    --  element names, wildcards and attributes
    --  e.g. /root/parent/*/grandchild[@attribute=value]
