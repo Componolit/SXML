@@ -228,11 +228,7 @@ is
    procedure Append (Left   : in out Document_Type;
                      Offset :        Offset_Type;
                      Right  :        Document_Type) with
-     Pre => Offset < Offset_Type (Index_Type'Last)
-            and then Offset < Left'Length
-            and then Left'Length - Offset <= Right'Length
-            and then Right'Length <= Offset_Type'Last - Offset
-            and then Right'Length <= Left'Length - Offset;
+     Pre =>  Right'Length <= Left'Length - Offset;
    --  Append a document inplace
    --
    --  @param Left    Document to append to
