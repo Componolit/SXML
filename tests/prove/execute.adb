@@ -30,13 +30,13 @@ is
 
    function To_Subtree (Arguments : Args_Type) return Document_Type
    with
-      Pre => Arguments'Length < 100;
+      Pre => Arguments'Length > 0 and Arguments'Length < 100;
 
    function To_Subtree (Arguments : Args_Type) return Document_Type
    is
       Dummy   : constant Arg_Type := (others => 'x');
-      pragma Assert (Num_Elements ("arg") < Offset_Type'Last - SXML.Generator.Num_Elements (A ("value", String (Dummy))) - Num_Elements (Null_Document));
       Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
+      pragma Assert (Index_Type (Arg_Len) < Index_Type'Last / Arguments'Length);
       Result  : Document_Type (1 .. Index_Type (Arg_Len * Arguments'Length)) :=
          (others => Null_Node);
    begin
@@ -46,8 +46,18 @@ is
             Argument : constant Arg_Type := Arguments (Add (Arguments'First, I));
             Arg : constant Document_Type := E ("arg", A ("value", String (Argument)));
          begin
-            Result (Add (Result'First, Relative_Index_Type (Arg_Len) * I) ..
-                    Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I), Relative_Index_Type (Arg_Len) - 1)) := Arg;
+            if
+              I in Relative_Index_Type'Last / Relative_Index_Type (Arg_Len)
+              and then Relative_Index_Type (Arg_Len) * I <= Relative_Index_Type (Index_Type'Last - Result'First)
+              and then Relative_Index_Type (Add (Result'First, Relative_Index_Type (Arg_Len) * I))
+                       <= Relative_Index_Type (Index_Type'Last) - Relative_Index_Type (Arg_Len) - 1
+              and then Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I), Relative_Index_Type (Arg_Len) - 1)
+                       <= Index_Type (Arg_Len * Arguments'Length)
+            then
+               Result (Add (Result'First, Relative_Index_Type (Arg_Len) * I) ..
+                       Add (Add (Result'First, Relative_Index_Type (Arg_Len) * I),
+                            Relative_Index_Type (Arg_Len) - 1)) := Arg;
+            end if;
          end;
       end loop;
       return Result;
@@ -106,11 +116,9 @@ is
    -- 	</start>
    -- </config>
 
-   procedure Execute (Program   : String;
+   procedure Execute (Program   : Content_Type;
                       Arguments : Args_Type)
    is
-      pragma Assert (Num_Elements (Null_Document) = 0);
-
       Doc : Document_Type :=
        E ("config",
          E ("report",
@@ -166,11 +174,15 @@ is
       Result : Result_Type;
    begin
       To_String (Doc, Data, Offset, Result);
-      if Result = Result_OK
+      if
+        Result = Result_OK
+        and Offset >= Data'First
+        and Offset <= Data'Last
       then
          IO.Put_Line (Data (1 .. Offset));
       else
-         IO.Put_Line ("Error: " & Result'Img);
+         IO.Put_Line ("Error:");
+         IO.Put_Line (Result'Img);
       end if;
    end Execute;
 end Execute;
