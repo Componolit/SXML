@@ -24,8 +24,6 @@ is
    is
       Unused : Index_Type;
 
-      Parse_Internal_Depth : constant := 100;
-
       subtype Document_Index_Type is Index_Type with
         Predicate => Document_Index_Type in Document'Range;
 
@@ -947,7 +945,7 @@ is
 
       procedure Parse_Internal (Match  : out Match_Type;
                                 Start  : out Index_Type;
-                                Level  :     Natural := Parse_Internal_Depth) with
+                                First  :     Boolean := True) with
           Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       -----------------
@@ -1110,7 +1108,7 @@ is
 
       procedure Parse_Internal (Match  : out Match_Type;
                                 Start  : out Index_Type;
-                                Level  :     Natural := Parse_Internal_Depth)
+                                First  :     Boolean := True)
       is
          Old_Offset     : constant Natural := Offset;
          Done           : Boolean;
@@ -1122,13 +1120,8 @@ is
       begin
 
          Match := Match_Invalid;
-         Start := Invalid_Index;
 
-         if Level = 0 then
-            return;
-         end if;
-
-         if Level < Parse_Internal_Depth then
+         if not First then
             Parse_Content (Sub_Match, Start);
             if Sub_Match = Match_OK then
                Match := Match_OK;
@@ -1166,7 +1159,7 @@ is
          end if;
 
          loop
-            Parse_Internal (Sub_Match, Child_Start, Level - 1);
+            Parse_Internal (Sub_Match, Child_Start, False);
             exit when Sub_Match /= Match_OK;
 
             if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
