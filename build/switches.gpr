@@ -36,7 +36,7 @@ is
      ,"-gnatyI"    -- check mode in
      ,"-gnatyk"    -- check casing rules for keywords
      ,"-gnatyl"    -- check reference manual layout
-     ,"-gnatyL8"   -- check max nest level < nn
+     ,"-gnatyL9"   -- check max nest level < nn
      ,"-gnatyM120" -- check line length <= nn characters
      ,"-gnatyn"    -- check casing of package Standard identifiers
      ,"-gnatyO"    -- check overriding indicators

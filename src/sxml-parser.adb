@@ -1117,74 +1117,87 @@ is
          Child_Start    : Index_Type;
          Previous_Child : Index_Type := Invalid_Index;
          Parent         : Index_Type;
+
+         type State_Type is (Call_Start, Loop_Start, Loop_End);
+         State : State_Type := Call_Start;
       begin
 
          Call_Return : loop
+            loop
+               Call_Iteration : loop
+                  case State is
+                     when Call_Start =>
 
-            Match := Match_Invalid;
+                        Match := Match_Invalid;
 
-            if not First then
-               Parse_Content (Sub_Match, Start);
-               if Sub_Match = Match_OK then
-                  Match := Match_OK;
-                  exit Call_Return;
-               end if;
-            end if;
+                        if not First then
+                           Parse_Content (Sub_Match, Start);
+                           if Sub_Match = Match_OK then
+                              Match := Match_OK;
+                              exit Call_Return;
+                           end if;
+                        end if;
 
-            Parse_Sections;
+                        Parse_Sections;
 
-            if Data_Overflow then
-               Restore_Offset (Old_Offset);
-               exit Call_Return;
-            end if;
+                        if Data_Overflow then
+                           Restore_Offset (Old_Offset);
+                           exit Call_Return;
+                        end if;
 
-            Parse_Opening_Tag (Sub_Match, Name, Start, Done);
-            if Sub_Match /= Match_OK then
-               Restore_Offset (Old_Offset);
-               Match := Match_None;
-               exit Call_Return;
-            end if;
+                        Parse_Opening_Tag (Sub_Match, Name, Start, Done);
+                        if Sub_Match /= Match_OK then
+                           Restore_Offset (Old_Offset);
+                           Match := Match_None;
+                           exit Call_Return;
+                        end if;
 
-            Parent := Start;
+                        Parent := Start;
 
-            if Context_Overflow then
-               Restore_Offset (Old_Offset);
-               Match := Match_Out_Of_Memory;
-               exit Call_Return;
-            end if;
+                        if Context_Overflow then
+                           Restore_Offset (Old_Offset);
+                           Match := Match_Out_Of_Memory;
+                           exit Call_Return;
+                        end if;
 
-            Parse_Sections;
+                        Parse_Sections;
 
-            if Done then
-               Match := Match_OK;
-               exit Call_Return;
-            end if;
+                        if Done then
+                           Match := Match_OK;
+                           exit Call_Return;
+                        end if;
 
-            <<Loop_Start>>
-               Parse_Internal (Sub_Match, Child_Start, False);
-               exit Loop_Start when Sub_Match /= Match_OK;
+                        State := Loop_Start;
 
-               if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
-                  exit Call_Return;
-               end if;
+                     when Loop_Start =>
 
-               Link_Child (Child_Start, Parent, Previous_Child);
+                        Parse_Internal (Sub_Match, Child_Start, False);
+                        if Sub_Match /= Match_OK then
+                           State := Loop_End;
+                           exit Call_Iteration;
+                        end if;
 
-               pragma Loop_Variant (Increases => Offset);
-               pragma Loop_Invariant (Offset > Offset'Loop_Entry);
+                        if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
+                           exit Call_Return;
+                        end if;
 
-            goto Loop_Start;
+                        Link_Child (Child_Start, Parent, Previous_Child);
 
-            Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
-            if Sub_Match /= Match_OK then
-               Restore_Offset (Old_Offset);
-               exit Call_Return;
-            end if;
+                     when Loop_End =>
 
-            Parse_Sections;
-            Match := Match_OK;
+                        Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
+                        if Sub_Match /= Match_OK then
+                           Restore_Offset (Old_Offset);
+                           exit Call_Return;
+                        end if;
 
-            exit Call_Return;
+                        Parse_Sections;
+                        Match := Match_OK;
+                        exit Call_Return;
+
+                  end case;
+               end loop Call_Iteration;
+            end loop;
          end loop Call_Return;
 
       end Parse_Internal;
