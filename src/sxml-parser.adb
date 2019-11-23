@@ -943,9 +943,39 @@ is
       -- Parse_Internal --
       --------------------
 
-      procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                First  :     Boolean := True) with
+      type State_Type is (Call_Start, Loop_Start, Loop_End);
+
+      type Local_Type is
+         record
+            Done           : Boolean;
+            Do_Exit        : Boolean;
+            Name           : Range_Type;
+            Sub_Match      : Match_Type;
+            Child_Start    : Index_Type;
+            Previous_Child : Index_Type;
+            Parent         : Index_Type;
+            Old_Offset     : Natural;
+            State          : State_Type;
+         end record;
+      Null_Local : constant Local_Type := (Done           => False,
+                                           Do_Exit        => False,
+                                           Name           => Null_Range,
+                                           Sub_Match      => Match_Invalid,
+                                           Child_Start    => Invalid_Index,
+                                           Previous_Child => Invalid_Index,
+                                           Parent         => Invalid_Index,
+                                           Old_Offset     => 0,
+                                           State          => Call_Start);
+
+      type Frame_Type is
+         record
+            First : Boolean;
+            Local : Local_Type;
+         end record;
+
+      procedure Parse_Internal (Match :    out Match_Type;
+                                Start :    out Index_Type;
+                                Frame : in out Frame_Type) with
           Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       -----------------
@@ -1106,33 +1136,26 @@ is
       -- Parse_Internal --
       --------------------
 
-      procedure Parse_Internal (Match  : out Match_Type;
-                                Start  : out Index_Type;
-                                First  :     Boolean := True)
+      procedure Parse_Internal (Match :    out Match_Type;
+                                Start :    out Index_Type;
+                                Frame : in out Frame_Type)
       is
-         Old_Offset     : constant Natural := Offset;
-         Done           : Boolean;
-         Name           : Range_Type;
-         Sub_Match      : Match_Type;
-         Child_Start    : Index_Type;
-         Previous_Child : Index_Type := Invalid_Index;
-         Parent         : Index_Type;
-
-         type State_Type is (Call_Start, Loop_Start, Loop_End);
-         State : State_Type := Call_Start;
       begin
+         Frame.Local.Old_Offset     := Offset;
+         Frame.Local.Previous_Child := Invalid_Index;
+         Frame.Local.State          := Call_Start;
 
          Call_Return : loop
             loop
                Call_Iteration : loop
-                  case State is
+                  case Frame.Local.State is
                      when Call_Start =>
 
                         Match := Match_Invalid;
 
-                        if not First then
-                           Parse_Content (Sub_Match, Start);
-                           if Sub_Match = Match_OK then
+                        if not Frame.First then
+                           Parse_Content (Frame.Local.Sub_Match, Start);
+                           if Frame.Local.Sub_Match = Match_OK then
                               Match := Match_OK;
                               exit Call_Return;
                            end if;
@@ -1141,53 +1164,63 @@ is
                         Parse_Sections;
 
                         if Data_Overflow then
-                           Restore_Offset (Old_Offset);
+                           Restore_Offset (Frame.Local.Old_Offset);
                            exit Call_Return;
                         end if;
 
-                        Parse_Opening_Tag (Sub_Match, Name, Start, Done);
-                        if Sub_Match /= Match_OK then
-                           Restore_Offset (Old_Offset);
+                        Parse_Opening_Tag (Frame.Local.Sub_Match, Frame.Local.Name, Start, Frame.Local.Done);
+                        if Frame.Local.Sub_Match /= Match_OK then
+                           Restore_Offset (Frame.Local.Old_Offset);
                            Match := Match_None;
                            exit Call_Return;
                         end if;
 
-                        Parent := Start;
+                        Frame.Local.Parent := Start;
 
                         if Context_Overflow then
-                           Restore_Offset (Old_Offset);
+                           Restore_Offset (Frame.Local.Old_Offset);
                            Match := Match_Out_Of_Memory;
                            exit Call_Return;
                         end if;
 
                         Parse_Sections;
 
-                        if Done then
+                        if Frame.Local.Done then
                            Match := Match_OK;
                            exit Call_Return;
                         end if;
 
-                        State := Loop_Start;
+                        Frame.Local.State := Loop_Start;
 
                      when Loop_Start =>
 
-                        Parse_Internal (Sub_Match, Child_Start, False);
-                        if Sub_Match /= Match_OK then
-                           State := Loop_End;
+                        declare
+                           Local_Frame : Frame_Type := (False, Null_Local);
+                        begin
+                           Parse_Internal (Frame.Local.Sub_Match, Frame.Local.Child_Start, Local_Frame);
+                        end;
+
+                        if Frame.Local.Sub_Match /= Match_OK then
+                           Frame.Local.State := Loop_End;
                            exit Call_Iteration;
                         end if;
 
-                        if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
+                        if
+                           not Is_Valid_Link (Child    => Frame.Local.Child_Start,
+                                              Parent   => Frame.Local.Parent,
+                                              Previous => Frame.Local.Previous_Child)
+                        then
                            exit Call_Return;
                         end if;
 
-                        Link_Child (Child_Start, Parent, Previous_Child);
+                        Link_Child (Frame.Local.Child_Start, Frame.Local.Parent, Frame.Local.Previous_Child);
 
                      when Loop_End =>
 
-                        Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
-                        if Sub_Match /= Match_OK then
-                           Restore_Offset (Old_Offset);
+                        Parse_Closing_Tag (Name  => Data (Frame.Local.Name.First .. Frame.Local.Name.Last),
+                                           Match => Frame.Local.Sub_Match);
+                        if Frame.Local.Sub_Match /= Match_OK then
+                           Restore_Offset (Frame.Local.Old_Offset);
                            exit Call_Return;
                         end if;
 
@@ -1231,7 +1264,11 @@ is
 
    begin
       Skip_Byte_Order_Mark;
-      Parse_Internal (Parse_Result, Unused);
+      declare
+         Local_Frame : Frame_Type := (True, Null_Local);
+      begin
+         Parse_Internal (Parse_Result, Unused, Local_Frame);
+      end;
       pragma Unreferenced (Unused);
       Skip (Whitespace);
 
