@@ -1119,68 +1119,73 @@ is
          Parent         : Index_Type;
       begin
 
-         Match := Match_Invalid;
+         Call_Return : loop
 
-         if not First then
-            Parse_Content (Sub_Match, Start);
-            if Sub_Match = Match_OK then
+            Match := Match_Invalid;
+
+            if not First then
+               Parse_Content (Sub_Match, Start);
+               if Sub_Match = Match_OK then
+                  Match := Match_OK;
+                  exit Call_Return;
+               end if;
+            end if;
+
+            Parse_Sections;
+
+            if Data_Overflow then
+               Restore_Offset (Old_Offset);
+               exit Call_Return;
+            end if;
+
+            Parse_Opening_Tag (Sub_Match, Name, Start, Done);
+            if Sub_Match /= Match_OK then
+               Restore_Offset (Old_Offset);
+               Match := Match_None;
+               exit Call_Return;
+            end if;
+
+            Parent := Start;
+
+            if Context_Overflow then
+               Restore_Offset (Old_Offset);
+               Match := Match_Out_Of_Memory;
+               exit Call_Return;
+            end if;
+
+            Parse_Sections;
+
+            if Done then
                Match := Match_OK;
-               return;
+               exit Call_Return;
             end if;
-         end if;
 
-         Parse_Sections;
+            loop
+               Parse_Internal (Sub_Match, Child_Start, False);
+               exit when Sub_Match /= Match_OK;
 
-         if Data_Overflow then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
+               if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
+                  exit Call_Return;
+               end if;
 
-         Parse_Opening_Tag (Sub_Match, Name, Start, Done);
-         if Sub_Match /= Match_OK then
-            Restore_Offset (Old_Offset);
-            Match := Match_None;
-            return;
-         end if;
+               Link_Child (Child_Start, Parent, Previous_Child);
 
-         Parent := Start;
+               pragma Loop_Variant (Increases => Offset);
+               pragma Loop_Invariant (Offset > Offset'Loop_Entry);
 
-         if Context_Overflow then
-            Restore_Offset (Old_Offset);
-            Match := Match_Out_Of_Memory;
-            return;
-         end if;
+            end loop;
 
-         Parse_Sections;
+            Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
+            if Sub_Match /= Match_OK then
+               Restore_Offset (Old_Offset);
+               exit Call_Return;
+            end if;
 
-         if Done then
+            Parse_Sections;
             Match := Match_OK;
-            return;
-         end if;
 
-         loop
-            Parse_Internal (Sub_Match, Child_Start, False);
-            exit when Sub_Match /= Match_OK;
-
-            if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
-               return;
-            end if;
-
-            Link_Child (Child_Start, Parent, Previous_Child);
-
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset > Offset'Loop_Entry);
-
-         end loop;
-
-         Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
-         if Sub_Match /= Match_OK then
-            Restore_Offset (Old_Offset);
-            return;
-         end if;
-
-         Parse_Sections;
-         Match := Match_OK;
+            exit Call_Return;
+         end loop Call_Return;
 
       end Parse_Internal;
 
