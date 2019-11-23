@@ -1160,9 +1160,9 @@ is
                exit Call_Return;
             end if;
 
-            loop
+            <<Loop_Start>>
                Parse_Internal (Sub_Match, Child_Start, False);
-               exit when Sub_Match /= Match_OK;
+               exit Loop_Start when Sub_Match /= Match_OK;
 
                if not Is_Valid_Link (Child_Start, Parent, Previous_Child) then
                   exit Call_Return;
@@ -1173,7 +1173,7 @@ is
                pragma Loop_Variant (Increases => Offset);
                pragma Loop_Invariant (Offset > Offset'Loop_Entry);
 
-            end loop;
+            goto Loop_Start;
 
             Parse_Closing_Tag (Data (Name.First .. Name.Last), Sub_Match);
             if Sub_Match /= Match_OK then
