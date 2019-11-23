@@ -9,6 +9,8 @@
 --  GNU Affero General Public License version 3.
 --
 
+with SXML.Stack;
+
 package body SXML.Parser
 is
    pragma Annotate (GNATprove, Terminating, SXML.Parser);
@@ -943,7 +945,7 @@ is
       -- Parse_Internal --
       --------------------
 
-      type State_Type is (Call_Start, Loop_Start, Loop_End);
+      type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
 
       type Local_Type is
          record
@@ -973,9 +975,32 @@ is
             Local : Local_Type;
          end record;
 
-      procedure Parse_Internal (Match :    out Match_Type;
-                                Start :    out Index_Type;
-                                Frame : in out Frame_Type) with
+      type Call_Stack_Type is array (SXML.Natural_Without_Last range <>) of Frame_Type with
+        Dynamic_Predicate => Call_Stack_Type'First <= Call_Stack_Type'Last
+                             and Call_Stack_Type'Length > 3;
+      Stack_Buffer : Call_Stack_Type (1 .. 1000);
+
+      package Call_Stack is new SXML.Stack (Element_Type => Frame_Type,
+                                            Stack_Type   => Call_Stack_Type,
+                                            S            => Stack_Buffer,
+                                            Null_Element => (True, Null_Local));
+
+      type Out_Type is
+         record
+            Match : Match_Type;
+            Start : Index_Type;
+         end record;
+
+      type Result_Stack_Type is array (SXML.Natural_Without_Last range <>) of Out_Type;
+      Result_Buffer : Result_Stack_Type (1 .. 1000);
+
+      package Result_Stack is new SXML.Stack (Element_Type => Out_Type,
+                                              Stack_Type   => Result_Stack_Type,
+                                              S            => Result_Buffer,
+                                              Null_Element => (Match_Invalid, Invalid_Index));
+
+      procedure Parse_Internal (Match : out Match_Type;
+                                Start : out Index_Type) with
           Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       -----------------
@@ -1136,102 +1161,118 @@ is
       -- Parse_Internal --
       --------------------
 
-      procedure Parse_Internal (Match :    out Match_Type;
-                                Start :    out Index_Type;
-                                Frame : in out Frame_Type)
+      procedure Parse_Internal (Match : out Match_Type;
+                                Start : out Index_Type)
       is
+         Frame  : Frame_Type;
+         Result : Out_Type;
       begin
-         Frame.Local.Old_Offset     := Offset;
-         Frame.Local.Previous_Child := Invalid_Index;
-         Frame.Local.State          := Call_Start;
+         Start := Invalid_Index;
+         Match := Match_Invalid;
+         loop
+            Call_Return : loop
+               if Call_Stack.Is_Empty then
+                  return;
+               end if;
+               Call_Stack.Pop (Frame);
+               case Frame.Local.State is
 
-         Call_Return : loop
-            loop
-               Call_Iteration : loop
-                  case Frame.Local.State is
-                     when Call_Start =>
+                  when Call_Start =>
+                     Frame.Local.Old_Offset := Offset;
+                     Frame.Local.Previous_Child := Invalid_Index;
+                     Match := Match_Invalid;
 
-                        Match := Match_Invalid;
-
-                        if not Frame.First then
-                           Parse_Content (Frame.Local.Sub_Match, Start);
-                           if Frame.Local.Sub_Match = Match_OK then
-                              Match := Match_OK;
-                              exit Call_Return;
-                           end if;
-                        end if;
-
-                        Parse_Sections;
-
-                        if Data_Overflow then
-                           Restore_Offset (Frame.Local.Old_Offset);
-                           exit Call_Return;
-                        end if;
-
-                        Parse_Opening_Tag (Frame.Local.Sub_Match, Frame.Local.Name, Start, Frame.Local.Done);
-                        if Frame.Local.Sub_Match /= Match_OK then
-                           Restore_Offset (Frame.Local.Old_Offset);
-                           Match := Match_None;
-                           exit Call_Return;
-                        end if;
-
-                        Frame.Local.Parent := Start;
-
-                        if Context_Overflow then
-                           Restore_Offset (Frame.Local.Old_Offset);
-                           Match := Match_Out_Of_Memory;
-                           exit Call_Return;
-                        end if;
-
-                        Parse_Sections;
-
-                        if Frame.Local.Done then
+                     if not Frame.First then
+                        Parse_Content (Frame.Local.Sub_Match, Start);
+                        if Frame.Local.Sub_Match = Match_OK then
                            Match := Match_OK;
                            exit Call_Return;
                         end if;
+                     end if;
 
-                        Frame.Local.State := Loop_Start;
+                     Parse_Sections;
 
-                     when Loop_Start =>
+                     if Data_Overflow then
+                        Restore_Offset (Frame.Local.Old_Offset);
+                        exit Call_Return;
+                     end if;
 
-                        declare
-                           Local_Frame : Frame_Type := (False, Null_Local);
-                        begin
-                           Parse_Internal (Frame.Local.Sub_Match, Frame.Local.Child_Start, Local_Frame);
-                        end;
+                     Parse_Opening_Tag (Frame.Local.Sub_Match, Frame.Local.Name, Start, Frame.Local.Done);
+                     if Frame.Local.Sub_Match /= Match_OK then
+                        Restore_Offset (Frame.Local.Old_Offset);
+                        Match := Match_None;
+                        exit Call_Return;
+                     end if;
 
-                        if Frame.Local.Sub_Match /= Match_OK then
-                           Frame.Local.State := Loop_End;
-                           exit Call_Iteration;
-                        end if;
+                     Frame.Local.Parent := Start;
 
-                        if
-                           not Is_Valid_Link (Child    => Frame.Local.Child_Start,
-                                              Parent   => Frame.Local.Parent,
-                                              Previous => Frame.Local.Previous_Child)
-                        then
-                           exit Call_Return;
-                        end if;
+                     if Context_Overflow then
+                        Restore_Offset (Frame.Local.Old_Offset);
+                        Match := Match_Out_Of_Memory;
+                        exit Call_Return;
+                     end if;
 
-                        Link_Child (Frame.Local.Child_Start, Frame.Local.Parent, Frame.Local.Previous_Child);
+                     Parse_Sections;
 
-                     when Loop_End =>
-
-                        Parse_Closing_Tag (Name  => Data (Frame.Local.Name.First .. Frame.Local.Name.Last),
-                                           Match => Frame.Local.Sub_Match);
-                        if Frame.Local.Sub_Match /= Match_OK then
-                           Restore_Offset (Frame.Local.Old_Offset);
-                           exit Call_Return;
-                        end if;
-
-                        Parse_Sections;
+                     if Frame.Local.Done then
                         Match := Match_OK;
                         exit Call_Return;
+                     end if;
 
-                  end case;
-               end loop Call_Iteration;
-            end loop;
-         end loop Call_Return;
+                     Frame.Local.State := Loop_Start;
+                     Call_Stack.Push (Frame);
+
+                  when Loop_Start =>
+
+                     Frame.Local.State := Recurse_End;
+                     Call_Stack.Push (Frame);
+                     Call_Stack.Push ((False, Null_Local));
+
+                     Result_Stack.Push ((Match, Start));
+
+                  when Recurse_End =>
+
+                     Frame.Local.Sub_Match := Match;
+                     Frame.Local.Child_Start := Start;
+
+                     Result_Stack.Pop (Result);
+                     Match := Result.Match;
+                     Start := Result.Start;
+
+                     if Frame.Local.Sub_Match /= Match_OK then
+                        Frame.Local.State := Loop_End;
+                        Call_Stack.Push (Frame);
+                        exit Call_Return;
+                     end if;
+
+                     if
+                        not Is_Valid_Link (Child    => Frame.Local.Child_Start,
+                                           Parent   => Frame.Local.Parent,
+                                           Previous => Frame.Local.Previous_Child)
+                     then
+                        exit Call_Return;
+                     end if;
+
+                     Link_Child (Frame.Local.Child_Start, Frame.Local.Parent, Frame.Local.Previous_Child);
+
+                     Frame.Local.State := Loop_Start;
+                     Call_Stack.Push (Frame);
+
+                  when Loop_End =>
+
+                     Parse_Closing_Tag (Name  => Data (Frame.Local.Name.First .. Frame.Local.Name.Last),
+                                        Match => Frame.Local.Sub_Match);
+                     if Frame.Local.Sub_Match /= Match_OK then
+                        Restore_Offset (Frame.Local.Old_Offset);
+                        exit Call_Return;
+                     end if;
+
+                     Parse_Sections;
+                     Match := Match_OK;
+
+               end case;
+            end loop Call_Return;
+         end loop;
 
       end Parse_Internal;
 
@@ -1264,11 +1305,10 @@ is
 
    begin
       Skip_Byte_Order_Mark;
-      declare
-         Local_Frame : Frame_Type := (True, Null_Local);
-      begin
-         Parse_Internal (Parse_Result, Unused, Local_Frame);
-      end;
+      Call_Stack.Init;
+      Result_Stack.Init;
+      Call_Stack.Push ((True, Null_Local));
+      Parse_Internal (Parse_Result, Unused);
       pragma Unreferenced (Unused);
       Skip (Whitespace);
 
