@@ -31,18 +31,21 @@ is
    -------------------
    -- Check_Invalid --
    -------------------
- 
-   procedure Check_Invalid (Input : String)
+
+   procedure Check_Invalid (Input       : String;
+                            Stack_Depth : Positive := 100)
    is
       use SXML;
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
+
+      procedure Parse is new Parser.Parse (Stack_Depth);
    begin
-      Parser.Parse (Data         => Input,
-                    Document     => Document.all,
-                    Parse_Result => Result,
-                    Position     => Position);
+      Parse (Data         => Input,
+             Document     => Document.all,
+             Parse_Result => Result,
+             Position     => Position);
       pragma Unreferenced (Position);
       Assert (Result /= Match_OK, "Error expected");
    end Check_Invalid;
@@ -77,8 +80,8 @@ is
    -- Parse_Document --
    --------------------
 
-   procedure Parse_Document (File       : String;
-                             Stack_Size : Natural := 10000)
+   procedure Parse_Document (File        : String;
+                             Stack_Depth : Natural := 10000)
    is
       Input : access String := Read_File (File);
       use SXML;
@@ -90,16 +93,17 @@ is
       Stack : access Stack_Type;
       Serialize_Result : Result_Type;
 
+      procedure Parse is new Parser.Parse (Stack_Depth);
    begin
       Document.all (Document.all'First) := Null_Node;
-      Parser.Parse (Data         => Input.all,
-                    Document     => Document.all,
-                    Parse_Result => Result,
-                    Position     => Position);
+      Parse (Data         => Input.all,
+             Document     => Document.all,
+             Parse_Result => Result,
+             Position     => Position);
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      Stack := new Stack_Type (1 .. Stack_Size);
+      Stack := new Stack_Type (1 .. Stack_Depth);
       To_String (Document.all, Data.all, Last, Serialize_Result, Stack.All);
       Free (Data);
       Free (Stack);
@@ -112,7 +116,8 @@ is
 
    procedure Check_Document (Input                : String;
                              Output               : String := "INPUT";
-                             Ignore_Final_Newline : Boolean := False)
+                             Ignore_Final_Newline : Boolean := False;
+                             Stack_Depth          : Positive := 100)
    is
       use SXML;
       use SXML.Parser;
@@ -121,12 +126,14 @@ is
       XML      : access String := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
       Serialize_Result : Result_Type;
+
+      procedure Parse is new Parser.Parse (Stack_Depth);
    begin
       Document.all (1) := Null_Node;
-      Parser.Parse (Data         => Input,
-                    Document     => Document.all,
-                    Parse_Result => Result,
-                    Position     => Position);
+      Parse (Data         => Input,
+             Document     => Document.all,
+             Parse_Result => Result,
+             Position     => Position);
       Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
 
       To_String (Document.all, XML.all, Last, Serialize_Result);

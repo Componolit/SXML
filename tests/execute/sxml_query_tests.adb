@@ -61,8 +61,9 @@ package body SXML_Query_Tests is
       use SXML.Parser;
       Match  : Match_Type;
       Result : State_Type := Init (Context);
+      procedure Parse is new Parser.Parse (1000);
    begin
-      Parser.Parse (Input.all, Context, Match, Position);
+      Parse (Input.all, Context, Match, Position);
       if Match /= Match_OK
       then
          return Invalid_State;

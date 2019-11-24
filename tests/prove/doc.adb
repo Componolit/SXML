@@ -5,7 +5,7 @@ with SPARK_Mode
 is
    use SXML;
    use SXML.Parser;
-   Text : String := 
+   Text : String :=
         "<?xml version=""1.0""?>"
       & "<?xml-stylesheet type='text/xsl' href='foo.xsl'?>"
       & "<parent>"
@@ -17,10 +17,12 @@ is
       Document : SXML.Document_Type (1 .. 100) := (others => Null_Node);
       Result   : Match_Type;
       Position : Natural;
+
+   procedure P is new SXML.Parser.Parse (100);
 begin
    pragma Assert (Valid_Content (Text'First, Text'Last));
-   Parse (Data         => Text,
-          Document     => Document,
-          Parse_Result => Result,
-          Position     => Position); 
+   P (Data         => Text,
+      Document     => Document,
+      Parse_Result => Result,
+      Position     => Position);
 end Doc;

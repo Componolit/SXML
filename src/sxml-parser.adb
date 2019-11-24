@@ -978,7 +978,7 @@ is
       type Call_Stack_Type is array (SXML.Natural_Without_Last range <>) of Frame_Type with
         Dynamic_Predicate => Call_Stack_Type'First <= Call_Stack_Type'Last
                              and Call_Stack_Type'Length > 3;
-      Stack_Buffer : Call_Stack_Type (1 .. 1000);
+      Stack_Buffer : Call_Stack_Type (1 .. Depth);
 
       package Call_Stack is new SXML.Stack (Element_Type => Frame_Type,
                                             Stack_Type   => Call_Stack_Type,
@@ -992,7 +992,7 @@ is
          end record;
 
       type Result_Stack_Type is array (SXML.Natural_Without_Last range <>) of Out_Type;
-      Result_Buffer : Result_Stack_Type (1 .. 1000);
+      Result_Buffer : Result_Stack_Type (1 .. Depth);
 
       package Result_Stack is new SXML.Stack (Element_Type => Out_Type,
                                               Stack_Type   => Result_Stack_Type,

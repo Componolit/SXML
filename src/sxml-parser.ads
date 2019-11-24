@@ -35,6 +35,8 @@ is
    -- Parse --
    -----------
 
+   generic
+      Depth : Positive;
    procedure Parse (Data         :        Content_Type;
                     Document     : in out Document_Type;
                     Parse_Result :    out Match_Type;

@@ -465,15 +465,17 @@ package body SXML_Parser_Tests is
       declare
          Input : access String := Read_File (File_Name);
          Position : Natural;
-         use SXML.Parser;
-         Result   : Match_Type;
+         Result   : SXML.Parser.Match_Type;
+
+         procedure Parse is new SXML.Parser.Parse (1000000);
+         use type SXML.Parser.Match_Type;
       begin
          Parse (Data         => Input.all,
                 Document     => Document.all,
                 Parse_Result => Result,
                 Position     => Position);
          Free_Subtree (Document);
-         Assert (Result /= Match_OK,
+         Assert (Result /= SXML.Parser.Match_OK,
                  File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
       end;
    end Deep_File;
