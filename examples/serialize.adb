@@ -1,5 +1,6 @@
 with SXML.Parser;
 with SXML.Serialize;
+with SXML.Debug;
 with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Text_Streams;
@@ -44,6 +45,7 @@ is
              Document     => Document.all,
              Parse_Result => Match,
              Position     => Position);
+      SXML.Debug.Dump (Context => Document.all, Short => True);
       if Match /= Match_OK
       then
          Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
@@ -53,6 +55,7 @@ is
          then
             Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Position'Img);
          end if;
+         Ada.Text_IO.Put_Line (Output.all);
       end if;
    end Parse_Document;
 begin
