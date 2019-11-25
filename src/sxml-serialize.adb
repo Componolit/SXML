@@ -284,7 +284,7 @@ is
                         Data     :    out String;
                         Last     :    out Natural;
                         Result   :    out Result_Type;
-                        Buffer   : in out Stack_Type)
+                        Depth    :        Natural := 1000)
    is
       Child    : Relative_Index_Type;
       Element  : Index_Type;
@@ -293,15 +293,8 @@ is
       Position : Integer := 0;
       Count    : Natural := 0;
 
-      package S is new SXML.Stack (Traversal_Type,
-                                   Stack_Type,
-                                   Buffer (Buffer'First .. Buffer'First + Buffer'Length / 2 - 1),
-                                   Null_Traversal);
-
-      package Rev is new SXML.Stack (Traversal_Type,
-                                     Stack_Type,
-                                     Buffer (Buffer'First + Buffer'Length / 2 .. Buffer'Last),
-                                     Null_Traversal);
+      package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
+      package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
    begin
       Result := Result_Invalid;
       Last := 0;
@@ -392,22 +385,6 @@ is
 
       Result := Result_OK;
       Last   := Position;
-   end To_String;
-
-   ---------------
-   -- To_String --
-   ---------------
-
-   procedure To_String (Document :     Document_Type;
-                        Data     : out String;
-                        Last     : out Natural;
-                        Result   : out Result_Type)
-   is
-      Stack_Buffer : Stack_Type (1 .. 1000);
-   begin
-      Initialize (Stack_Buffer);
-      To_String (Document, Data, Last, Result, Stack_Buffer);
-      pragma Unreferenced (Stack_Buffer);
    end To_String;
 
 end SXML.Serialize;

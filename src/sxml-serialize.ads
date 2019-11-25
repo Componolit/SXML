@@ -31,7 +31,8 @@ is
    procedure To_String (Document :     Document_Type;
                         Data     : out String;
                         Last     : out Natural;
-                        Result   : out Result_Type) with
+                        Result   : out Result_Type;
+                        Depth    :     Natural := 1000) with
      Pre => Data'Length > 0;
    --  Serialize document to string using runtime stack
    --
@@ -39,24 +40,7 @@ is
    --  @param Data      Output string
    --  @param Last      Last valid element of output string
    --  @param Result    Result of operation
-
-   ---------------
-   -- To_String --
-   ---------------
-
-   procedure To_String (Document :        Document_Type;
-                        Data     :    out String;
-                        Last     :    out Natural;
-                        Result   :    out Result_Type;
-                        Buffer   : in out Stack_Type) with
-     Pre => Data'Length > 0 and Buffer'Length > 1;
-   --  Serialize document to string using heap stack
-   --
-   --  @param Document  Document to serialize
-   --  @param Data      Output string
-   --  @param Last      Last valid element of output string
-   --  @param Result    Result of operation
-   --  @param Buffer    Stack buffer
+   --  @param Depth     Size of heap stack
 
 private
 

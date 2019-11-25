@@ -13,6 +13,8 @@ package body SXML.Stack
 is
    pragma Annotate (GNATprove, Terminating, SXML.Stack);
 
+   type Stack_Type is array (1 .. Size) of Element_Type;
+   S : Stack_Type;
    Index : Natural := S'First;
 
    -----------
@@ -90,7 +92,7 @@ is
    begin
       --  We need to give explicit bounds here, as a direct assignment to S
       --  causes a buffer overflow due to a compiler bug, cf. RB29-053
-      S (S'First .. S'Last) := (others => Null_Element);
+      S (S'Range) := (others => Null_Element);
       Index := S'First;
    end Init;
 

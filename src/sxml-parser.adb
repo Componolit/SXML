@@ -975,15 +975,7 @@ is
             Local : Local_Type;
          end record;
 
-      type Call_Stack_Type is array (SXML.Natural_Without_Last range <>) of Frame_Type with
-        Dynamic_Predicate => Call_Stack_Type'First <= Call_Stack_Type'Last
-                             and Call_Stack_Type'Length > 3;
-      Stack_Buffer : Call_Stack_Type (1 .. Depth);
-
-      package Call_Stack is new SXML.Stack (Element_Type => Frame_Type,
-                                            Stack_Type   => Call_Stack_Type,
-                                            S            => Stack_Buffer,
-                                            Null_Element => (True, Null_Local));
+      package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
 
       type Out_Type is
          record
@@ -991,13 +983,7 @@ is
             Start : Index_Type;
          end record;
 
-      type Result_Stack_Type is array (SXML.Natural_Without_Last range <>) of Out_Type;
-      Result_Buffer : Result_Stack_Type (1 .. Depth);
-
-      package Result_Stack is new SXML.Stack (Element_Type => Out_Type,
-                                              Stack_Type   => Result_Stack_Type,
-                                              S            => Result_Buffer,
-                                              Null_Element => (Match_Invalid, Invalid_Index));
+      package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
 
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type) with

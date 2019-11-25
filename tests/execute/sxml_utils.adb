@@ -90,7 +90,6 @@ is
       Position : Natural;
       Data : access String := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
       Last : Natural := 1;
-      Stack : access Stack_Type;
       Serialize_Result : Result_Type;
 
       procedure Parse is new Parser.Parse (Stack_Depth);
@@ -103,10 +102,8 @@ is
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      Stack := new Stack_Type (1 .. Stack_Depth);
-      To_String (Document.all, Data.all, Last, Serialize_Result, Stack.All);
+      To_String (Document.all, Data.all, Last, Serialize_Result, Stack_Depth);
       Free (Data);
-      Free (Stack);
       Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
    end Parse_Document;
 
