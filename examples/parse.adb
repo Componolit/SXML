@@ -34,6 +34,7 @@ is
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
+      procedure Parse is new SXML.Parser.Parse (1000);
    begin
       Document.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,

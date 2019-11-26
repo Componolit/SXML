@@ -14,25 +14,16 @@ is
    type Traversal_Type is private;
    Null_Traversal : constant Traversal_Type;
 
-   type Stack_Type is array (SXML.Natural_Without_Last range <>) of Traversal_Type with
-     Dynamic_Predicate => Stack_Type'First <= Stack_Type'Last
-                          and Stack_Type'Length > 3;
-
-   procedure Initialize (S : out Stack_Type) with
-     Pre => S'First <= S'Last and then S'Length > 3;
-   --  Initialize stack
-   --
-   --  @param S  Stack to initialize
-
    ---------------
    -- To_String --
    ---------------
 
+   generic
+      Depth : Natural;
    procedure To_String (Document :     Document_Type;
                         Data     : out String;
                         Last     : out Natural;
-                        Result   : out Result_Type;
-                        Depth    :     Natural := 1000) with
+                        Result   : out Result_Type) with
      Pre => Data'Length > 0;
    --  Serialize document to string using runtime stack
    --

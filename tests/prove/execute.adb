@@ -172,6 +172,7 @@ is
       Data   : String (1 .. 5000);
       Offset : Natural;
       Result : Result_Type;
+      procedure To_String is new SXML.Serialize.To_String (100);
    begin
       To_String (Doc, Data, Offset, Result);
       if

@@ -15,15 +15,6 @@ package body SXML.Serialize
 is
    pragma Annotate (GNATprove, Terminating, SXML.Serialize);
 
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize (S : out Stack_Type) is
-   begin
-      S := (others => Null_Traversal);
-   end Initialize;
-
    ---------
    -- Put --
    ---------
@@ -283,8 +274,7 @@ is
    procedure To_String (Document :        Document_Type;
                         Data     :    out String;
                         Last     :    out Natural;
-                        Result   :    out Result_Type;
-                        Depth    :        Natural := 1000)
+                        Result   :    out Result_Type)
    is
       Child    : Relative_Index_Type;
       Element  : Index_Type;

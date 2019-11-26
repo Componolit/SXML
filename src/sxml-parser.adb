@@ -945,46 +945,6 @@ is
       -- Parse_Internal --
       --------------------
 
-      type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
-
-      type Local_Type is
-         record
-            Done           : Boolean;
-            Do_Exit        : Boolean;
-            Name           : Range_Type;
-            Sub_Match      : Match_Type;
-            Child_Start    : Index_Type;
-            Previous_Child : Index_Type;
-            Parent         : Index_Type;
-            Old_Offset     : Natural;
-            State          : State_Type;
-         end record;
-      Null_Local : constant Local_Type := (Done           => False,
-                                           Do_Exit        => False,
-                                           Name           => Null_Range,
-                                           Sub_Match      => Match_Invalid,
-                                           Child_Start    => Invalid_Index,
-                                           Previous_Child => Invalid_Index,
-                                           Parent         => Invalid_Index,
-                                           Old_Offset     => 0,
-                                           State          => Call_Start);
-
-      type Frame_Type is
-         record
-            First : Boolean;
-            Local : Local_Type;
-         end record;
-
-      package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
-
-      type Out_Type is
-         record
-            Match : Match_Type;
-            Start : Index_Type;
-         end record;
-
-      package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
-
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type) with
           Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
@@ -1150,13 +1110,58 @@ is
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type)
       is
+         type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
+
+         type Local_Type is
+            record
+               Done           : Boolean;
+               Do_Exit        : Boolean;
+               Name           : Range_Type;
+               Sub_Match      : Match_Type;
+               Child_Start    : Index_Type;
+               Previous_Child : Index_Type;
+               Parent         : Index_Type;
+               Old_Offset     : Natural;
+               State          : State_Type;
+            end record;
+         Null_Local : constant Local_Type := (Done           => False,
+                                              Do_Exit        => False,
+                                              Name           => Null_Range,
+                                              Sub_Match      => Match_Invalid,
+                                              Child_Start    => Invalid_Index,
+                                              Previous_Child => Invalid_Index,
+                                              Parent         => Invalid_Index,
+                                              Old_Offset     => 0,
+                                              State          => Call_Start);
+
+         type Frame_Type is
+            record
+               First : Boolean;
+               Local : Local_Type;
+            end record;
+
+         package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
+
+         type Out_Type is
+            record
+               Match : Match_Type;
+               Start : Index_Type;
+            end record;
+
+         package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
+
          Frame  : Frame_Type;
          Result : Out_Type;
       begin
+         Call_Stack.Init;
+         Result_Stack.Init;
+         Call_Stack.Push ((True, Null_Local));
+
          Start := Invalid_Index;
          Match := Match_Invalid;
          loop
             Call_Return : loop
+
                if Call_Stack.Is_Empty then
                   return;
                end if;
@@ -1212,14 +1217,24 @@ is
 
                      Frame.Local.State := Recurse_End;
                      Call_Stack.Push (Frame);
-                     Call_Stack.Push ((False, Null_Local));
 
+                     if Call_Stack.Is_Full or Result_Stack.Is_Full then
+                        Match := Match_Depth_Limit;
+                        return;
+                     end if;
+
+                     Call_Stack.Push ((False, Null_Local));
                      Result_Stack.Push ((Match, Start));
 
                   when Recurse_End =>
 
                      Frame.Local.Sub_Match := Match;
                      Frame.Local.Child_Start := Start;
+
+                     if Result_Stack.Is_Empty then
+                        Match := Match_Invalid;
+                        return;
+                     end if;
 
                      Result_Stack.Pop (Result);
                      Match := Result.Match;
@@ -1246,6 +1261,10 @@ is
 
                   when Loop_End =>
 
+                     if Frame.Local.Name.First not in Data'Range or Frame.Local.Name.Last not in Data'Range then
+                        return;
+                     end if;
+
                      Parse_Closing_Tag (Name  => Data (Frame.Local.Name.First .. Frame.Local.Name.Last),
                                         Match => Frame.Local.Sub_Match);
                      if Frame.Local.Sub_Match /= Match_OK then
@@ -1257,7 +1276,14 @@ is
                      Match := Match_OK;
 
                end case;
+
+               pragma Loop_Invariant (Call_Stack.Is_Valid);
+               pragma Loop_Invariant (Result_Stack.Is_Valid);
+
             end loop Call_Return;
+
+            pragma Loop_Invariant (Call_Stack.Is_Valid);
+            pragma Loop_Invariant (Result_Stack.Is_Valid);
          end loop;
 
       end Parse_Internal;
@@ -1291,9 +1317,6 @@ is
 
    begin
       Skip_Byte_Order_Mark;
-      Call_Stack.Init;
-      Result_Stack.Init;
-      Call_Stack.Push ((True, Null_Local));
       Parse_Internal (Parse_Result, Unused);
       pragma Unreferenced (Unused);
       Skip (Whitespace);

@@ -25,9 +25,6 @@ is
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
 
-   type Stack_Access is access all Stack_Type;
-   procedure Free is new Ada.Unchecked_Deallocation (Stack_Type, Stack_Access);
-
    -------------------
    -- Check_Invalid --
    -------------------
@@ -93,6 +90,7 @@ is
       Serialize_Result : Result_Type;
 
       procedure Parse is new Parser.Parse (Stack_Depth);
+      procedure To_String is new SXML.Serialize.To_String (Stack_Depth);
    begin
       Document.all (Document.all'First) := Null_Node;
       Parse (Data         => Input.all,
@@ -102,7 +100,7 @@ is
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      To_String (Document.all, Data.all, Last, Serialize_Result, Stack_Depth);
+      To_String (Document.all, Data.all, Last, Serialize_Result);
       Free (Data);
       Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
    end Parse_Document;
@@ -125,6 +123,7 @@ is
       Serialize_Result : Result_Type;
 
       procedure Parse is new Parser.Parse (Stack_Depth);
+      procedure To_String is new SXML.Serialize.To_String (Stack_Depth);
    begin
       Document.all (1) := Null_Node;
       Parse (Data         => Input,

@@ -70,6 +70,7 @@ is
    Data   : String (1 .. 5000);
    Offset : Natural := 0;
    Result : Result_Type;
+   procedure To_String is new SXML.Serialize.To_String (1000);
 begin
    Debug.Dump (Doc);
    To_String (Doc, Data, Offset, Result);

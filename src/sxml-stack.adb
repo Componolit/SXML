@@ -9,13 +9,14 @@
 --  GNU Affero General Public License version 3.
 --
 
-package body SXML.Stack
+package body SXML.Stack with
+   Refined_State => (State => (S, Index))
 is
    pragma Annotate (GNATprove, Terminating, SXML.Stack);
 
    type Stack_Type is array (1 .. Size) of Element_Type;
-   S : Stack_Type;
-   Index : Natural := S'First;
+   S     : Stack_Type := (others => Null_Element);
+   Index : Natural    := S'First;
 
    -----------
    -- Level --
