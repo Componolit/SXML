@@ -947,7 +947,7 @@ is
 
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type) with
-          Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       -----------------
       -- Parse_CDATA --
@@ -1110,6 +1110,8 @@ is
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type)
       is
+         Old_Offset : constant Natural := Offset;
+
          type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
 
          type Local_Type is
@@ -1150,8 +1152,9 @@ is
 
          package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
 
-         Frame  : Frame_Type;
-         Result : Out_Type;
+         Frame      : Frame_Type;
+         Result     : Out_Type;
+
       begin
          Call_Stack.Init;
          Result_Stack.Init;
@@ -1163,6 +1166,9 @@ is
             Call_Return : loop
 
                if Call_Stack.Is_Empty then
+                  if Match = Match_OK and Offset <= Old_Offset then
+                     Match := Match_Invalid;
+                  end if;
                   return;
                end if;
                Call_Stack.Pop (Frame);
@@ -1262,6 +1268,7 @@ is
                   when Loop_End =>
 
                      if Frame.Local.Name.First not in Data'Range or Frame.Local.Name.Last not in Data'Range then
+                        Match := Match_Invalid;
                         return;
                      end if;
 
@@ -1269,6 +1276,12 @@ is
                                         Match => Frame.Local.Sub_Match);
                      if Frame.Local.Sub_Match /= Match_OK then
                         Restore_Offset (Frame.Local.Old_Offset);
+                        --  Should not happen, but we cannot prove it unless we show that the value of
+                        --  Frame.Local.Old_Offset remains greater or equal to to Old_Offset between stack pushes
+                        --  and pops.
+                        if Offset < Old_Offset then
+                           Offset := Old_Offset;
+                        end if;
                         exit Call_Return;
                      end if;
 
@@ -1279,11 +1292,13 @@ is
 
                pragma Loop_Invariant (Call_Stack.Is_Valid);
                pragma Loop_Invariant (Result_Stack.Is_Valid);
+               pragma Loop_Invariant (Offset >= Old_Offset);
 
             end loop Call_Return;
 
             pragma Loop_Invariant (Call_Stack.Is_Valid);
             pragma Loop_Invariant (Result_Stack.Is_Valid);
+            pragma Loop_Invariant (Offset >= Old_Offset);
          end loop;
 
       end Parse_Internal;
