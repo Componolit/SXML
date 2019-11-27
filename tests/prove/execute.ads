@@ -19,6 +19,6 @@ is
                       Arguments : Args_Type)
    with
       Global => (In_Out => Output),
-      Pre => Arguments'Length > 0 and Arguments'Length < 100;
+      Pre => Arguments'Length > 0 and Arguments'Length < 100 and Program'Length < 100 and Program'Length > 0;
 
 end Execute;

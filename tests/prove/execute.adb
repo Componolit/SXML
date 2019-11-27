@@ -28,14 +28,19 @@ is
       procedure Put_Line (Data : String) renames Ada.Text_IO.Put_Line;
    end IO;
 
+   Dummy_Element : constant Document_Type := E ("arg", A ("value", String (Arg_Type'(others => 'x'))));
+   Arg_Len       : constant Natural  := Natural (Num_Elements (Dummy_Element));
+
+   pragma Assert (Arg_Len = 15);
+
    function To_Subtree (Arguments : Args_Type) return Document_Type
    with
-      Pre => Arguments'Length > 0 and Arguments'Length < 100;
+     Pre  => Arguments'Length > 0 and Arguments'Length < 100,
+     Post => Num_Elements (To_Subtree'Result) = Offset_Type (Arg_Len * Arguments'Length)
+             and then Num_Elements (To_Subtree'Result) = Arguments'Length * 15;
 
    function To_Subtree (Arguments : Args_Type) return Document_Type
    is
-      Dummy   : constant Arg_Type := (others => 'x');
-      Arg_Len : constant Natural  := E ("arg", A ("value", String (Dummy)))'Length;
       pragma Assert (Index_Type (Arg_Len) < Index_Type'Last / Arguments'Length);
       Result  : Document_Type (1 .. Index_Type (Arg_Len * Arguments'Length)) :=
          (others => Null_Node);
@@ -60,6 +65,9 @@ is
             end if;
          end;
       end loop;
+      pragma Assert (Arg_Len = 15);
+      pragma Assert (Num_Elements (Result) = Offset_Type (Arguments'Length * Arg_Len));
+      pragma Assert (Num_Elements (Result) = Arguments'Length * 15);
       return Result;
    end To_Subtree;
 
