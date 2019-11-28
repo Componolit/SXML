@@ -1,7 +1,8 @@
 MODE ?= strict
+BOUNDED ?= false
 CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
-GPRBUILD_OPTS = -s -p -XMode=$(MODE)
+GPRBUILD_OPTS = -s -p -XMode=$(MODE) -XBounded=$(BOUNDED)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 --waitretry=5 --random-wait --no-clobber
 GNATCHECK = $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
 
@@ -72,4 +73,4 @@ clean:
 	gnatclean -P examples/examples
 	gnatprove -P examples/examples --clean
 	gnatclean -P examples/fuzzdriver
-	rm -rf obj/document
+	rm -rf obj
