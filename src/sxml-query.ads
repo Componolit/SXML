@@ -206,19 +206,24 @@ is
    -- Attribute --
    ---------------
 
-   function Attribute (State          : State_Type;
-                       Document       : Document_Type;
-                       Attribute_Name : String) return String with
+   procedure Attribute (State          :     State_Type;
+                        Document       :     Document_Type;
+                        Attribute_Name :     String;
+                        Result         : out Result_Type;
+                        Data           : out Content_Type;
+                        Last           : out Natural) with
      Pre  => State.Result = Result_OK
              and then Is_Valid (Document, State)
              and then Is_Open (Document, State)
-             and then Has_Attribute (State, Document, Attribute_Name);
+             and then Data'Length > 0;
    --  Get first attribute by name
    --
-   --  @param State          Current state
-   --  @param Document       Document
-   --  @param Attribute_Name Name to match for
-   --  @return               Value of attribute
+   --  @param State     Current state
+   --  @param Document  Document
+   --  @param Data      Name to match for
+   --  @param Result    Result of operation
+   --  @param Data      Result data
+   --  @param Last      Last valid element of result
 
    --------------------
    -- Is_Valid_Value --

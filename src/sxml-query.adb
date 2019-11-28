@@ -583,30 +583,40 @@ is
    -- Attribute --
    ---------------
 
-   function Attribute (State          : State_Type;
-                       Document       : Document_Type;
-                       Attribute_Name : String) return String is
-      Result_State : constant State_Type := Find_Attribute (State, Document, Attribute_Name);
-      Result       : Result_Type;
-      Unused       : Natural;
-      pragma Unreferenced (Unused);
+   procedure Attribute (State          :     State_Type;
+                        Document       :     Document_Type;
+                        Attribute_Name :     String;
+                        Result         : out Result_Type;
+                        Data           : out Content_Type;
+                        Last           : out Natural)
+   is
+      S : constant State_Type := Find_Attribute (State, Document, Attribute_Name);
    begin
-      if Result_State.Result /= Result_OK then
-         return "";
+      Last   := 0;
+      Result := Result_Invalid;
+
+      for D of Data
+      loop
+         D := Character'Val (0);
+      end loop;
+
+      if S.Result /= Result_OK then
+         return;
       end if;
 
       declare
-         Val           : constant Relative_Index_Type := Document (Add (Document'First, Result_State.Offset)).Value;
-         Result_Length : constant Natural := String_Length (Document, Add (Result_State.Offset, Val));
-         Result_String : String (1 .. Result_Length);
+         Val : constant Relative_Index_Type := Document (Add (Document'First, S.Offset)).Value;
+         Len : constant Natural := String_Length (Document, Add (S.Offset, Val));
       begin
-         if Result_Length = 0 then
-            return "";
+         if
+           Len > Data'Length
+           or else Data'First > Natural'Last - Len
+           or else Data'First > Natural'Last
+         then
+            return;
          end if;
 
-         pragma Assert (Valid_Content (Result_String'First, Result_String'Last));
-         Value (Result_State, Document, Result, Result_String, Unused);
-         return (if Result = Result_OK then Result_String else "");
+         Value (S, Document, Result, Data (Data'First .. Data'First + Len), Last);
       end;
 
    end Attribute;

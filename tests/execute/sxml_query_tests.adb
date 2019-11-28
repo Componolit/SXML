@@ -526,14 +526,17 @@ package body SXML_Query_Tests is
                      "tests/data/attribute_value.xml",
                      "/root/child/elem",
                      Position);
+      Result : Result_Type;
+      Data   : String (1..1000);
+      Last   : Natural;
    begin
       Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
 
-      Assert (Has_Attribute (State, Context.all, "value")
-              and then Attribute (State, Context.all, "value") = "a",
-              "Invalid attribute: " & Attribute (State, Context.all, "value")'Length'Img);
-
+      Assert (Has_Attribute (State, Context.all, "value"), "Attribute ""value"" not present");
+      Attribute (State, Context.all, "value", Result, Data, Last);
+      Assert (Result = Result_OK, "Error querying result: " & Result'Img);
+      Assert (Data (Data'First .. Last) = "a", "Invalid attribute: " & Data (Data'First .. Last));
       Assert (not Has_Attribute (State, Context.all, "nonexistent"), "Unexpected attribute");
 
    end Test_Simplified_Attribute_Value;
