@@ -3,6 +3,14 @@ with "../build/SXML";
 project Examples
 is
    for Main use ("exec.adb", "simple.adb", "parse.adb", "doc.adb", "serialize.adb", "parse_simple.adb");
-   for Source_Dirs use (".", "../tests/prove", "../tests/debug");
+   for Source_Dirs use (".", "../tests/prove");
    for Exec_Dir use "../obj";
+
+   case SXML.Mode is
+      when "strict" =>
+         for Source_Dirs use (".", "../tests/prove", "../tests/debug");
+      when "debug" =>
+         for Source_Dirs use (".", "../tests/prove");
+      when others => null;
+   end case;
 end Examples;
