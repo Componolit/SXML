@@ -25,7 +25,6 @@ package body SXML_Generator_Tests is
       Offset : Natural := 0;
       Last   : Natural;
       Result : Result_Type;
-      procedure To_String is new SXML.Serialize.To_String (1000);
    begin
       To_String (Doc, XML.all, Offset, Result);
       Last := XML.all'First + Offset - 1;

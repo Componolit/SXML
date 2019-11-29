@@ -17,12 +17,10 @@ is
       Document : SXML.Document_Type (1 .. 100) := (others => Null_Node);
       Result   : Match_Type;
       Position : Natural;
-
-   procedure P is new SXML.Parser.Parse (100);
 begin
    pragma Assert (Valid_Content (Text'First, Text'Last));
-   P (Data         => Text,
-      Document     => Document,
-      Parse_Result => Result,
-      Position     => Position);
+   Parse (Data         => Text,
+          Document     => Document,
+          Parse_Result => Result,
+          Position     => Position);
 end Doc;

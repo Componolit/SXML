@@ -11,9 +11,59 @@
 
 with SXML.Stack;
 
-package body SXML.Parser
+package body SXML.Generic_Parser
 is
-   pragma Annotate (GNATprove, Terminating, SXML.Parser);
+   pragma Annotate (GNATprove, Terminating, SXML.Generic_Parser);
+
+   type Range_Type is
+      record
+         First : Natural;
+         Last  : Natural;
+      end record
+    with
+      Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last)
+                   or (Range_Type.First = Natural'Last and Range_Type.Last = 0);
+   Null_Range : constant Range_Type := (Natural'Last, 0);
+
+   type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
+
+   type Local_Type is
+      record
+         Done           : Boolean;
+         Do_Exit        : Boolean;
+         Name           : Range_Type;
+         Sub_Match      : Match_Type;
+         Child_Start    : Index_Type;
+         Previous_Child : Index_Type;
+         Parent         : Index_Type;
+         Old_Offset     : Natural;
+         State          : State_Type;
+      end record;
+   Null_Local : constant Local_Type := (Done           => False,
+                                        Do_Exit        => False,
+                                        Name           => Null_Range,
+                                        Sub_Match      => Match_Invalid,
+                                        Child_Start    => Invalid_Index,
+                                        Previous_Child => Invalid_Index,
+                                        Parent         => Invalid_Index,
+                                        Old_Offset     => 0,
+                                        State          => Call_Start);
+
+   type Frame_Type is
+      record
+         First : Boolean;
+         Local : Local_Type;
+      end record;
+
+   package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
+
+   type Out_Type is
+      record
+         Match : Match_Type;
+         Start : Index_Type;
+      end record;
+
+   package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
 
    -----------
    -- Parse --
@@ -32,16 +82,6 @@ is
       Document_Index : Document_Index_Type := Document'First;
       Offset         : Natural := 0;
       Error_Index    : Natural := 0;
-
-      type Range_Type is
-         record
-            First : Natural;
-            Last  : Natural;
-         end record
-       with
-         Predicate => (Range_Type.Last < Natural'Last and Range_Type.First <= Range_Type.Last)
-                      or (Range_Type.First = Natural'Last and Range_Type.Last = 0);
-      Null_Range : constant Range_Type := (Natural'Last, 0);
 
       function Is_Valid (R : Range_Type) return Boolean is
         (R.Last < Natural'Last and R.Last >= R.First);
@@ -1112,46 +1152,6 @@ is
       is
          Old_Offset : constant Natural := Offset;
 
-         type State_Type is (Call_Start, Loop_Start, Recurse_End, Loop_End);
-
-         type Local_Type is
-            record
-               Done           : Boolean;
-               Do_Exit        : Boolean;
-               Name           : Range_Type;
-               Sub_Match      : Match_Type;
-               Child_Start    : Index_Type;
-               Previous_Child : Index_Type;
-               Parent         : Index_Type;
-               Old_Offset     : Natural;
-               State          : State_Type;
-            end record;
-         Null_Local : constant Local_Type := (Done           => False,
-                                              Do_Exit        => False,
-                                              Name           => Null_Range,
-                                              Sub_Match      => Match_Invalid,
-                                              Child_Start    => Invalid_Index,
-                                              Previous_Child => Invalid_Index,
-                                              Parent         => Invalid_Index,
-                                              Old_Offset     => 0,
-                                              State          => Call_Start);
-
-         type Frame_Type is
-            record
-               First : Boolean;
-               Local : Local_Type;
-            end record;
-
-         package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
-
-         type Out_Type is
-            record
-               Match : Match_Type;
-               Start : Index_Type;
-            end record;
-
-         package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
-
          Frame      : Frame_Type;
          Result     : Out_Type;
 
@@ -1351,4 +1351,4 @@ is
       end if;
    end Parse;
 
-end SXML.Parser;
+end SXML.Generic_Parser;

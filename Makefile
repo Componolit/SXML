@@ -4,7 +4,8 @@ CODEPEER ?= off
 GNATPROVE_OPTS = --prover=z3,cvc4,altergo -j0 --codepeer=$(CODEPEER) --output-header
 GPRBUILD_OPTS = -s -p -XMode=$(MODE) -XBounded=$(BOUNDED)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 --waitretry=5 --random-wait --no-clobber
-GNATCHECK = $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
+GNATCHECK ?= $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
+TEST_OPTS ?= ulimit -s 30; ulimit -a;
 
 all:
 	$(GNATCHECK) -P build/SXML
@@ -14,7 +15,7 @@ all:
 test: build/SXML.gpr
 	$(GNATCHECK) -P build/SXML
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@obj/tests
+	@($(TEST_OPTS)time obj/tests)
 
 prove:
 	@gnatprove $(GNATPROVE_OPTS) -P build/SXML
@@ -29,17 +30,17 @@ doc/api/index.html: build/SXML.gpr
 
 testonly: build/SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@time obj/tests
+	@($(TEST_OPTS)time obj/tests)
 
 testbulk: export SXML_BULK_TESTS ?= 1
 testbulk: build/SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@time obj/tests
+	@($(TEST_OPTS)time obj/tests)
 
 testinsane: export SXML_INSANE_TESTS ?= 1
 testinsane: build/SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@time obj/tests
+	@($(TEST_OPTS)time obj/tests)
 
 rawdata:
 	@rm -rf obj/rawdata
@@ -57,6 +58,8 @@ fuzz: obj/fuzzdriver
 
 stack: MODE=stack
 stack: build/SXML.gpr
+stack: BOUNDED = true
+stack:
 	gprbuild $(GPRBUILD_OPTS) -P build/SXML
 	gnatstack $(GPRBUILD_OPTS) -P build/SXML
 

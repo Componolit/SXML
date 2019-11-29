@@ -11,18 +11,15 @@
 
 package SXML_Utils
 is
-   procedure Check_Invalid (Input       : String;
-                            Stack_Depth : Positive := 100);
+   procedure Check_Invalid (Input : String);
 
    function Read_File (File_Name : String) return access String;
 
-   procedure Parse_Document (File        : String;
-                             Stack_Depth : Natural := 10000);
+   procedure Parse_Document (File : String);
 
    procedure Check_Document (Input                : String;
                              Output               : String := "INPUT";
-                             Ignore_Final_Newline : Boolean := False;
-                             Stack_Depth          : Positive := 100);
+                             Ignore_Final_Newline : Boolean := False);
 
    procedure Generate_Deep_Nodes (Name  : String;
                                   Level : Natural);

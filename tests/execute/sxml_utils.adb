@@ -16,6 +16,7 @@ with Ada.Text_IO.Text_Streams;
 with SXML.Generator; use SXML.Generator;
 with SXML.Serialize; use SXML.Serialize;
 with SXML.Parser;
+with SXML.Generic_Serialize;
 with Text_IO;
 
 package body SXML_Utils
@@ -29,15 +30,12 @@ is
    -- Check_Invalid --
    -------------------
 
-   procedure Check_Invalid (Input       : String;
-                            Stack_Depth : Positive := 100)
+   procedure Check_Invalid (Input : String)
    is
       use SXML;
       use SXML.Parser;
       Result   : Match_Type;
       Position : Natural;
-
-      procedure Parse is new Parser.Parse (Stack_Depth);
    begin
       Parse (Data         => Input,
              Document     => Document.all,
@@ -77,8 +75,9 @@ is
    -- Parse_Document --
    --------------------
 
-   procedure Parse_Document (File        : String;
-                             Stack_Depth : Natural := 10000)
+   package Ser is new SXML.Generic_Serialize (Depth => 10000000);
+
+   procedure Parse_Document (File : String)
    is
       Input : access String := Read_File (File);
       use SXML;
@@ -88,9 +87,6 @@ is
       Data : access String := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
       Last : Natural := 1;
       Serialize_Result : Result_Type;
-
-      procedure Parse is new Parser.Parse (Stack_Depth);
-      procedure To_String is new SXML.Serialize.To_String (Stack_Depth);
    begin
       Document.all (Document.all'First) := Null_Node;
       Parse (Data         => Input.all,
@@ -100,7 +96,7 @@ is
       Free (Input);
       Assert (Result = Match_OK,
               File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
-      To_String (Document.all, Data.all, Last, Serialize_Result);
+      Ser.To_String (Document.all, Data.all, Last, Serialize_Result);
       Free (Data);
       Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
    end Parse_Document;
@@ -111,8 +107,7 @@ is
 
    procedure Check_Document (Input                : String;
                              Output               : String := "INPUT";
-                             Ignore_Final_Newline : Boolean := False;
-                             Stack_Depth          : Positive := 100)
+                             Ignore_Final_Newline : Boolean := False)
    is
       use SXML;
       use SXML.Parser;
@@ -121,9 +116,6 @@ is
       XML      : access String := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
       Serialize_Result : Result_Type;
-
-      procedure Parse is new Parser.Parse (Stack_Depth);
-      procedure To_String is new SXML.Serialize.To_String (Stack_Depth);
    begin
       Document.all (1) := Null_Node;
       Parse (Data         => Input,

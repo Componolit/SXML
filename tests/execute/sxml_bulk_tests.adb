@@ -23,7 +23,7 @@ package body SXML_Bulk_Tests is
       URL : constant String := T.Routine_Name.all;
    begin
       Ada.Text_IO.Put_Line ("Testing " & URL);
-      Parse_Document ("obj/rawdata/" & URL (9..URL'Last), 15000000);
+      Parse_Document ("obj/rawdata/" & URL (9..URL'Last));
 	end Test_URL;
 
    ---------------------------------------------------------------------------

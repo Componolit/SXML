@@ -14,7 +14,6 @@ is
    Document : SXML.Document_Type (1 .. 100) := (others => SXML.Null_Node);
    Result   : Match_Type;
    Position : Natural;
-   procedure Parse is new SXML.Parser.Parse (100);
 begin
    Parse (Data         => Input,
           Document     => Document,

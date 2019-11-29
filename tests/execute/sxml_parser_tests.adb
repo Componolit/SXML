@@ -447,7 +447,7 @@ package body SXML_Parser_Tests is
    procedure Large_File (T : in out Test_Cases.Test_Case'Class)
    is
    begin
-      Parse_Document ("tests/data/orders.xml", 100000);
+      Parse_Document ("tests/data/orders.xml");
    end Large_File;
 
    ---------------------------------------------------------------------------
@@ -466,14 +466,12 @@ package body SXML_Parser_Tests is
          Input : access String := Read_File (File_Name);
          Position : Natural;
          Result   : SXML.Parser.Match_Type;
-
-         procedure Parse is new SXML.Parser.Parse (1000000);
          use type SXML.Parser.Match_Type;
       begin
-         Parse (Data         => Input.all,
-                Document     => Document.all,
-                Parse_Result => Result,
-                Position     => Position);
+         SXML.Parser.Parse (Data         => Input.all,
+                            Document     => Document.all,
+                            Parse_Result => Result,
+                            Position     => Position);
          Free_Subtree (Document);
          Assert (Result /= SXML.Parser.Match_OK,
                  File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
@@ -487,7 +485,7 @@ package body SXML_Parser_Tests is
       File_Name : constant String := "obj/many_nodes.xml";
    begin
       Generate_Many_Nodes (File_Name, 1000000);
-      Parse_Document (File_Name, 3000000);
+      Parse_Document (File_Name);
    end Many_Nodes;
 
    ---------------------------------------------------------------------------

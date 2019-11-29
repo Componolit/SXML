@@ -11,9 +11,9 @@
 
 with SXML.Stack;
 
-package body SXML.Serialize
+package body SXML.Generic_Serialize
 is
-   pragma Annotate (GNATprove, Terminating, SXML.Serialize);
+   pragma Annotate (GNATprove, Terminating, SXML.Generic_Serialize);
 
    ---------
    -- Put --
@@ -271,6 +271,9 @@ is
    -- To_String --
    ---------------
 
+   package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
+   package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
+
    procedure To_String (Document :        Document_Type;
                         Data     :    out String;
                         Last     :    out Natural;
@@ -282,16 +285,16 @@ is
       Current  : Traversal_Type;
       Position : Integer := 0;
       Count    : Natural := 0;
-
-      package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
-      package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
    begin
       Result := Result_Invalid;
       Last := 0;
       S.Reset;
       Rev.Reset;
       S.Push ((Document'First, Mode_Open));
-      Data := (others => Character'Val (0));
+      for D of Data
+      loop
+         D := Character'Val (0);
+      end loop;
 
       while not S.Is_Empty
       loop
@@ -377,4 +380,4 @@ is
       Last   := Position;
    end To_String;
 
-end SXML.Serialize;
+end SXML.Generic_Serialize;

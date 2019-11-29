@@ -39,8 +39,6 @@ is
       Match    : Match_Type;
       Result   : Result_Type;
       Position : Natural;
-      procedure Parse is new SXML.Parser.Parse (1000);
-      procedure To_String is new SXML.Serialize.To_String (1000);
    begin
       Document.all := (others => SXML.Null_Node);
       Parse (Data         => Input.all,
@@ -52,7 +50,7 @@ is
       then
          Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
       else
-         To_String (Document.all, Output.all, Position, Result);
+         SXML.Serialize.To_String (Document.all, Output.all, Position, Result);
          if Result /= Result_OK
          then
             Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Position'Img);
