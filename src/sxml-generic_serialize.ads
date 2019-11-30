@@ -11,11 +11,10 @@
 
 generic
    Depth : Positive;
-package SXML.Generic_Serialize
+package SXML.Generic_Serialize with
+   Abstract_State => State,
+   Initializes    => State
 is
-   type Traversal_Type is private;
-   Null_Traversal : constant Traversal_Type;
-
    ---------------
    -- To_String --
    ---------------
@@ -31,17 +30,5 @@ is
    --  @param Data      Output string
    --  @param Last      Last valid element of output string
    --  @param Result    Result of operation
-
-private
-
-   type Mode_Type is (Mode_Invalid, Mode_Open, Mode_Close);
-
-   type Traversal_Type is
-      record
-         Index : Index_Type;
-         Mode  : Mode_Type;
-      end record;
-
-   Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
 
 end SXML.Generic_Serialize;

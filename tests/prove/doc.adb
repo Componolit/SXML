@@ -1,7 +1,7 @@
 with SXML.Parser;
 
-procedure Doc
-with SPARK_Mode
+procedure Doc with
+   Global => SXML.Parser.State
 is
    use SXML;
    use SXML.Parser;
@@ -23,4 +23,5 @@ begin
           Document     => Document,
           Parse_Result => Result,
           Position     => Position);
+   pragma Unreferenced (Document, Result, Position);
 end Doc;

@@ -9,7 +9,7 @@
 --  GNU Affero General Public License version 3.
 --
 
-with SXML.Stack;
+private with SXML.Stack;
 
 package body SXML.Generic_Parser with
    Refined_State => (State => (Call_Stack.State, Result_Stack.State))

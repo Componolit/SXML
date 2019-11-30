@@ -11,9 +11,23 @@
 
 with SXML.Stack;
 
-package body SXML.Generic_Serialize
+package body SXML.Generic_Serialize with
+   Refined_State => (State => (S.State, Rev.State))
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generic_Serialize);
+
+   type Mode_Type is (Mode_Invalid, Mode_Open, Mode_Close);
+
+   type Traversal_Type is
+      record
+         Index : Index_Type;
+         Mode  : Mode_Type;
+      end record;
+
+   Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
+
+   package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
+   package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
 
    ---------
    -- Put --
@@ -270,9 +284,6 @@ is
    ---------------
    -- To_String --
    ---------------
-
-   package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
-   package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
 
    procedure To_String (Document :        Document_Type;
                         Data     :    out String;

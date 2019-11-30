@@ -13,6 +13,7 @@ with
 is
    package IO
    with
+      SPARK_Mode,
       Abstract_State => State,
       Initializes => State
    is
