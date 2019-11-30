@@ -2,7 +2,13 @@ with "../build/SXML";
 
 project Examples
 is
-   for Main use ("exec.adb", "simple.adb", "parse.adb", "doc.adb", "serialize.adb", "parse_simple.adb");
+   for Main use ("exec.adb",
+                 "simple.adb",
+                 "parse.adb",
+                 "doc.adb",
+                 "serialize.adb",
+                 "parse_simple.adb",
+                 "fuzzdriver.adb");
    for Source_Dirs use (".", "../tests/prove");
    for Exec_Dir use "../obj";
 
