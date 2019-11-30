@@ -11,7 +11,9 @@
 
 generic
    Depth : Positive;
-package SXML.Generic_Parser
+package SXML.Generic_Parser with
+   Abstract_State => State,
+   Initializes    => State
 is
    type Match_Type is (Match_OK,
                        Match_None,

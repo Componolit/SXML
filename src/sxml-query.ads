@@ -215,7 +215,8 @@ is
      Pre  => State.Result = Result_OK
              and then Is_Valid (Document, State)
              and then Is_Open (Document, State)
-             and then Data'Length > 0;
+             and then Data'Length > 0
+             and then Data'Last <= Natural'Last - Chunk_Length;
    --  Get first attribute by name
    --
    --  @param State     Current state

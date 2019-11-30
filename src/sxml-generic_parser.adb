@@ -11,7 +11,8 @@
 
 with SXML.Stack;
 
-package body SXML.Generic_Parser
+package body SXML.Generic_Parser with
+   Refined_State => (State => (Call_Stack.State, Result_Stack.State))
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generic_Parser);
 
@@ -996,7 +997,7 @@ is
       procedure Parse_CDATA (Result : out Match_Type;
                              Start  : out Index_Type)
       with
-         Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_CDATA (Result : out Match_Type;
                              Start  : out Index_Type)
@@ -1035,7 +1036,7 @@ is
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
       with
-         Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
 
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
@@ -1152,9 +1153,9 @@ is
       is
          Old_Offset : constant Natural := Offset;
 
-         Frame      : Frame_Type;
-         Result     : Out_Type;
-
+         Frame  : Frame_Type;
+         Result : Out_Type;
+         Limit  : Natural := Natural'Last;
       begin
          Call_Stack.Init;
          Result_Stack.Init;
@@ -1165,7 +1166,7 @@ is
          loop
             Call_Return : loop
 
-               if Call_Stack.Is_Empty then
+               if Limit < 2 or Call_Stack.Is_Empty then
                   if Match = Match_OK and Offset <= Old_Offset then
                      Match := Match_Invalid;
                   end if;
@@ -1290,15 +1291,22 @@ is
 
                end case;
 
+               Limit := Limit - 1;
+
                pragma Loop_Invariant (Call_Stack.Is_Valid);
                pragma Loop_Invariant (Result_Stack.Is_Valid);
                pragma Loop_Invariant (Offset >= Old_Offset);
+               pragma Loop_Invariant (Limit < Limit'Loop_Entry);
+               pragma Loop_Variant (Decreases => Limit);
 
             end loop Call_Return;
+
+            Limit := Limit - 1;
 
             pragma Loop_Invariant (Call_Stack.Is_Valid);
             pragma Loop_Invariant (Result_Stack.Is_Valid);
             pragma Loop_Invariant (Offset >= Old_Offset);
+            pragma Loop_Variant (Decreases => Limit);
          end loop;
 
       end Parse_Internal;

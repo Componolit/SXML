@@ -595,9 +595,9 @@ is
       Last   := 0;
       Result := Result_Invalid;
 
-      for D of Data
+      for I in Data'Range
       loop
-         D := Character'Val (0);
+         Data (I) := Character'Val (0);
       end loop;
 
       if S.Result /= Result_OK then
@@ -610,7 +610,7 @@ is
       begin
          if
            Len > Data'Length
-           or else Data'First > Natural'Last - Len
+           or else Data'First > Data'Last - Len
            or else Data'First > Natural'Last
          then
             return;
