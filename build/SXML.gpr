@@ -6,7 +6,7 @@ is
    Mode : Mode_Type := external ("Mode", "strict");
 
    type Bounded_Type is ("true", "false");
-   Bounded : Bounded_Type := external ("Bounded", "true");
+   Bounded : Bounded_Type := external ("Bounded", "false");
 
    SD := ();
    case Mode is
