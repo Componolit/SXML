@@ -12,7 +12,7 @@
 with SXML.Stack;
 
 package body SXML.Generic_Serialize with
-   Refined_State => (State => (S.State, Rev.State))
+   Refined_State => (State => (S, Rev))
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generic_Serialize);
 
@@ -23,11 +23,12 @@ is
          Index : Index_Type;
          Mode  : Mode_Type;
       end record;
-
    Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
 
-   package S is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
-   package Rev is new SXML.Stack (Traversal_Type, Null_Traversal, Depth);
+   package Traversal_Stack is new SXML.Stack (Traversal_Type);
+
+   S   : Traversal_Stack.Stack_Type (Depth);
+   Rev : Traversal_Stack.Stack_Type (Depth);
 
    ---------
    -- Put --
@@ -299,23 +300,21 @@ is
    begin
       Result := Result_Invalid;
       Last := 0;
-      S.Reset;
-      Rev.Reset;
-      S.Push ((Document'First, Mode_Open));
+      Traversal_Stack.Reset (S);
+      Traversal_Stack.Reset (Rev);
+      Traversal_Stack.Push (S, (Document'First, Mode_Open));
       for D of Data
       loop
          D := Character'Val (0);
       end loop;
 
-      while not S.Is_Empty
+      while not Traversal_Stack.Is_Empty (S)
       loop
          pragma Loop_Variant (Increases => Count);
          pragma Loop_Invariant (Position >= 0);
-         pragma Loop_Invariant (S.Is_Valid);
-         pragma Loop_Invariant (not S.Is_Empty);
-         pragma Loop_Invariant (Rev.Is_Valid);
+         pragma Loop_Invariant (not Traversal_Stack.Is_Empty (S));
 
-         S.Pop (Current);
+         Traversal_Stack.Pop (S, Current);
 
          if
             Count = Natural'Last
@@ -334,10 +333,10 @@ is
          end if;
 
          if Current.Mode = Mode_Open then
-            if S.Is_Full then
+            if Traversal_Stack.Is_Full (S) then
                return;
             end if;
-            S.Push ((Current.Index, Mode_Close));
+            Traversal_Stack.Push (S, (Current.Index, Mode_Close));
 
             Element := Current.Index;
             if
@@ -354,7 +353,7 @@ is
 
                Element := Add (Element, Child);
                if
-                  (Rev.Is_Full or not (Element in Document'Range))
+                  (Traversal_Stack.Is_Full (Rev) or not (Element in Document'Range))
                   or else (Document (Element).Kind /= Kind_Element_Open
                            and Document (Element).Kind /= Kind_Content)
                then
@@ -362,26 +361,23 @@ is
                end if;
 
                pragma Loop_Variant (Increases => Element);
-               pragma Loop_Invariant (Rev.Is_Valid);
-               pragma Loop_Invariant (not Rev.Is_Full);
+               pragma Loop_Invariant (not Traversal_Stack.Is_Full (Rev));
                pragma Loop_Invariant (Element in Document'Range);
                pragma Loop_Invariant (Document (Element).Kind = Kind_Element_Open or
                                       Document (Element).Kind = Kind_Content);
 
-               Rev.Push ((Element, Mode_Open));
+               Traversal_Stack.Push (Rev, (Element, Mode_Open));
                Child := Document (Element).Siblings;
             end loop;
-            while not Rev.Is_Empty
+            while not Traversal_Stack.Is_Empty (Rev)
             loop
-               pragma Loop_Variant (Decreases => Rev.Level);
-               pragma Loop_Invariant (S.Is_Valid);
-               pragma Loop_Invariant (Rev.Is_Valid);
-               pragma Loop_Invariant (not Rev.Is_Empty);
-               Rev.Pop (Tmp);
-               if S.Is_Full then
+               pragma Loop_Variant (Decreases => Traversal_Stack.Level (Rev));
+               pragma Loop_Invariant (not Traversal_Stack.Is_Empty (Rev));
+               Traversal_Stack.Pop (Rev, Tmp);
+               if Traversal_Stack.Is_Full (S) then
                   return;
                end if;
-               S.Push ((Tmp.Index, Mode_Open));
+               Traversal_Stack.Push (S, (Tmp.Index, Mode_Open));
             end loop;
          end if;
 
@@ -391,4 +387,7 @@ is
       Last   := Position;
    end To_String;
 
+begin
+   Traversal_Stack.Init (S, Null_Traversal);
+   Traversal_Stack.Init (Rev, Null_Traversal);
 end SXML.Generic_Serialize;

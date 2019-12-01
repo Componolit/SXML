@@ -9,92 +9,81 @@
 --  GNU Affero General Public License version 3.
 --
 
-package body SXML.Stack with
-   Refined_State => (State => (S, Index))
+package body SXML.Stack
 is
    pragma Annotate (GNATprove, Terminating, SXML.Stack);
-
-   type Stack_Type is array (1 .. Size) of Element_Type;
-   S     : Stack_Type := (others => Null_Element);
-   Index : Natural    := S'First;
 
    -----------
    -- Level --
    -----------
 
-   function Level return Natural is
-     (Index);
+   function Capacity (S : Stack_Type) return Positive is
+     (S.List'Last);
 
-   --------------
-   -- Is_Valid --
-   --------------
+   -----------
+   -- Level --
+   -----------
 
-   function Is_Valid return Boolean is
-     (Index >= S'First and Index <= S'Last);
-
-   --------------
-   -- Is_Empty --
-   --------------
-
-   function Is_Empty return Boolean is
-     (Index = S'First);
-
-   -------------
-   -- Is_Full --
-   -------------
-
-   function Is_Full return Boolean is
-     (Index >= S'Last);
+   function Level (S : Stack_Type) return Natural is
+     (S.Index);
 
    ----------
    -- Push --
    ----------
 
-   procedure Push (E : Element_Type) is
+   procedure Push (S : in out Stack_Type;
+                   E :        Element_Type) is
    begin
-      S (Index) := E;
-      Index := Index + 1;
+      S.Index := S.Index + 1;
+      S.List (S.Index) := E;
    end Push;
 
    ---------
    -- Pop --
    ---------
 
-   procedure Pop (E : out Element_Type) is
+   procedure Pop (S : in out Stack_Type;
+                  E :    out Element_Type) is
    begin
-      Index := Index - 1;
-      E := S (Index);
+      E := S.List (S.Index);
+      Drop (S);
    end Pop;
 
    ----------
    -- Drop --
    ----------
 
-   procedure Drop is
+   procedure Drop (S : in out Stack_Type) is
    begin
-      Index := Index - 1;
+      S.Index := S.Index - 1;
    end Drop;
 
    -----------
    -- Reset --
    -----------
 
-   procedure Reset is
+   procedure Reset (S : in out Stack_Type) is
    begin
-      Index := S'First;
+      S.Index := 0;
    end Reset;
 
    ----------
    -- Init --
    ----------
 
-   procedure Init
+   procedure Init (S            : out Stack_Type;
+                   Null_Element :     Element_Type)
    is
    begin
-      --  We need to give explicit bounds here, as a direct assignment to S
-      --  causes a buffer overflow due to a compiler bug, cf. RB29-053
-      S (S'Range) := (others => Null_Element);
-      Index := S'First;
+      S.Index := 0;
+      --  This would be the correct way to initialize S.List:
+      --     S.List  := (others => Null_Element);
+      --  As this creates a (potentially large) object on the stack, we initialize in a loop. The resulting flow
+      --  error is justified in the spec.
+      for E of S.List loop
+         pragma Loop_Invariant (S.Index = 0);
+         E := Null_Element;
+      end loop;
    end Init;
 
 end SXML.Stack;

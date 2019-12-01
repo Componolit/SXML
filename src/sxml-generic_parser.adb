@@ -12,7 +12,7 @@
 private with SXML.Stack;
 
 package body SXML.Generic_Parser with
-   Refined_State => (State => (Call_Stack.State, Result_Stack.State))
+   Refined_State => (State => (CS, RS))
 is
    pragma Annotate (GNATprove, Terminating, SXML.Generic_Parser);
 
@@ -55,16 +55,20 @@ is
          First : Boolean;
          Local : Local_Type;
       end record;
-
-   package Call_Stack is new SXML.Stack (Frame_Type, (True, Null_Local), Depth);
+   Null_Frame : constant Frame_Type := (False, Null_Local);
 
    type Out_Type is
       record
          Match : Match_Type;
          Start : Index_Type;
       end record;
+   Null_Out : constant Out_Type := (Match_Invalid, Invalid_Index);
 
-   package Result_Stack is new SXML.Stack (Out_Type, (Match_Invalid, Invalid_Index), Depth);
+   package Call_Stack is new SXML.Stack (Frame_Type);
+   CS : Call_Stack.Stack_Type (Depth);
+
+   package Result_Stack is new SXML.Stack (Out_Type);
+   RS : Result_Stack.Stack_Type (Depth);
 
    -----------
    -- Parse --
@@ -1157,22 +1161,22 @@ is
          Result : Out_Type;
          Limit  : Natural := Natural'Last;
       begin
-         Call_Stack.Init;
-         Result_Stack.Init;
-         Call_Stack.Push ((True, Null_Local));
+         Call_Stack.Init (CS, (False, Null_Local));
+         Result_Stack.Init (RS, (Match_Invalid, Invalid_Index));
+         Call_Stack.Push (CS, (True, Null_Local));
 
          Start := Invalid_Index;
          Match := Match_Invalid;
          loop
             Call_Return : loop
 
-               if Limit < 2 or Call_Stack.Is_Empty then
+               if Limit < 2 or Call_Stack.Is_Empty (CS) then
                   if Match = Match_OK and Offset <= Old_Offset then
                      Match := Match_Invalid;
                   end if;
                   return;
                end if;
-               Call_Stack.Pop (Frame);
+               Call_Stack.Pop (CS, Frame);
                case Frame.Local.State is
 
                   when Call_Start =>
@@ -1218,38 +1222,38 @@ is
                      end if;
 
                      Frame.Local.State := Loop_Start;
-                     Call_Stack.Push (Frame);
+                     Call_Stack.Push (CS, Frame);
 
                   when Loop_Start =>
 
                      Frame.Local.State := Recurse_End;
-                     Call_Stack.Push (Frame);
+                     Call_Stack.Push (CS, Frame);
 
-                     if Call_Stack.Is_Full or Result_Stack.Is_Full then
+                     if Call_Stack.Is_Full (CS) or Result_Stack.Is_Full (RS) then
                         Match := Match_Depth_Limit;
                         return;
                      end if;
 
-                     Call_Stack.Push ((False, Null_Local));
-                     Result_Stack.Push ((Match, Start));
+                     Call_Stack.Push (CS, (False, Null_Local));
+                     Result_Stack.Push (RS, (Match, Start));
 
                   when Recurse_End =>
 
                      Frame.Local.Sub_Match := Match;
                      Frame.Local.Child_Start := Start;
 
-                     if Result_Stack.Is_Empty then
+                     if Result_Stack.Is_Empty (RS) or Call_Stack.Is_Full (CS) then
                         Match := Match_Invalid;
                         return;
                      end if;
 
-                     Result_Stack.Pop (Result);
+                     Result_Stack.Pop (RS, Result);
                      Match := Result.Match;
                      Start := Result.Start;
 
                      if Frame.Local.Sub_Match /= Match_OK then
                         Frame.Local.State := Loop_End;
-                        Call_Stack.Push (Frame);
+                        Call_Stack.Push (CS, Frame);
                         exit Call_Return;
                      end if;
 
@@ -1264,7 +1268,7 @@ is
                      Link_Child (Frame.Local.Child_Start, Frame.Local.Parent, Frame.Local.Previous_Child);
 
                      Frame.Local.State := Loop_Start;
-                     Call_Stack.Push (Frame);
+                     Call_Stack.Push (CS, Frame);
 
                   when Loop_End =>
 
@@ -1293,8 +1297,6 @@ is
 
                Limit := Limit - 1;
 
-               pragma Loop_Invariant (Call_Stack.Is_Valid);
-               pragma Loop_Invariant (Result_Stack.Is_Valid);
                pragma Loop_Invariant (Offset >= Old_Offset);
                pragma Loop_Invariant (Limit < Limit'Loop_Entry);
                pragma Loop_Variant (Decreases => Limit);
@@ -1303,8 +1305,6 @@ is
 
             Limit := Limit - 1;
 
-            pragma Loop_Invariant (Call_Stack.Is_Valid);
-            pragma Loop_Invariant (Result_Stack.Is_Valid);
             pragma Loop_Invariant (Offset >= Old_Offset);
             pragma Loop_Variant (Decreases => Limit);
          end loop;
@@ -1359,4 +1359,7 @@ is
       end if;
    end Parse;
 
+begin
+   Call_Stack.Init (CS, Null_Frame);
+   Result_Stack.Init (RS, Null_Out);
 end SXML.Generic_Parser;
