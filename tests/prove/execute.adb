@@ -9,7 +9,7 @@ use SXML.Serialize;
 package body Execute
 with
    SPARK_Mode,
-   Refined_State => (Output => IO.State)
+   Refined_State => (State => IO.State)
 is
    package IO
    with
