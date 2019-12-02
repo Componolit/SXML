@@ -469,6 +469,7 @@ is
          loop
             pragma Loop_Variant (Increases => Offset);
             pragma Loop_Invariant (Offset >= Offset'Loop_Entry);
+
             if Data_Overflow then
                return;
             end if;
@@ -1319,7 +1320,8 @@ is
       -- Skip_Byte_Order_Mark --
       --------------------------
 
-      procedure Skip_Byte_Order_Mark;
+      procedure Skip_Byte_Order_Mark with
+         Post => Offset >= Offset'Old;
 
       procedure Skip_Byte_Order_Mark
       is
@@ -1355,6 +1357,10 @@ is
          Position := Offset;
       else
          Position := Error_Index;
+      end if;
+
+      if Position >= Data'Length then
+         Position := Data'Length - 1;
       end if;
 
       if Document_Index in Document'Range

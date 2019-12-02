@@ -18,8 +18,12 @@ test: build/SXML.gpr
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
 	@($(TEST_OPTS)time obj/tests)
 
-prove:
+prove: prove_tests prove_lib
+
+prove_lib:
 	@time gnatprove $(GNATPROVE_OPTS) -P build/SXML
+
+prove_tests:
 	@time gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
 
 doc: doc/api/index.html

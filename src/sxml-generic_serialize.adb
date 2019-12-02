@@ -288,7 +288,7 @@ is
 
    procedure To_String (Document :        Document_Type;
                         Data     :    out String;
-                        Last     :    out Natural;
+                        Offset   :    out Natural;
                         Result   :    out Result_Type)
    is
       Child    : Relative_Index_Type;
@@ -299,7 +299,7 @@ is
       Count    : Natural := 0;
    begin
       Result := Result_Invalid;
-      Last := 0;
+      Offset := 0;
       Traversal_Stack.Reset (S);
       Traversal_Stack.Reset (Rev);
       Traversal_Stack.Push (S, (Document'First, Mode_Open));
@@ -384,7 +384,11 @@ is
       end loop;
 
       Result := Result_OK;
-      Last   := Position;
+      Offset := Position;
+
+      if Offset >= Data'Length then
+         Offset := Data'Length - 1;
+      end if;
    end To_String;
 
 begin -- SXML.Generic_Serialize
