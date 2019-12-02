@@ -601,6 +601,7 @@ is
       end loop;
 
       if S.Result /= Result_OK then
+         Result := S.Result;
          return;
       end if;
 

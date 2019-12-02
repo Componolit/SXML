@@ -274,6 +274,30 @@ package body SXML_Query_Tests is
 
    ---------------------------------------------------------------------------
 
+   procedure Test_Query_Attribute_Missing (T : in out Test_Cases.Test_Case'Class)
+   is
+      use SXML;
+      use SXML.Query;
+      Doc    : Document_Type := E ("config",
+                                  A ("attribute1", "value1") +
+                                  A ("attribute2", "value2") +
+                                  A ("attribute3", "value3") +
+                                  A ("attribute4", "value4"));
+      State  : State_Type := Init (Doc);
+      Result : Result_Type;
+      Data   : Content_Type (1 .. 10);
+      Last   : Natural;
+   begin
+      Attribute (State, Doc, "attribute2", Result, Data, Last);
+      Assert (Result = Result_OK, "Attribute not found: " & Result'Img);
+      Assert (Last = 6, "Attribute has invalid last: " & Last'Img);
+      Assert (Data (Data'First .. Last) = "value2", "Attribute result invalid: " & Data (Data'First .. Last));
+      Attribute (State, Doc, "does_not_exist", Result, Data, Last);
+      Assert (Result = Result_Not_Found, "Attribute must not be found: " & Result'Img);
+   end Test_Query_Attribute_Missing;
+
+   ---------------------------------------------------------------------------
+
    procedure Test_Query_Find_Sub_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
@@ -553,6 +577,7 @@ package body SXML_Query_Tests is
       Register_Routine (T, Test_Query_Find_Sibling_With_Content'Access, "Find sibling with content");
       Register_Routine (T, Test_Query_Find_First_Sibling'Access, "Find first sibling by name");
       Register_Routine (T, Test_Query_Attribute'Access, "Query attribute name and value");
+      Register_Routine (T, Test_Query_Attribute_Missing'Access, "Query missing attribute");
       Register_Routine (T, Test_Query_Multiple_Attributes'Access, "Query multiple attribute");
       Register_Routine (T, Test_Query_Find_Attribute'Access, "Find attribute");
       Register_Routine (T, Test_Query_Find_Attribute_Missing'Access, "Find missing attribute");
