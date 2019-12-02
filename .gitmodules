@@ -1,0 +1,3 @@
+[submodule "contrib/basalt"]
+	path = contrib/basalt
+	url = https://github.com/Componolit/basalt

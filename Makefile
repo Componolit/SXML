@@ -1,7 +1,7 @@
 MODE ?= strict
 BOUNDED ?= false
 CODEPEER ?= off
-GNATPROVE_OPTS = --prover=z3,cvc4 -j0 --codepeer=$(CODEPEER) --output-header --steps=1000 --checks-as-errors
+GNATPROVE_OPTS = --prover=z3,cvc4 -j0 --codepeer=$(CODEPEER) --output-header --steps=5000 --checks-as-errors
 GPRBUILD_OPTS = -s -p -XMode=$(MODE) -XBounded=$(BOUNDED)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 --waitretry=5 --random-wait --no-clobber
 GNATCHECK ?= $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
