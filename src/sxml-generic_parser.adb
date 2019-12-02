@@ -102,11 +102,11 @@ is
                      and then Set_Type'First <= Set_Type'Last;
       Empty_Set : constant Set_Type := (1 => Character'Val (0));
 
-      Whitespace : constant Set_Type :=
-        Character'Val (16#20#)
-        & Character'Val (16#9#)
-        & Character'Val (16#D#)
-        & Character'Val (16#A#);
+      --  Need to use & operator of base type (Componolit/Workarounds#11)
+      Whitespace : constant Set_Type := Set_Type (String'(Character'Val (16#20#)
+                                                          & Character'Val (16#9#)
+                                                          & Character'Val (16#D#)
+                                                          & Character'Val (16#A#)));
 
       --------------------
       -- Restore_Offset --
@@ -517,7 +517,8 @@ is
             return;
          end if;
 
-         Match_Until_Set (Whitespace & "=", ">", Match_Tmp, Attribute_Name);
+         --  Need to use & operator of base type (Componolit/Workarounds#11)
+         Match_Until_Set (Set_Type (String (Whitespace) & "="), ">", Match_Tmp, Attribute_Name);
          if Match_Tmp /= Match_OK then
             Restore_Offset (Old_Offset);
             return;
@@ -698,7 +699,9 @@ is
          end if;
 
          --  Match tag name
-         Match_Until_Set (Whitespace & ">/", Empty_Set, Match_Tmp, Name);
+         --
+         --  Need to use & operator of base type (Componolit/Workarounds#11)
+         Match_Until_Set (Set_Type (String (Whitespace) & ">/"), Empty_Set, Match_Tmp, Name);
          if
             Match_Tmp /= Match_OK
             or else not (Document_Index in Document'Range)
@@ -793,7 +796,8 @@ is
             return;
          end if;
 
-         Match_Until_Set (Whitespace & ">", Empty_Set, Match_Tmp, Closing_Name);
+         --  Need to use & operator of base type (Componolit/Workarounds#11)
+         Match_Until_Set (Set_Type (String (Whitespace) & ">"), Empty_Set, Match_Tmp, Closing_Name);
          if
             Match_Tmp /= Match_OK
             or Data_Overflow
@@ -1359,7 +1363,7 @@ is
       end if;
    end Parse;
 
-begin
+begin -- SXML.Generic_Parser
    Call_Stack.Init (CS, Null_Frame);
    Result_Stack.Init (RS, Null_Out);
 end SXML.Generic_Parser;

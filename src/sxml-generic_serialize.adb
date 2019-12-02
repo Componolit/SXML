@@ -387,7 +387,7 @@ is
       Last   := Position;
    end To_String;
 
-begin
+begin -- SXML.Generic_Serialize
    Traversal_Stack.Init (S, Null_Traversal);
    Traversal_Stack.Init (Rev, Null_Traversal);
 end SXML.Generic_Serialize;
