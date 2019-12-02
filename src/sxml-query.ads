@@ -89,10 +89,11 @@ is
                    Result   : out Result_Type;
                    Data     : out Content_Type;
                    Last     : out Natural) with
-     Pre => Valid_Content (Data'First, Data'Last)
-            and then State.Result = Result_OK
-            and then (Is_Valid (Document, State)
-            and then (Is_Open (Document, State) or Is_Attribute (Document, State)));
+     Pre  => Valid_Content (Data'First, Data'Last)
+             and then State.Result = Result_OK
+             and then (Is_Valid (Document, State)
+             and then (Is_Open (Document, State) or Is_Attribute (Document, State))),
+     Post => (if Result = Result_OK then Last in Data'Range);
    --  Return name for current node
    --
    --  @param State     Current state
@@ -216,11 +217,12 @@ is
                         Result         : out Result_Type;
                         Data           : out Content_Type;
                         Last           : out Natural) with
-     Pre  => State.Result = Result_OK
-             and then Is_Valid (Document, State)
-             and then Is_Open (Document, State)
-             and then Data'Length > 0
-             and then Data'Last <= Natural'Last - Chunk_Length;
+     Pre   => State.Result = Result_OK
+              and then Is_Valid (Document, State)
+              and then Is_Open (Document, State)
+              and then Data'Length > 0
+              and then Data'Last <= Natural'Last - Chunk_Length,
+     Post => (if Result = Result_OK then Last in Data'Range);
    --  Get first attribute by name
    --
    --  @param State     Current state
