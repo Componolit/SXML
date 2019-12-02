@@ -21,15 +21,16 @@ is
 
    procedure To_String (Document :     Document_Type;
                         Data     : out String;
-                        Last     : out Natural;
+                        Offset   : out Natural;
                         Result   : out Result_Type) with
      Global => (In_Out => State),
-     Pre    => Data'Length > 0;
+     Pre    => Data'Length > 0,
+     Post   => (if Result = Result_OK then Offset < Data'Length);
    --  Serialize document to string using runtime stack
    --
    --  @param Document  Document to serialize
    --  @param Data      Output string
-   --  @param Last      Last valid element of output string
+   --  @param Offset    Offset of last valid character of output string
    --  @param Result    Result of operation
 
 end SXML.Generic_Serialize;

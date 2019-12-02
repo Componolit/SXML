@@ -42,7 +42,9 @@ is
    procedure Parse (Data         :        Content_Type;
                     Document     : in out Document_Type;
                     Parse_Result :    out Match_Type;
-                    Position     :    out Natural);
+                    Position     :    out Natural) with
+      Global => (In_Out => (State)),
+      Post   => Position < Data'Length;
    --  Parse an XML file
    --
    --  @param Data          Input data
