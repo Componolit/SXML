@@ -9,7 +9,7 @@
 --  GNU Affero General Public License version 3.
 --
 
-with SXML.Stack;
+with Basalt.Stack;
 
 package body SXML.Generic_Serialize with
    Refined_State => (State => (S, Rev))
@@ -25,7 +25,7 @@ is
       end record;
    Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
 
-   package Traversal_Stack is new SXML.Stack (Traversal_Type);
+   package Traversal_Stack is new Basalt.Stack (Traversal_Type);
 
    S   : Traversal_Stack.Stack_Type (Depth);
    Rev : Traversal_Stack.Stack_Type (Depth);
@@ -371,7 +371,7 @@ is
             end loop;
             while not Traversal_Stack.Is_Empty (Rev)
             loop
-               pragma Loop_Variant (Decreases => Traversal_Stack.Level (Rev));
+               pragma Loop_Variant (Decreases => Traversal_Stack.Count (Rev));
                pragma Loop_Invariant (not Traversal_Stack.Is_Empty (Rev));
                Traversal_Stack.Pop (Rev, Tmp);
                if Traversal_Stack.Is_Full (S) then
@@ -388,6 +388,6 @@ is
    end To_String;
 
 begin -- SXML.Generic_Serialize
-   Traversal_Stack.Init (S, Null_Traversal);
-   Traversal_Stack.Init (Rev, Null_Traversal);
+   Traversal_Stack.Initialize (S, Null_Traversal);
+   Traversal_Stack.Initialize (Rev, Null_Traversal);
 end SXML.Generic_Serialize;

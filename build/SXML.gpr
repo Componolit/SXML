@@ -1,4 +1,5 @@
 with "switches";
+with "../contrib/basalt/basalt";
 
 project SXML
 is

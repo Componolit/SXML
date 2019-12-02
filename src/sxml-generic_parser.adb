@@ -9,7 +9,7 @@
 --  GNU Affero General Public License version 3.
 --
 
-private with SXML.Stack;
+private with Basalt.Stack;
 
 package body SXML.Generic_Parser with
    Refined_State => (State => (CS, RS))
@@ -64,10 +64,10 @@ is
       end record;
    Null_Out : constant Out_Type := (Match_Invalid, Invalid_Index);
 
-   package Call_Stack is new SXML.Stack (Frame_Type);
+   package Call_Stack is new Basalt.Stack (Frame_Type);
    CS : Call_Stack.Stack_Type (Depth);
 
-   package Result_Stack is new SXML.Stack (Out_Type);
+   package Result_Stack is new Basalt.Stack (Out_Type);
    RS : Result_Stack.Stack_Type (Depth);
 
    -----------
@@ -1165,8 +1165,8 @@ is
          Result : Out_Type;
          Limit  : Natural := Natural'Last;
       begin
-         Call_Stack.Init (CS, (False, Null_Local));
-         Result_Stack.Init (RS, (Match_Invalid, Invalid_Index));
+         Call_Stack.Initialize (CS, (False, Null_Local));
+         Result_Stack.Initialize (RS, (Match_Invalid, Invalid_Index));
          Call_Stack.Push (CS, (True, Null_Local));
 
          Start := Invalid_Index;
@@ -1364,6 +1364,6 @@ is
    end Parse;
 
 begin -- SXML.Generic_Parser
-   Call_Stack.Init (CS, Null_Frame);
-   Result_Stack.Init (RS, Null_Out);
+   Call_Stack.Initialize (CS, Null_Frame);
+   Result_Stack.Initialize (RS, Null_Out);
 end SXML.Generic_Parser;
