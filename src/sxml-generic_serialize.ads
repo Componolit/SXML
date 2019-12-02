@@ -23,7 +23,8 @@ is
                         Data     : out String;
                         Last     : out Natural;
                         Result   : out Result_Type) with
-     Pre => Data'Length > 0;
+     Global => (In_Out => State),
+     Pre    => Data'Length > 0;
    --  Serialize document to string using runtime stack
    --
    --  @param Document  Document to serialize
