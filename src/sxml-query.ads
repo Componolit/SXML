@@ -158,7 +158,11 @@ is
               then Offset (Find_Sibling'Result) >= Offset (State)
                    and then (Is_Valid (Document, Find_Sibling'Result)
                              and then Is_Open (Document, Find_Sibling'Result)));
-   --  Find sibling by name
+   --
+   --  Find sibling by name, beginning at State. The result has to match Sibling_Name, Attribute_Name and
+   --  Attribute_Value. The special value "*" can be used to match any name or value. If State passed to the function
+   --  already is a match, it is returned directly. If not, a matching sibling is searched. If no matching sibling
+   --  is found, State.Result will have the value Result_Not_Found.
    --
    --  @param State           Current state
    --  @param Document        Document
