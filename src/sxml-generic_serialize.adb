@@ -27,8 +27,8 @@ is
 
    package Traversal_Stack is new Basalt.Stack (Traversal_Type);
 
-   S   : Traversal_Stack.Stack_Type (Depth);
-   Rev : Traversal_Stack.Stack_Type (Depth);
+   S   : Traversal_Stack.Context (Depth);
+   Rev : Traversal_Stack.Context (Depth);
 
    ---------
    -- Put --

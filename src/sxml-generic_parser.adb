@@ -65,10 +65,10 @@ is
    Null_Out : constant Out_Type := (Match_Invalid, Invalid_Index);
 
    package Call_Stack is new Basalt.Stack (Frame_Type);
-   CS : Call_Stack.Stack_Type (Depth);
+   CS : Call_Stack.Context (Depth);
 
    package Result_Stack is new Basalt.Stack (Out_Type);
-   RS : Result_Stack.Stack_Type (Depth);
+   RS : Result_Stack.Context (Depth);
 
    -----------
    -- Parse --
