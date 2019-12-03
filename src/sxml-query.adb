@@ -56,17 +56,6 @@ is
      (Document (Add (Document'First, State.Offset)).Kind = Kind_Attribute);
 
    ----------
-   -- Init --
-   ----------
-
-   function Init (Document : Document_Type) return State_Type
-   is
-      pragma Unreferenced (Document);
-   begin
-      return State_Type'(Result => Result_OK, Offset => 0);
-   end Init;
-
-   ----------
    -- Name --
    ----------
 

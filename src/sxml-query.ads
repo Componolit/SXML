@@ -11,10 +11,13 @@
 
 package SXML.Query
 is
+   pragma Annotate (GNATprove, Terminating, SXML.Query);
+
    type State_Type (Result : Result_Type := Result_Invalid) is private;
    --  @field  Result Result of the last operation
 
    Invalid_State : constant State_Type;
+   Initial_State : constant State_Type;
 
    ------------
    -- Offset --
@@ -30,7 +33,9 @@ is
 
    function Is_Valid (Document : Document_Type;
                       State    : State_Type) return Boolean with
-     Ghost;
+     Ghost,
+     Post => Is_Valid'Result = (Document'Length > 0 and (if State.Result = Result_OK
+                                                         then Offset (State) < Document'Length));
 
    -------------
    -- Is_Open --
@@ -74,8 +79,8 @@ is
    -- Init --
    ----------
 
-   function Init (Document : Document_Type) return State_Type with
-     Post => Is_Valid (Document, Init'Result);
+   function Init (Document : Document_Type) return State_Type is (Initial_State) with
+     Post => Offset (Init'Result) < Document'Length;
    --  Initialize state
    --
    --  @param Document  Document to initialize state for
@@ -348,5 +353,6 @@ private
       end record;
 
    Invalid_State : constant State_Type := (Result => Result_Invalid);
+   Initial_State : constant State_Type := (Result => Result_OK, Offset => 0);
 
 end SXML.Query;
