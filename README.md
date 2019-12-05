@@ -7,6 +7,8 @@ SXML is an XML library implemented in pure
 and bounded stack usage have been proven for the library. This makes it a ideal
 choice for processing information of untrusted origin.
 
+The full API documentation is available in [doc/api/index.html](doc/api/index.html).
+
 ## Structure
 
 The library consists of four parts: the generator, the parser, the serializer
@@ -18,9 +20,9 @@ The generator interface allows for declaring XML documents directly inside
 SPARK code. This is much more concise and safe than constructing an XML
 document by consecutive calls to API functions.
 
-Constructors for elements (`E`), for attributes (`A`) and for
-content (`C`) can be combinded using the combination opperator (`+`). The
-following XML document is to be declared using the SXML generator:
+Constructors for elements (`E`), for attributes (`A`) and for content (`C`) can
+be combined using the combination operator (`+`). The following XML document is
+to be declared using the SXML generator:
 
 ```XML
 <config>
@@ -74,7 +76,7 @@ is
    & "      <service name=""CAP""/>"
    & "      <service name=""CPU"">Some content</service>"
    & "   </parent-provides>"
-   & "</config>";                                                                                                                              
+   & "</config>";
    Document : SXML.Document_Type (1 .. 100) := (others => SXML.Null_Node);
    Result   : Match_Type;
    Position : Natural;
@@ -138,7 +140,7 @@ fuzzed the parser and serializer using American Fuzzy Lop (AFL) for more than
 ## Absence of Runtime Errors
 
 To prove and build the library just type `make` in the root of the source
-directory. The GNAT and SPARK toolset (Pro 18 or Community 2018) must be
+directory. The GNAT and SPARK toolset (Pro 20 or Community 2019) must be
 installed and in your path.
 
 ## Bounded Stack Usage
@@ -166,9 +168,6 @@ internal fixed-size buffer that is used.
 
 Special XML sections like CDATA, comments, DOCTYPE and procession information
 are accepted by the parser, but ignored by all other parts of SXML.
-
-Initialization of `SXML.Generator."+"` cannot be proven due to a SPARK bug
-(RA06-002).
 
 As the constructor and combinator functions in `SXML.Generator` return
 unbounded arrays of type `Document_Type` and `Attributes_Type`, those functions
