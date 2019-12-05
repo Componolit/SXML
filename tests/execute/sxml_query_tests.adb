@@ -62,7 +62,7 @@ package body SXML_Query_Tests is
       Match  : Match_Type;
       Result : State_Type := Init (Context);
    begin
-      Parse (Input.all, Context, Match, Position);
+      Parse (Input.all, Context, Position, Match);
       if Match /= Match_OK
       then
          return Invalid_State;

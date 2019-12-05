@@ -16,12 +16,12 @@ is
 
       Document : SXML.Document_Type (1 .. 100) := (others => Null_Node);
       Result   : Match_Type;
-      Position : Natural;
+      Offset   : Natural;
 begin
    pragma Assert (Valid_Content (Text'First, Text'Last));
-   Parse (Data         => Text,
-          Document     => Document,
-          Parse_Result => Result,
-          Position     => Position);
-   pragma Unreferenced (Document, Result, Position);
+   Parse (Data     => Text,
+          Document => Document,
+          Offset   => Offset,
+          Result   => Result);
+   pragma Unreferenced (Document, Result, Offset);
 end Doc;

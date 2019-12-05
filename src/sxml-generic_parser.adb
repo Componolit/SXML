@@ -74,10 +74,10 @@ is
    -- Parse --
    -----------
 
-   procedure Parse (Data         :        Content_Type;
-                    Document     : in out Document_Type;
-                    Parse_Result :    out Match_Type;
-                    Position     :    out Natural)
+   procedure Parse (Data     :        Content_Type;
+                    Document : in out Document_Type;
+                    Offset   :    out Natural;
+                    Result   :    out Match_Type)
    is
       Unused : Index_Type;
 
@@ -85,7 +85,7 @@ is
         Predicate => Document_Index_Type in Document'Range;
 
       Document_Index : Document_Index_Type := Document'First;
-      Offset         : Natural := 0;
+      Current_Offset : Natural := 0;
       Error_Index    : Natural := 0;
 
       function Is_Valid (R : Range_Type) return Boolean is
@@ -113,15 +113,15 @@ is
       --------------------
 
       procedure Restore_Offset (Old_Offset : Natural) with
-        Post => Offset = Old_Offset;
+        Post => Current_Offset = Old_Offset;
 
       procedure Restore_Offset (Old_Offset : Natural) is
       begin
-         if Offset > Error_Index
+         if Current_Offset > Error_Index
          then
-            Error_Index := Offset;
+            Error_Index := Current_Offset;
          end if;
-         Offset := Old_Offset;
+         Current_Offset := Old_Offset;
       end Restore_Offset;
 
       ---------------------
@@ -151,8 +151,8 @@ is
       -------------------
 
       function Data_Overflow return Boolean is
-        (Data'First > Natural'Last - Offset
-         or Offset > Data'Length - 1);
+        (Data'First > Natural'Last - Current_Offset
+         or Current_Offset > Data'Length - 1);
 
       ---------------
       -- Match_Set --
@@ -161,7 +161,7 @@ is
       function Match_Set (Valid   : Set_Type;
                           Invalid : Set_Type;
                           Value   : Character) return Match_Type with
-        Pre  => Offset < Data'Length,
+        Pre  => Current_Offset < Data'Length,
         Post => (case Match_Set'Result is
                  when Match_OK      => (for some E of Valid   => E = Value)
                                        and (for all E of Invalid  => E /= Value),
@@ -201,16 +201,16 @@ is
                            Invalid :     Set_Type;
                            Match   : out Match_Type;
                            Value   : out Character) with
-        Pre  => Offset < Data'Length,
+        Pre  => Current_Offset < Data'Length,
         Post => (case Match is
-                 when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old))
-                                       and (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
-                                       and Offset > Offset'Old,
-                 when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old))
-                                       and Offset > Offset'Old,
-                 when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
-                                       and (for all E of Valid    => E /= Data (Data'First + Offset'Old))
-                                       and Offset > Offset'Old,
+                 when Match_OK      => (for some E of Valid   => E = Data (Data'First + Current_Offset'Old))
+                                       and (for all E of Invalid  => E /= Data (Data'First + Current_Offset'Old))
+                                       and Current_Offset > Current_Offset'Old,
+                 when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Current_Offset'Old))
+                                       and Current_Offset > Current_Offset'Old,
+                 when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Current_Offset'Old))
+                                       and (for all E of Valid    => E /= Data (Data'First + Current_Offset'Old))
+                                       and Current_Offset > Current_Offset'Old,
                  when others        => False);
 
       procedure Match_Set (Valid   :     Set_Type;
@@ -226,13 +226,13 @@ is
             return;
          end if;
 
-         Match := Match_Set (Valid, Invalid, Data (Data'First + Offset));
+         Match := Match_Set (Valid, Invalid, Data (Data'First + Current_Offset));
 
          if Match = Match_OK then
-            Value  := Data (Data'First + Offset);
+            Value  := Data (Data'First + Current_Offset);
          end if;
 
-         Offset := Offset + 1;
+         Current_Offset := Current_Offset + 1;
 
       end Match_Set;
 
@@ -240,16 +240,16 @@ is
                            Invalid :     Set_Type;
                            Match   : out Match_Type)
       with
-         Pre  => Offset < Data'Length,
+         Pre  => Current_Offset < Data'Length,
          Post => (case Match is
-                  when Match_OK      => (for some E of Valid   => E = Data (Data'First + Offset'Old))
-                                        and (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
-                                        and Offset > Offset'Old,
-                  when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Offset'Old))
-                                        and Offset > Offset'Old,
-                  when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Offset'Old))
-                                        and (for all E of Valid    => E /= Data (Data'First + Offset'Old))
-                                        and Offset > Offset'Old,
+                  when Match_OK      => (for some E of Valid   => E = Data (Data'First + Current_Offset'Old))
+                                        and (for all E of Invalid  => E /= Data (Data'First + Current_Offset'Old))
+                                        and Current_Offset > Current_Offset'Old,
+                  when Match_Invalid => (for some E of Invalid => E = Data (Data'First + Current_Offset'Old))
+                                        and Current_Offset > Current_Offset'Old,
+                  when Match_None    => (for all E of Invalid  => E /= Data (Data'First + Current_Offset'Old))
+                                        and (for all E of Valid    => E /= Data (Data'First + Current_Offset'Old))
+                                        and Current_Offset > Current_Offset'Old,
                   when others        => False);
 
       procedure Match_Set (Valid   :     Set_Type;
@@ -270,13 +270,13 @@ is
                               Match : out Match_Type) with
         Pre  => Text'Length > 0,
         Post => (if Match /= Match_OK
-                 then Offset = Offset'Old
-                 else Offset > Offset'Old);
+                 then Current_Offset = Current_Offset'Old
+                 else Current_Offset > Current_Offset'Old);
 
       procedure Match_String (Text  :     String;
                               Match : out Match_Type)
       is
-         Old_Offset : constant Natural := Offset;
+         Old_Offset : constant Natural := Current_Offset;
       begin
          for C of Text
          loop
@@ -286,14 +286,14 @@ is
                return;
             end if;
 
-            if Data (Data'First + Offset) /= C then
+            if Data (Data'First + Current_Offset) /= C then
                Match  := Match_None;
                Restore_Offset (Old_Offset);
                return;
             end if;
 
-            Offset := Offset + 1;
-            pragma Loop_Invariant (Offset > Offset'Loop_Entry);
+            Current_Offset := Current_Offset + 1;
+            pragma Loop_Invariant (Current_Offset > Current_Offset'Loop_Entry);
          end loop;
 
          Match := Match_OK;
@@ -312,16 +312,16 @@ is
 
       procedure Context_Put_String (Value  :     Content_Type;
                                     Start  : out Index_Type;
-                                    Result : out Boolean);
+                                    Valid  : out Boolean);
 
       procedure Context_Put_String (Value  :     Content_Type;
                                     Start  : out Index_Type;
-                                    Result : out Boolean)
+                                    Valid  : out Boolean)
       is
          NE : constant Offset_Type := Length (Value);
       begin
-         Result := False;
-         Start  := Invalid_Index;
+         Valid := False;
+         Start := Invalid_Index;
 
          if
             (Underflow (Document'Last, NE) or else Document_Index > Sub (Document'Last, NE))
@@ -333,7 +333,7 @@ is
          Start := Document_Index;
          Put_Content (Document, Sub (Document_Index, Document'First), Value);
          Document_Index := Add (Document_Index, NE);
-         Result := True;
+         Valid := True;
       end Context_Put_String;
 
       ----------------------
@@ -344,47 +344,49 @@ is
                                     Text       : out Range_Type) with
         Pre  => End_String'Length > 0
                 and not Data_Overflow,
-        Post => (if Text /= Null_Range then Offset > Offset'Old else Offset = Offset'Old);
+        Post => (if Text /= Null_Range
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset = Current_Offset'Old);
 
       procedure Match_Until_String (End_String :     String;
                                     Text       : out Range_Type)
       is
-         Old_Offset : constant Natural := Offset;
-         First      : constant Natural := Data'First + Offset;
-         Result     : Match_Type;
+         Old_Offset   : constant Natural := Current_Offset;
+         First        : constant Natural := Data'First + Current_Offset;
+         Match_Result : Match_Type;
       begin
          Text := Null_Range;
 
          loop
             if
                Data_Overflow
-               or Offset = Natural'Last
+               or Current_Offset = Natural'Last
             then
                Restore_Offset (Old_Offset);
                return;
             end if;
 
-            Match_String (End_String, Result);
-            exit when Result = Match_OK;
+            Match_String (End_String, Match_Result);
+            exit when Match_Result = Match_OK;
 
-            Offset := Offset + 1;
+            Current_Offset := Current_Offset + 1;
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Data'First <= Natural'Last - Offset);
-            pragma Loop_Invariant (Offset < Natural'Last);
-            pragma Loop_Invariant (Offset > Old_Offset);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Data'First <= Natural'Last - Current_Offset);
+            pragma Loop_Invariant (Current_Offset < Natural'Last);
+            pragma Loop_Invariant (Current_Offset > Old_Offset);
 
          end loop;
 
          if
-            Old_Offset > Offset - End_String'Length - 1
-            or Data'First > Natural'Last - Offset
+            Old_Offset > Current_Offset - End_String'Length - 1
+            or Data'First > Natural'Last - Current_Offset
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
-         Text := (First, Data'First + Offset - End_String'Length - 1);
+         Text := (First, Data'First + Current_Offset - End_String'Length - 1);
 
       end Match_Until_String;
 
@@ -395,28 +397,28 @@ is
       procedure Match_Until_Set (End_Set     :     Set_Type;
                                  Invalid_Set :     Set_Type;
                                  Match       : out Match_Type;
-                                 Result      : out Range_Type) with
-        Pre  => Data'First <= Data'Last - Offset,
+                                 Set_Range   : out Range_Type) with
+        Pre  => Data'First <= Data'Last - Current_Offset,
         Post => (case Match is
-                 when Match_OK   => In_Range (Result)
-                                    and Valid_Content (Result.First, Result.Last)
-                                    and Offset > Offset'Old,
-                 when Match_None => Result = Null_Range
-                                    and Offset >= Offset'Old,
-                 when others     => Offset = Offset'Old);
+                 when Match_OK   => In_Range (Set_Range)
+                                    and Valid_Content (Set_Range.First, Set_Range.Last)
+                                    and Current_Offset > Current_Offset'Old,
+                 when Match_None => Set_Range = Null_Range
+                                    and Current_Offset >= Current_Offset'Old,
+                 when others     => Current_Offset = Current_Offset'Old);
 
       procedure Match_Until_Set (End_Set     :     Set_Type;
                                  Invalid_Set :     Set_Type;
                                  Match       : out Match_Type;
-                                 Result      : out Range_Type)
+                                 Set_Range   : out Range_Type)
       is
-         Old_Offset : constant Natural := Offset;
-         First      : constant Natural := Data'First + Offset;
+         Old_Offset : constant Natural := Current_Offset;
+         First      : constant Natural := Data'First + Current_Offset;
          Last       : Natural;
          Tmp_Match  : Match_Type;
       begin
-         Match  := Match_Invalid;
-         Result := Null_Range;
+         Match     := Match_Invalid;
+         Set_Range := Null_Range;
 
          loop
             if Data_Overflow then
@@ -427,27 +429,27 @@ is
             Match_Set (End_Set, Invalid_Set, Tmp_Match);
             exit when Tmp_Match /= Match_None;
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset > Old_Offset);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Current_Offset > Old_Offset);
          end loop;
 
          if
             Tmp_Match /= Match_OK
-            or Data'First > Data'Last - Offset + 1
+            or Data'First > Data'Last - Current_Offset + 1
          then
             Restore_Offset (Old_Offset);
             return;
          end if;
 
-         Offset := Offset - 1;
-         Last   := Data'First + Offset - 1;
+         Current_Offset := Current_Offset - 1;
+         Last   := Data'First + Current_Offset - 1;
 
-         if Old_Offset <= Offset - 1 then
-            Result := (First, Last);
-            Match  := Match_OK;
+         if Old_Offset <= Current_Offset - 1 then
+            Set_Range := (First, Last);
+            Match     := Match_OK;
          else
-            Result := Null_Range;
-            Match  := Match_None;
+            Set_Range := Null_Range;
+            Match     := Match_None;
          end if;
 
       end Match_Until_Set;
@@ -457,28 +459,28 @@ is
       ----------
 
       procedure Skip (Skip_Set : Set_Type) with
-        Post => Offset >= Offset'Old;
+        Post => Current_Offset >= Current_Offset'Old;
 
       procedure Skip (Skip_Set : Set_Type)
       is
          Last_None_Whitespace : Natural;
-         Result : Match_Type;
+         Match : Match_Type;
          Unused_Result : Character;
          pragma Unreferenced (Unused_Result);
       begin
          loop
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset >= Offset'Loop_Entry);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Current_Offset >= Current_Offset'Loop_Entry);
 
             if Data_Overflow then
                return;
             end if;
 
-            Last_None_Whitespace := Offset;
-            Match_Set (Skip_Set, Empty_Set, Result, Unused_Result);
-            exit when Result /= Match_OK;
+            Last_None_Whitespace := Current_Offset;
+            Match_Set (Skip_Set, Empty_Set, Match, Unused_Result);
+            exit when Match /= Match_OK;
          end loop;
-         Offset := Last_None_Whitespace;
+         Current_Offset := Last_None_Whitespace;
       end Skip;
 
       ---------------------
@@ -488,13 +490,13 @@ is
       procedure Parse_Attribute (Start : out Index_Type;
                                  Match : out Match_Type) with
         Post => (if Match = Match_OK
-                 then Offset > Offset'Old
-                 else Offset = Offset'Old);
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset = Current_Offset'Old);
 
       procedure Parse_Attribute (Start : out Index_Type;
                                  Match : out Match_Type)
       is
-         Old_Offset          : constant Natural := Offset;
+         Old_Offset          : constant Natural := Current_Offset;
          Attribute_Name      : Range_Type;
          Attribute_Value     : Range_Type;
          Match_Tmp           : Match_Type;
@@ -560,7 +562,7 @@ is
             Restore_Offset (Old_Offset);
             return;
          end if;
-         Offset := Offset + 1;
+         Current_Offset := Current_Offset + 1;
 
          Start := Document_Index;
          Off   := Sub (Document_Index, Document'First);
@@ -658,8 +660,8 @@ is
                                    Start : out Index_Type;
                                    Done  : out Boolean) with
         Post => (if Match = Match_OK
-                 then In_Range (Name) and Offset > Offset'Old
-                 else Offset = Offset'Old);
+                 then In_Range (Name) and Current_Offset > Current_Offset'Old
+                 else Current_Offset = Current_Offset'Old);
 
       procedure Parse_Opening_Tag (Match : out Match_Type;
                                    Name  : out Range_Type;
@@ -667,7 +669,7 @@ is
                                    Done  : out Boolean)
       is
          Old_Index          : constant Index_Type := Document_Index;
-         Old_Offset         : constant Natural := Offset;
+         Old_Offset         : constant Natural := Current_Offset;
          Match_Attr         : Match_Type;
          Match_Tmp          : Match_Type;
          Attribute_Start    : Index_Type;
@@ -728,8 +730,8 @@ is
 
             Link_Attribute (Attribute_Start, Start, Previous_Attribute);
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset > Old_Offset);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Current_Offset > Old_Offset);
 
          end loop;
 
@@ -764,12 +766,12 @@ is
 
       procedure Parse_Closing_Tag (Name  :     String;
                                    Match : out Match_Type) with
-        Post => (if Match = Match_OK then Offset > Offset'Old else Offset = Offset'Old);
+        Post => (if Match = Match_OK then Current_Offset > Current_Offset'Old else Current_Offset = Current_Offset'Old);
 
       procedure Parse_Closing_Tag (Name  :     String;
                                    Match : out Match_Type)
       is
-         Old_Offset   : constant Natural := Offset;
+         Old_Offset   : constant Natural := Current_Offset;
          Closing_Name : Range_Type;
          Match_Tmp    : Match_Type;
       begin
@@ -837,21 +839,23 @@ is
 
       procedure Parse_Sections (Start_Tag :     String;
                                 End_Tag   :     String;
-                                Result    : out Range_Type) with
+                                Sec_Range : out Range_Type) with
         Pre  => Start_Tag'Length > 0 and
                 End_Tag'Length > 0,
-        Post => (if Result /= Null_Range then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Sec_Range /= Null_Range
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
       procedure Parse_Sections (Start_Tag :     String;
                                 End_Tag   :     String;
-                                Result    : out Range_Type)
+                                Sec_Range : out Range_Type)
       is
          Old_Offset : Natural;
          Tmp_Result : Match_Type;
       begin
-         Result := Null_Range;
+         Sec_Range := Null_Range;
          loop
-            Old_Offset := Offset;
+            Old_Offset := Current_Offset;
             if Data_Overflow then
                Restore_Offset (Old_Offset);
                return;
@@ -867,14 +871,14 @@ is
                return;
             end if;
 
-            Match_Until_String (End_Tag, Result);
-            if Result = Null_Range then
+            Match_Until_String (End_Tag, Sec_Range);
+            if Sec_Range = Null_Range then
                Restore_Offset (Old_Offset);
                return;
             end if;
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset > Offset'Loop_Entry);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Current_Offset > Current_Offset'Loop_Entry);
          end loop;
       end Parse_Sections;
 
@@ -882,47 +886,53 @@ is
       -- Parse_Comment --
       -------------------
 
-      procedure Parse_Comment (Result : out Match_Type) with
-        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+      procedure Parse_Comment (Match : out Match_Type) with
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
-      procedure Parse_Comment (Result : out Match_Type)
+      procedure Parse_Comment (Match : out Match_Type)
       is
          Tmp_Result : Range_Type;
       begin
          Parse_Sections ("<!--", "-->", Tmp_Result);
-         Result := (if Tmp_Result = Null_Range then Match_None else Match_OK);
+         Match := (if Tmp_Result = Null_Range then Match_None else Match_OK);
       end Parse_Comment;
 
       ----------------------------------
       -- Parse_Processing_Information --
       ----------------------------------
 
-      procedure Parse_Processing_Information (Result : out Match_Type) with
-        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+      procedure Parse_Processing_Information (Match : out Match_Type) with
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
-      procedure Parse_Processing_Information (Result : out Match_Type)
+      procedure Parse_Processing_Information (Match : out Match_Type)
       is
          Tmp_Result : Range_Type;
       begin
          Parse_Sections ("<?", "?>", Tmp_Result);
-         Result := (if Tmp_Result = Null_Range then Match_None else Match_OK);
+         Match := (if Tmp_Result = Null_Range then Match_None else Match_OK);
       end Parse_Processing_Information;
 
       -------------------
       -- Parse_Doctype --
       -------------------
 
-      procedure Parse_Doctype (Result : out Match_Type) with
-        Post => (if Result = Match_OK then Offset > Offset'Old else Offset = Offset'Old);
+      procedure Parse_Doctype (Match : out Match_Type) with
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset = Current_Offset'Old);
 
-      procedure Parse_Doctype (Result : out Match_Type)
+      procedure Parse_Doctype (Match : out Match_Type)
       is
-         Old_Offset   : constant Natural := Offset;
+         Old_Offset   : constant Natural := Current_Offset;
          Tmp_Result   : Match_Type;
          Unused_Range : Range_Type;
          Text         : Range_Type;
       begin
-         Result := Match_Invalid;
+         Match := Match_Invalid;
          Skip (Whitespace);
          Match_String ("<!DOCTYPE", Tmp_Result);
          if
@@ -961,7 +971,7 @@ is
             Restore_Offset (Old_Offset);
             return;
          end if;
-         Result := Match_OK;
+         Match := Match_OK;
       end Parse_Doctype;
 
       -------------------
@@ -969,14 +979,14 @@ is
       -------------------
 
       procedure Parse_Sections with
-        Post => Offset >= Offset'Old;
+        Post => Current_Offset >= Current_Offset'Old;
 
       procedure Parse_Sections
       is
          Match_Doctype : Match_Type;
          Match_Comment : Match_Type;
          Match_PI      : Match_Type;
-         Old_Offset    : constant Natural := Offset with Ghost;
+         Old_Offset    : constant Natural := Current_Offset with Ghost;
       begin
          loop
             Parse_Doctype (Match_Doctype);
@@ -985,8 +995,8 @@ is
 
             exit when Match_Doctype /= Match_OK and Match_Comment /= Match_OK and Match_PI /= Match_OK;
 
-            pragma Loop_Variant (Increases => Offset);
-            pragma Loop_Invariant (Offset >= Old_Offset);
+            pragma Loop_Variant (Increases => Current_Offset);
+            pragma Loop_Invariant (Current_Offset >= Old_Offset);
 
          end loop;
       end Parse_Sections;
@@ -997,26 +1007,30 @@ is
 
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type) with
-        Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
       -----------------
       -- Parse_CDATA --
       -----------------
 
-      procedure Parse_CDATA (Result : out Match_Type;
-                             Start  : out Index_Type)
+      procedure Parse_CDATA (Match : out Match_Type;
+                             Start : out Index_Type)
       with
-        Post => (if Result = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
-      procedure Parse_CDATA (Result : out Match_Type;
-                             Start  : out Index_Type)
+      procedure Parse_CDATA (Match : out Match_Type;
+                             Start : out Index_Type)
       is
          Tmp_Result : Range_Type;
          Tmp_Start  : Index_Type;
          Valid      : Boolean;
       begin
-         Result := Match_None;
-         Start  := Invalid_Index;
+         Match := Match_None;
+         Start := Invalid_Index;
 
          Parse_Sections ("<![CDATA[", "]]>", Tmp_Result);
          if
@@ -1025,14 +1039,14 @@ is
             and then Tmp_Result.Last <= Data'Last
             and then Valid_Content (Tmp_Result.First, Tmp_Result.Last)
          then
-            Context_Put_String (Value  => Data (Tmp_Result.First .. Tmp_Result.Last),
-                                Start  => Tmp_Start,
-                                Result => Valid);
+            Context_Put_String (Value => Data (Tmp_Result.First .. Tmp_Result.Last),
+                                Start => Tmp_Start,
+                                Valid => Valid);
             if Valid then
-               Start  := Tmp_Start;
-               Result := Match_OK;
+               Start := Tmp_Start;
+               Match := Match_OK;
             else
-               Result := Match_Invalid;
+               Match := Match_Invalid;
             end if;
             return;
          end if;
@@ -1045,7 +1059,9 @@ is
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
       with
-        Post => (if Match = Match_OK then Offset > Offset'Old else Offset >= Offset'Old);
+        Post => (if Match = Match_OK
+                 then Current_Offset > Current_Offset'Old
+                 else Current_Offset >= Current_Offset'Old);
 
       procedure Parse_Content (Match : out Match_Type;
                                Start : out Index_Type)
@@ -1089,9 +1105,9 @@ is
             Match_Content = Match_OK
             and then Length (Content_Range) > 0
          then
-            Context_Put_String (Value  => Data (Content_Range.First .. Content_Range.Last),
-                                Start  => Start,
-                                Result => Valid);
+            Context_Put_String (Value => Data (Content_Range.First .. Content_Range.Last),
+                                Start => Start,
+                                Valid => Valid);
             if not Valid then
                Match := Match_Invalid;
             end if;
@@ -1160,10 +1176,10 @@ is
       procedure Parse_Internal (Match : out Match_Type;
                                 Start : out Index_Type)
       is
-         Old_Offset : constant Natural := Offset;
+         Old_Offset : constant Natural := Current_Offset;
 
          Frame  : Frame_Type;
-         Result : Out_Type;
+         Output : Out_Type;
          Limit  : Natural := Natural'Last;
       begin
          Call_Stack.Initialize (CS, (False, Null_Local));
@@ -1176,7 +1192,7 @@ is
             Call_Return : loop
 
                if Limit < 2 or Call_Stack.Is_Empty (CS) then
-                  if Match = Match_OK and Offset <= Old_Offset then
+                  if Match = Match_OK and Current_Offset <= Old_Offset then
                      Match := Match_Invalid;
                   end if;
                   return;
@@ -1185,7 +1201,7 @@ is
                case Frame.Local.State is
 
                   when Call_Start =>
-                     Frame.Local.Old_Offset := Offset;
+                     Frame.Local.Old_Offset := Current_Offset;
                      Frame.Local.Previous_Child := Invalid_Index;
                      Match := Match_Invalid;
 
@@ -1252,9 +1268,9 @@ is
                         return;
                      end if;
 
-                     Result_Stack.Pop (RS, Result);
-                     Match := Result.Match;
-                     Start := Result.Start;
+                     Result_Stack.Pop (RS, Output);
+                     Match := Output.Match;
+                     Start := Output.Start;
 
                      if Frame.Local.Sub_Match /= Match_OK then
                         Frame.Local.State := Loop_End;
@@ -1289,8 +1305,8 @@ is
                         --  Should not happen, but we cannot prove it unless we show that the value of
                         --  Frame.Local.Old_Offset remains greater or equal to to Old_Offset between stack pushes
                         --  and pops.
-                        if Offset < Old_Offset then
-                           Offset := Old_Offset;
+                        if Current_Offset < Old_Offset then
+                           Current_Offset := Old_Offset;
                         end if;
                         exit Call_Return;
                      end if;
@@ -1302,7 +1318,7 @@ is
 
                Limit := Limit - 1;
 
-               pragma Loop_Invariant (Offset >= Old_Offset);
+               pragma Loop_Invariant (Current_Offset >= Old_Offset);
                pragma Loop_Invariant (Limit < Limit'Loop_Entry);
                pragma Loop_Variant (Decreases => Limit);
 
@@ -1310,7 +1326,7 @@ is
 
             Limit := Limit - 1;
 
-            pragma Loop_Invariant (Offset >= Old_Offset);
+            pragma Loop_Invariant (Current_Offset >= Old_Offset);
             pragma Loop_Variant (Decreases => Limit);
          end loop;
 
@@ -1321,46 +1337,46 @@ is
       --------------------------
 
       procedure Skip_Byte_Order_Mark with
-         Post => Offset >= Offset'Old;
+         Post => Current_Offset >= Current_Offset'Old;
 
       procedure Skip_Byte_Order_Mark
       is
       begin
          --  Too little space for BOM
          if
-            Offset > Data'Length - 3
-            or else Data'First > Data'Last - Offset - 3
+            Current_Offset > Data'Length - 3
+            or else Data'First > Data'Last - Current_Offset - 3
          then
             return;
          end if;
 
          --  We only support UTF-8 BOM
          if
-            Data (Data'First + Offset .. Data'First + Offset + 2)
+            Data (Data'First + Current_Offset .. Data'First + Current_Offset + 2)
             = Character'Val (16#ef#) & Character'Val (16#bb#) & Character'Val (16#bf#)
          then
-            Offset := Offset + 3;
+            Current_Offset := Current_Offset + 3;
          end if;
 
       end Skip_Byte_Order_Mark;
 
    begin
       Skip_Byte_Order_Mark;
-      Parse_Internal (Parse_Result, Unused);
+      Parse_Internal (Result, Unused);
       pragma Unreferenced (Unused);
       Skip (Whitespace);
 
-      if Parse_Result = Match_OK then
-         if Offset < Data'Length then
-            Parse_Result := Match_Trailing_Data;
+      if Result = Match_OK then
+         if Current_Offset < Data'Length then
+            Result := Match_Trailing_Data;
          end if;
-         Position := Offset;
+         Offset := Current_Offset;
       else
-         Position := Error_Index;
+         Offset := Error_Index;
       end if;
 
-      if Position >= Data'Length then
-         Position := Data'Length - 1;
+      if Offset >= Data'Length then
+         Offset := Data'Length - 1;
       end if;
 
       if Document_Index in Document'Range

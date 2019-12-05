@@ -464,17 +464,17 @@ package body SXML_Parser_Tests is
       Generate_Deep_Nodes (File_Name, 1000000);
       declare
          Input : access String := Read_File (File_Name);
-         Position : Natural;
+         Offset   : Natural;
          Result   : SXML.Parser.Match_Type;
          use type SXML.Parser.Match_Type;
       begin
-         SXML.Parser.Parse (Data         => Input.all,
-                            Document     => Document.all,
-                            Parse_Result => Result,
-                            Position     => Position);
+         SXML.Parser.Parse (Data     => Input.all,
+                            Document => Document.all,
+                            Result   => Result,
+                            Offset   => Offset);
          Free_Subtree (Document);
          Assert (Result /= SXML.Parser.Match_OK,
-                 File_Name & ":" & Position'Img(2..Position'Img'Last) & ": Expected error");
+                 File_Name & ":" & Offset'Img(2..Offset'Img'Last) & ": Expected error");
       end;
    end Deep_File;
 

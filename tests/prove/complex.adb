@@ -17,18 +17,18 @@ is
 
    Inner        : SXML.Document_Type (1 .. 100) := (others => SXML.Null_Node);
    Parse_Result : SXML.Parser.Match_Type;
-   Position     : Natural;
+   Offset       : Natural;
 
    use type SXML.Result_Type;
    use type SXML.Content_Type;
    use type SXML.Parser.Match_Type;
 begin
-   SXML.Parser.Parse (Data         => Input,
-                      Document     => Inner,
-                      Parse_Result => Parse_Result,
-                      Position     => Position);
+   SXML.Parser.Parse (Data     => Input,
+                      Document => Inner,
+                      Result   => Parse_Result,
+                      Offset   => Offset);
    if Parse_Result /= SXML.Parser.Match_OK then
-      Ada.Text_IO.Put_Line ("Parse error: >>" & Input (Input'First .. Input'First + Position) & "<<");
+      Ada.Text_IO.Put_Line ("Parse error: >>" & Input (Input'First .. Input'First + Offset) & "<<");
    end if;
 
    declare
@@ -63,7 +63,7 @@ begin
       use type SXML.Offset_Type;
    begin
       Root := SXML.Query.Init (Outer);
-      if not SXML.Query.Is_Open (Outer, Root) then
+      if not SXML.Query.Is_Open (Root, Outer) then
          Ada.Text_IO.Put_Line ("Invalid document (no opening tag)");
          return;
       end if;
@@ -78,8 +78,8 @@ begin
 
       Attr := SXML.Query.Attribute (Root, Outer);
       while Attr.Result = SXML.Result_OK loop
-         pragma Loop_Invariant (SXML.Query.Is_Attribute (Outer, Attr));
-         pragma Loop_Invariant (SXML.Query.Is_Valid (Outer, Attr));
+         pragma Loop_Invariant (SXML.Query.Is_Attribute (Attr, Outer));
+         pragma Loop_Invariant (SXML.Query.Is_Valid (Attr, Outer));
          pragma Loop_Invariant (SXML.Query.Is_Valid_Value (Attr, Outer));
          SXML.Query.Name (Attr, Outer, Name_Result, Name, Name_Last);
          SXML.Query.Value (Attr, Outer, Result, Data, Last);
@@ -90,7 +90,7 @@ begin
       end loop;
 
       State := SXML.Query.Path (Root, Outer, "/outer/header4");
-      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (Outer, State) then
+      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
          Attr := SXML.Query.Find_Attribute (State, Outer, "hattr43");
          if Attr.Result = SXML.Result_OK then
             SXML.Query.Name (Attr, Outer, Name_Result, Name, Name_Last);
@@ -116,16 +116,16 @@ begin
       end if;
 
       State := SXML.Query.Path (Root, Outer, "/outer/header1");
-      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (Outer, State) then
+      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
          State := SXML.Query.Find_Sibling (State, Outer, "header2");
          if State.Result = SXML.Result_OK then
             State := SXML.Query.Sibling (State, Outer);
-            if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (Outer, State) then
+            if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
                SXML.Query.Name (State, Outer, Result, Data, Last);
                if Result = SXML.Result_OK then
                   Ada.Text_IO.Put_Line ("   FOUND " & Data (Data'First .. Last));
                   State := SXML.Query.Child (State, Outer);
-                  if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (Outer, State) then
+                  if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
                      SXML.Query.Name (State, Outer, Result, Data, Last);
                      if Result = SXML.Result_OK then
                         Ada.Text_IO.Put_Line ("   FOUND " & Data (Data'First .. Last));
@@ -144,12 +144,12 @@ begin
 
       Ada.Text_IO.Put_Line ("-->");
 
-      SXML.Serialize.To_String (Outer, Output, Position, Result);
+      SXML.Serialize.To_String (Outer, Output, Offset, Result);
       if Result /= SXML.Result_OK then
          Ada.Text_IO.Put_Line ("Serialization error: " & Result'Img);
          return;
       end if;
-      Ada.Text_IO.Put_Line (Output (Output'First .. Output'First + Position));
+      Ada.Text_IO.Put_Line (Output (Output'First .. Output'First + Offset));
    end;
 
 end Complex;

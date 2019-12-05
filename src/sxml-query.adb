@@ -27,32 +27,32 @@ is
    -- Is_Valid --
    --------------
 
-   function Is_Valid (Document : Document_Type;
-                      State    : State_Type) return Boolean is
+   function Is_Valid (State    : State_Type;
+                      Document : Document_Type) return Boolean is
      (Document'Length > 0 and (if State.Result = Result_OK then State.Offset < Document'Length));
 
    -------------
    -- Is_Open --
    -------------
 
-   function Is_Open (Document : Document_Type;
-                     State    : State_Type) return Boolean is
+   function Is_Open (State    : State_Type;
+                     Document : Document_Type) return Boolean is
      (Document (Add (Document'First, State.Offset)).Kind = Kind_Element_Open);
 
    ----------------
    -- Is_Content --
    ----------------
 
-   function Is_Content (Document : Document_Type;
-                        State    : State_Type) return Boolean is
+   function Is_Content (State    : State_Type;
+                        Document : Document_Type) return Boolean is
      (Document (Add (Document'First, State.Offset)).Kind = Kind_Content);
 
    ------------------
    -- Is_Attribute --
    ------------------
 
-   function Is_Attribute (Document : Document_Type;
-                          State    : State_Type) return Boolean is
+   function Is_Attribute (State    : State_Type;
+                          Document : Document_Type) return Boolean is
      (Document (Add (Document'First, State.Offset)).Kind = Kind_Attribute);
 
    ----------
@@ -314,9 +314,9 @@ is
                           Segment  : String) return State_Type with
      Pre => Valid_Content (Segment'First, Segment'Last)
             and then State.Result = Result_OK
-            and then Is_Valid (Document, State)
-            and then (Is_Open (Document, State)
-                      or Is_Content (Document, State)),
+            and then Is_Valid (State, Document)
+            and then (Is_Open (State, Document)
+                      or Is_Content (State, Document)),
      Post => (if
                 Path_Segment'Result.Result = Result_OK
               then
@@ -373,7 +373,7 @@ is
       Result_State : State_Type := State;
    begin
 
-      if not Is_Open (Document, Result_State) then
+      if not Is_Open (Result_State, Document) then
          return (Result => Result_Invalid);
       end if;
 
@@ -385,9 +385,9 @@ is
 
          pragma Loop_Variant (Increases => Result_State.Offset);
          pragma Loop_Invariant (Result_State.Result = Result_OK);
-         pragma Loop_Invariant (Is_Valid (Document, Result_State));
-         pragma Loop_Invariant (Is_Open (Document, Result_State) or
-                                Is_Content (Document, Result_State));
+         pragma Loop_Invariant (Is_Valid (Result_State, Document));
+         pragma Loop_Invariant (Is_Open (Result_State, Document) or
+                                Is_Content (Result_State, Document));
          pragma Loop_Invariant (First >= Query_String'First);
          pragma Loop_Invariant (Last >= Query_String'First);
          pragma Loop_Invariant (Last <= Query_String'Last);
@@ -446,8 +446,8 @@ is
       while Result_State.Result = Result_OK
       loop
          pragma Loop_Variant (Increases => Offset (Result_State));
-         pragma Loop_Invariant (Is_Valid (Document, Result_State));
-         pragma Loop_Invariant (Is_Attribute (Document, Result_State));
+         pragma Loop_Invariant (Is_Valid (Result_State, Document));
+         pragma Loop_Invariant (Is_Attribute (Result_State, Document));
          pragma Loop_Invariant (Valid_Content (Scratch_Buffer'First, Scratch_Buffer'Last));
          pragma Loop_Invariant (Is_Valid_Value (Result_State, Document));
 
@@ -521,7 +521,7 @@ is
 
       while Result_State.Result = Result_OK
       loop
-         if Is_Open (Document, Result_State) then
+         if Is_Open (Result_State, Document) then
             if
                Sibling_Name = "*"
                or Sibling_Name = ""
@@ -548,10 +548,10 @@ is
          end if;
 
          pragma Loop_Variant (Increases => Result_State.Offset);
-         pragma Loop_Invariant (Is_Valid (Document, Result_State));
+         pragma Loop_Invariant (Is_Valid (Result_State, Document));
          pragma Loop_Invariant (Result_State.Result = Result_OK);
          pragma Loop_Invariant (Offset (Result_State) >= Offset (Result_State'Loop_Entry));
-         pragma Loop_Invariant (Is_Open (Document, Result_State) or Is_Content (Document, Result_State));
+         pragma Loop_Invariant (Is_Open (Result_State, Document) or Is_Content (Result_State, Document));
 
          Result_State := Sibling (Result_State, Document);
       end loop;

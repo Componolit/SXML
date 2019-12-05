@@ -39,17 +39,17 @@ is
    -- Parse --
    -----------
 
-   procedure Parse (Data         :        Content_Type;
-                    Document     : in out Document_Type;
-                    Parse_Result :    out Match_Type;
-                    Position     :    out Natural) with
+   procedure Parse (Data     :        Content_Type;
+                    Document : in out Document_Type;
+                    Offset   :    out Natural;
+                    Result   :    out Match_Type) with
       Global => (In_Out => (State)),
-      Post   => Position < Data'Length;
+      Post   => Offset < Data'Length;
    --  Parse an XML file
    --
-   --  @param Data          Input data
-   --  @param Document      Document
-   --  @param Parse_Result  Result of operation
-   --  @param Position      Input location after parsing or error
+   --  @param Data     Input data
+   --  @param Document Document
+   --  @param Result   Result of operation
+   --  @param Offset   Input location after parsing or error
 
 end SXML.Generic_Parser;

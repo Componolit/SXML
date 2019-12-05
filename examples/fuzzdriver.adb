@@ -37,23 +37,23 @@ is
       Document : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML;
       use SXML.Parser;
-      Match    : Match_Type;
-      Result   : Result_Type;
-      Position : Natural;
+      Match  : Match_Type;
+      Result : Result_Type;
+      Offset : Natural;
    begin
       Document.all := (others => SXML.Null_Node);
-      Parse (Data         => Input.all,
-             Document     => Document.all,
-             Parse_Result => Match,
-             Position     => Position);
+      Parse (Data     => Input.all,
+             Document => Document.all,
+             Result   => Match,
+             Offset   => Offset);
       if Match /= Match_OK
       then
-         Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Match'Img);
+         Ada.Text_IO.Put_Line (File & ":" & Offset'Img(2..Offset'Img'Last) & ": Invalid result: " & Match'Img);
       else
-         SXML.Serialize.To_String (Document.all, Output.all, Position, Result);
+         SXML.Serialize.To_String (Document.all, Output.all, Offset, Result);
          if Result /= Result_OK
          then
-            Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Position'Img);
+            Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Offset'Img);
          end if;
          Ada.Text_IO.Put_Line (File & ": OK");
       end if;

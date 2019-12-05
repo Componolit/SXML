@@ -13,12 +13,12 @@ is
    & "</config>";
    Document : SXML.Document_Type (1 .. 100) := (others => SXML.Null_Node);
    Result   : Match_Type;
-   Position : Natural;
+   Offset   : Natural;
 begin
-   Parse (Data         => Input,
-          Document     => Document,
-          Parse_Result => Result,                                                                                                           
-          Position     => Position);
+   Parse (Data     => Input,
+          Document => Document,
+          Result   => Result,
+          Offset   => Offset);
    if Result /= Match_OK
    then
       null;

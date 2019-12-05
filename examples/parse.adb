@@ -32,17 +32,17 @@ is
       Input    : access String := Read_File (File);
       Document : access SXML.Document_Type := new SXML.Document_Type (1 .. Input'Length);
       use SXML.Parser;
-      Result   : Match_Type;
-      Position : Natural;
+      Result  : Match_Type;
+      Offset : Natural;
    begin
       Document.all := (others => SXML.Null_Node);
-      Parse (Data         => Input.all,
-             Document     => Document.all,
-             Parse_Result => Result,
-             Position     => Position);
+      Parse (Data     => Input.all,
+             Document => Document.all,
+             Result   => Result,
+             Offset   => Offset);
       if Result /= Match_OK
       then
-         Ada.Text_IO.Put_Line (File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
+         Ada.Text_IO.Put_Line (File & ":" & Offset'Img(2..Offset'Img'Last) & ": Invalid result: " & Result'Img);
       else
          Ada.Text_IO.Put_Line (File & ": OK");
       end if;

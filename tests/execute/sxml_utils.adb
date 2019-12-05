@@ -34,14 +34,14 @@ is
    is
       use SXML;
       use SXML.Parser;
-      Result   : Match_Type;
-      Position : Natural;
+      Result : Match_Type;
+      Offset : Natural;
    begin
-      Parse (Data         => Input,
-             Document     => Document.all,
-             Parse_Result => Result,
-             Position     => Position);
-      pragma Unreferenced (Position);
+      Parse (Data     => Input,
+             Document => Document.all,
+             Result   => Result,
+             Offset   => Offset);
+      pragma Unreferenced (Offset);
       Assert (Result /= Match_OK, "Error expected");
    end Check_Invalid;
 
@@ -83,19 +83,19 @@ is
       use SXML;
       use SXML.Parser;
       Result   : Match_Type;
-      Position : Natural;
+      Offset   : Natural;
       Data : access String := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
       Last : Natural := 1;
       Serialize_Result : Result_Type;
    begin
       Document.all (Document.all'First) := Null_Node;
-      Parse (Data         => Input.all,
-             Document     => Document.all,
-             Parse_Result => Result,
-             Position     => Position);
+      Parse (Data     => Input.all,
+             Document => Document.all,
+             Result   => Result,
+             Offset   => Offset);
       Free (Input);
       Assert (Result = Match_OK,
-              File & ":" & Position'Img(2..Position'Img'Last) & ": Invalid result: " & Result'Img);
+              File & ":" & Offset'Img(2..Offset'Img'Last) & ": Invalid result: " & Result'Img);
       Ser.To_String (Document.all, Data.all, Last, Serialize_Result);
       Free (Data);
       Assert (Serialize_Result = Result_OK, File & ": Serialization error: " & Serialize_Result'Img);
@@ -112,17 +112,17 @@ is
       use SXML;
       use SXML.Parser;
       Result   : Match_Type;
-      Position : Natural;
+      Offset   : Natural;
       XML      : access String := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
       Serialize_Result : Result_Type;
    begin
       Document.all (1) := Null_Node;
-      Parse (Data         => Input,
-             Document     => Document.all,
-             Parse_Result => Result,
-             Position     => Position);
-      Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Position'Img  & ")");
+      Parse (Data     => Input,
+             Document => Document.all,
+             Result   => Result,
+             Offset   => Offset);
+      Assert (Result = Match_OK, "Invalid result: " & Result'Img & " (Pos:" & Offset'Img  & ")");
 
       To_String (Document.all, XML.all, Last, Serialize_Result);
       Assert (Serialize_Result = Result_OK, "Error serializing: " & Serialize_Result'Img);
@@ -131,7 +131,7 @@ is
                                             Input (Input'First .. Input'Last - 1)
                                          else Input)
                                      else Output),
-         "Invalid result at" & Position'Img &
+         "Invalid result at" & Offset'Img &
          ": (" & XML.all (1 .. Last) & "), expected: (" & (if Output = "INPUT" then Input else Output) &
          "), Last=" & Last'Img);
       Free (XML);
