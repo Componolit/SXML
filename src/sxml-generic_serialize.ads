@@ -19,6 +19,12 @@ is
    -- To_String --
    ---------------
 
+   --  Serialize document to string using runtime stack
+   --
+   --  @param Document  Document to serialize
+   --  @param Data      Output string
+   --  @param Offset    Offset of last valid character of output string
+   --  @param Result    Result of operation
    procedure To_String (Document :     Document_Type;
                         Data     : out String;
                         Offset   : out Natural;
@@ -26,11 +32,5 @@ is
      Global => (In_Out => State),
      Pre    => Data'Length > 0,
      Post   => (if Result = Result_OK then Offset < Data'Length);
-   --  Serialize document to string using runtime stack
-   --
-   --  @param Document  Document to serialize
-   --  @param Data      Output string
-   --  @param Offset    Offset of last valid character of output string
-   --  @param Result    Result of operation
 
 end SXML.Generic_Serialize;
