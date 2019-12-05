@@ -321,10 +321,11 @@ is
    function Path (State        : State_Type;
                   Document     : Document_Type;
                   Query_String : String) return State_Type with
-     Pre => Query_String'First > 0
-            and then Query_String'Length > 0
-            and then State.Result = Result_OK
-            and then Is_Valid (Document, State);
+     Pre  => Query_String'First > 0
+             and then Query_String'Length > 0
+             and then State.Result = Result_OK
+             and then Is_Valid (Document, State),
+     Post => (if State.Result = Result_OK then Is_Valid (Document, Path'Result));
    --  Query element by path beginning at State. Path queries may reference
    --  element names, wildcards and attributes
    --  e.g. /root/parent/*/grandchild[@attribute=value]
