@@ -93,7 +93,7 @@ package body SXML_Query_Tests is
       State : State_Type   := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "Expected child");
+      Assert (State_Result (State) = Result_OK, "Expected child");
       declare
          Child_Name : constant String := Name (State, Doc);
       begin
@@ -111,7 +111,7 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_Not_Found, "Expected no child");
+      Assert (State_Result (State) = Result_Not_Found, "Expected no child");
    end Test_Query_No_Child;
 
    ---------------------------------------------------------------------------
@@ -124,16 +124,16 @@ package body SXML_Query_Tests is
       State  : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "First child not found");
+      Assert (State_Result (State) = Result_OK, "First child not found");
       Assert (Name (State, Doc) = "child1", "Invalid first child");
       State := Sibling (State, Doc);
-      Assert (State.Result = Result_OK, "Second child not found");
+      Assert (State_Result (State) = Result_OK, "Second child not found");
       Assert (Name (State, Doc) = "child2", "Invalid second child");
       State := Sibling (State, Doc);
-      Assert (State.Result = Result_OK, "Third child not found");
+      Assert (State_Result (State) = Result_OK, "Third child not found");
       Assert (Name (State, Doc) = "child3", "Invalid third child");
       State := Sibling (State, Doc);
-      Assert (State.Result = Result_Not_Found, "Expected no more children");
+      Assert (State_Result (State) = Result_Not_Found, "Expected no more children");
    end Test_Query_All_Children;
 
    ---------------------------------------------------------------------------
@@ -146,7 +146,7 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "First child not found");
+      Assert (State_Result (State) = Result_OK, "First child not found");
       State := Find_Sibling (State, Doc, "child2");
       Assert (Name (State, Doc) = "child2", "Invalid child");
    end Test_Query_Find_Sibling;
@@ -164,10 +164,10 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "First child not found");
+      Assert (State_Result (State) = Result_OK, "First child not found");
       Assert (Name (State, Doc) = "child1", "First child has wrong value");
       State := Find_Sibling (State, Doc, "child2");
-      Assert (State.Result = Result_OK, "Second child not found: " & State.Result'Img);
+      Assert (State_Result (State) = Result_OK, "Second child not found: " & State_Result (State)'Img);
       Assert (Name (State, Doc) = "child2", "Invalid child: " & Name (State, Doc));
    end Test_Query_Find_Sibling_With_Content;
 
@@ -181,7 +181,7 @@ package body SXML_Query_Tests is
       State  : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "First child not found");
+      Assert (State_Result (State) = Result_OK, "First child not found");
       State := Find_Sibling (State, Doc, "child1");
       Assert (Name (State, Doc) = "child1", "Invalid child");
    end Test_Query_Find_First_Sibling;
@@ -196,7 +196,7 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Attribute (State, Doc);
-      Assert (State.Result = Result_OK, "Invalid attribute");
+      Assert (State_Result (State) = Result_OK, "Invalid attribute");
       declare
          N : String := Name (State, Doc);
          V : String := Value (State, Doc);
@@ -220,19 +220,19 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Attribute (State, Doc);
-      Assert (State.Result = Result_OK, "Invalid attribute");
+      Assert (State_Result (State) = Result_OK, "Invalid attribute");
       Assert (Name (State, Doc) = "attribute1", "Unexpected name");
       Assert (Value (State, Doc) = "value1", "Unexpected name");
       State := Next_Attribute (State, Doc);
-      Assert (State.Result = Result_OK, "Invalid attribute");
+      Assert (State_Result (State) = Result_OK, "Invalid attribute");
       Assert (Name (State, Doc) = "attribute2", "Unexpected name");
       Assert (Value (State, Doc) = "value2", "Unexpected name");
       State := Next_Attribute (State, Doc);
-      Assert (State.Result = Result_OK, "Invalid attribute");
+      Assert (State_Result (State) = Result_OK, "Invalid attribute");
       Assert (Name (State, Doc) = "attribute3", "Unexpected name");
       Assert (Value (State, Doc) = "value3", "Unexpected name");
       State := Next_Attribute (State, Doc);
-      Assert (State.Result = Result_OK, "Invalid attribute");
+      Assert (State_Result (State) = Result_OK, "Invalid attribute");
       Assert (Name (State, Doc) = "attribute4", "Unexpected name");
       Assert (Value (State, Doc) = "value4", "Unexpected name");
    end Test_Query_Multiple_Attributes;
@@ -251,7 +251,7 @@ package body SXML_Query_Tests is
       State  : State_Type := Init (Doc);
    begin
       State := Find_Attribute (State, Doc, "attribute2");
-      Assert (State.Result = Result_OK, "Attribute not found");
+      Assert (State_Result (State) = Result_OK, "Attribute not found");
       Assert (Value (State, Doc) = "value2", "Unexpected value");
    end Test_Query_Find_Attribute;
 
@@ -269,7 +269,7 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Find_Attribute (State, Doc, "does_not_exist");
-      Assert (State.Result = Result_Not_Found, "Attribute must not be found: " & State.Result'Img);
+      Assert (State_Result (State) = Result_Not_Found, "Attribute must not be found: " & State_Result (State)'Img);
    end Test_Query_Find_Attribute_Missing;
 
    ---------------------------------------------------------------------------
@@ -310,10 +310,10 @@ package body SXML_Query_Tests is
       State : State_Type := Init (Doc);
    begin
       State := Child (State, Doc);
-      Assert (State.Result = Result_OK, "Expected child");
+      Assert (State_Result (State) = Result_OK, "Expected child");
       Assert (Name (State, Doc) = "sub", "Unexpected name");
       State := Find_Attribute (State, Doc, "attribute2");
-      Assert (State.Result = Result_OK, "Attribute not found");
+      Assert (State_Result (State) = Result_OK, "Attribute not found");
       Assert (Value (State, Doc) = "value2", "Unexpected value");
    end Test_Query_Find_Sub_Attribute;
 
@@ -328,7 +328,7 @@ package body SXML_Query_Tests is
                      "tests/data/Vitera_CCDA_SMART_Sample.xml", "/ClinicalDocument",
                      Position);
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "ClinicalDocument", "Invalid name: " & Name (State, Context.all));
    end Test_Path_Query_Simple;
 
@@ -343,7 +343,7 @@ package body SXML_Query_Tests is
                      "tests/data/Vitera_CCDA_SMART_Sample.xml", "/Does_Not_Exist",
                      Position);
    begin
-      Assert (State.Result = Result_Not_Found, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_Not_Found, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
    end Test_Path_Query_Simple_Missing;
 
    ---------------------------------------------------------------------------
@@ -358,10 +358,10 @@ package body SXML_Query_Tests is
                      "/ClinicalDocument/recordTarget/patientRole/id",
                      Position);
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "id", "Invalid node name: " & Name (State, Context.all));
       State := Find_Attribute (State, Context.all, "root");
-      Assert (State.Result = Result_OK, "Invalid attribute: " & State.Result'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid attribute: " & State_Result (State)'Img);
       Assert (Value (State, Context.all) = "2.16.840.1.113883.3.140.1.0.6.4", "Invalid value");
    end Test_Path_Query_Long;
 
@@ -378,28 +378,28 @@ package body SXML_Query_Tests is
                      "/root/child/elem",
                      Position);
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
 
       Attr := Find_Attribute (State, Context.all, "id");
-      Assert (Attr.Result = Result_OK, "Invalid attribute (1): " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid attribute (1): " & State_Result (Attr)'Img);
       Assert (Value (Attr, Context.all) = "1", "Invalid value (1)");
 
       Attr := Find_Attribute (State, Context.all, "id", "");
-      Assert (Attr.Result = Result_OK, "Invalid attribute (1b): " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid attribute (1b): " & State_Result (Attr)'Img);
       Assert (Value (Attr, Context.all) = "1", "Invalid value (1b)");
 
       Attr := Find_Attribute (State, Context.all, "id", "1");
-      Assert (Attr.Result = Result_OK, "Invalid attribute (2): " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid attribute (2): " & State_Result (Attr)'Img);
 
       Attr := Find_Attribute (State, Context.all, "value", "a");
-      Assert (Attr.Result = Result_OK, "Invalid value: " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid value: " & State_Result (Attr)'Img);
 
       Attr := Find_Attribute (State, Context.all, "id", "invalid");
-      Assert (Attr.Result = Result_Not_Found, "Expected Result_Not_Found, got: " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_Not_Found, "Expected Result_Not_Found, got: " & State_Result (Attr)'Img);
 
       Attr := Find_Attribute (State, Context.all);
-      Assert (Attr.Result = Result_OK, "Invalid attribute (3): " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid attribute (3): " & State_Result (Attr)'Img);
       Assert (Name (Attr, Context.all) = "id", "Invalid attribute name: " & Name (Attr, Context.all));
       Assert (Value (Attr, Context.all) = "1", "Invalid attribute value: " & Value (Attr, Context.all));
    end Test_Attribute_Value;
@@ -417,29 +417,29 @@ package body SXML_Query_Tests is
                      "/root/child/elem",
                      Position);
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
 
       Elem := Find_Sibling (State, Context.all, "elem", "id", "2");
-      Assert (Elem.Result = Result_OK, "Element not found (1): " & Elem.Result'Img);
+      Assert (State_Result (Elem) = Result_OK, "Element not found (1): " & State_Result (Elem)'Img);
       Attr := Find_Attribute (Elem, Context.all, "value");
       Assert (Value (Attr, Context.all) = "b", "Invalid attribute (1): " & Value (Attr, Context.all));
 
       Elem := Find_Sibling (State, Context.all, "elem", "id", "4");
-      Assert (Elem.Result = Result_OK, "Element not found (2): " & Elem.Result'Img);
+      Assert (State_Result (Elem) = Result_OK, "Element not found (2): " & State_Result (Elem)'Img);
       Attr := Find_Attribute (Elem, Context.all, "value");
       Assert (Value (Attr, Context.all) = "d", "Invalid attribute (2)" & Value (Attr, Context.all));
 
       Elem := Find_Sibling (State, Context.all, "elem", "id", "7");
-      Assert (Elem.Result = Result_Not_Found, "Expected Result_Not_Found, got " & Elem.Result'Img);
+      Assert (State_Result (Elem) = Result_Not_Found, "Expected Result_Not_Found, got " & State_Result (Elem)'Img);
 
       Elem := Find_Sibling (State, Context.all, "elem", "value", "e");
-      Assert (Elem.Result = Result_OK, "Element not found (4): " & Elem.Result'Img);
+      Assert (State_Result (Elem) = Result_OK, "Element not found (4): " & State_Result (Elem)'Img);
       Attr := Find_Attribute (Elem, Context.all, "value");
       Assert (Value (Attr, Context.all) = "e", "Invalid attribute (4)" & Value (Attr, Context.all));
 
       Elem := Find_Sibling (State, Context.all, "elem", "id", "invalid");
-      Assert (Elem.Result = Result_Not_Found, "Expected Result_Not_Found, got " & Elem.Result'Img);
+      Assert (State_Result (Elem) = Result_Not_Found, "Expected Result_Not_Found, got " & State_Result (Elem)'Img);
 
    end Test_Find_Node_By_Attribute;
 
@@ -454,7 +454,7 @@ package body SXML_Query_Tests is
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[@id=3]", Position);
          Attr : State_Type;
       begin
-         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Assert (State_Result (Elem) = Result_OK, "Element not found: " & State_Result (Elem)'Img & " at" & Position'Img);
          Attr := Find_Attribute (Elem, Context.all, "value");
          Assert (Value (Attr, Context.all) = "c", "Invalid value, got: " & Value (Attr, Context.all));
       end;
@@ -463,7 +463,7 @@ package body SXML_Query_Tests is
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[@foo]", Position);
          Attr : State_Type;
       begin
-         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Assert (State_Result (Elem) = Result_OK, "Element not found: " & State_Result (Elem)'Img & " at" & Position'Img);
          Attr := Find_Attribute (Elem, Context.all, "value");
          Assert (Value (Attr, Context.all) = "x", "Invalid value");
       end;
@@ -471,20 +471,20 @@ package body SXML_Query_Tests is
       declare
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[", Position);
       begin
-         Assert (Elem.Result = Result_Invalid, "Expected Result_Not_Found, got " & Elem.Result'Img);
+         Assert (State_Result (Elem) = Result_Invalid, "Expected Result_Not_Found, got " & State_Result (Elem)'Img);
       end;
 
       declare
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[x]", Position);
       begin
-         Assert (Elem.Result = Result_Invalid, "Expected Result_Invalid, got " & Elem.Result'Img);
+         Assert (State_Result (Elem) = Result_Invalid, "Expected Result_Invalid, got " & State_Result (Elem)'Img);
       end;
 
       declare
          Elem : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child2/elem[]", Position);
          Attr : State_Type;
       begin
-         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Assert (State_Result (Elem) = Result_OK, "Element not found: " & State_Result (Elem)'Img & " at" & Position'Img);
          Attr := Find_Attribute (Elem, Context.all, "value");
          Assert (Value (Attr, Context.all) = "a", "Invalid value");
       end;
@@ -503,7 +503,7 @@ package body SXML_Query_Tests is
                                          Position);
          Attr : State_Type;
       begin
-         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Assert (State_Result (Elem) = Result_OK, "Element not found: " & State_Result (Elem)'Img & " at" & Position'Img);
          Attr := Find_Attribute (Elem, Context.all, "value");
          Assert (Value (Attr, Context.all) = "43", "Invalid value, got: " & Value (Attr, Context.all));
       end;
@@ -514,7 +514,7 @@ package body SXML_Query_Tests is
                                          Position);
          Attr : State_Type;
       begin
-         Assert (Elem.Result = Result_OK, "Element not found: " & Elem.Result'Img & " at" & Position'Img);
+         Assert (State_Result (Elem) = Result_OK, "Element not found: " & State_Result (Elem)'Img & " at" & Position'Img);
          Attr := Find_Attribute (Elem, Context.all, "value");
          Assert (Value (Attr, Context.all) = "47", "Invalid value, got: " & Value (Attr, Context.all));
       end;
@@ -530,11 +530,11 @@ package body SXML_Query_Tests is
       Attr     : State_Type;
       State    : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child3", Position);
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       State := Query.Path (State, Context.all, "/child3/elem[@value=e]/subelem/subsubelem");
-      Assert (State.Result = Result_OK, "Invalid relative query: " & State.Result'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid relative query: " & State_Result (State)'Img);
       Attr := Find_Attribute (State, Context.all, "id");
-      Assert (Attr.Result = Result_OK, "Invalid attribute (1): " & Attr.Result'Img);
+      Assert (State_Result (Attr) = Result_OK, "Invalid attribute (1): " & State_Result (Attr)'Img);
       Assert (Value (Attr, Context.all) = "10", "Invalid value (1)");
    end Test_Relative_Path_Query;
 
@@ -553,7 +553,7 @@ package body SXML_Query_Tests is
       Data   : String (1..1000);
       Last   : Natural;
    begin
-      Assert (State.Result = Result_OK, "Invalid result: " & State.Result'Img & " at" & Position'Img);
+      Assert (State_Result (State) = Result_OK, "Invalid result: " & State_Result (State)'Img & " at" & Position'Img);
       Assert (Name (State, Context.all) = "elem", "Invalid node name: " & Name (State, Context.all));
 
       Assert (Has_Attribute (State, Context.all, "value"), "Attribute ""value"" not present");

@@ -55,7 +55,6 @@ is
          then
             Ada.Text_IO.Put_Line (File & ": Serialization error: " & Result'Img & " at " & Offset'Img);
          end if;
-         Ada.Text_IO.Put_Line (File & ": OK");
       end if;
    end Parse_Document;
 begin

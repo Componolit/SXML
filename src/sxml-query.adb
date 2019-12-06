@@ -80,14 +80,14 @@ is
       Tmp_Offset      : Offset_Type;
    begin
       if Document (Children_Offset).Kind /= Kind_Element_Open then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
       Children := Document (Children_Offset).Children;
       if Offset_Type (Children) > Offset_Type'Last - State.Offset then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
       if Children = Invalid_Relative_Index then
-         return (Result => Result_Not_Found);
+         return (Result => Result_Not_Found, Offset => 0);
       end if;
       Tmp_Offset := Add (State.Offset, Children);
       if
@@ -95,7 +95,7 @@ is
          or else (Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Element_Open
                   and Document (Add (Document'First, Tmp_Offset)).Kind /= Kind_Content)
       then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       return (Result => Result_OK, Offset => Tmp_Offset);
@@ -113,11 +113,11 @@ is
       Tmp_Index : Index_Type;
    begin
       if Siblings = Invalid_Relative_Index then
-         return (Result => Result_Not_Found);
+         return (Result => Result_Not_Found, Offset => 0);
       end if;
 
       if Overflow (Current, Siblings) then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       Tmp_Index := Add (Current, Siblings);
@@ -126,7 +126,7 @@ is
          or else (Document (Tmp_Index).Kind /= Kind_Element_Open
                   and Document (Tmp_Index).Kind /= Kind_Content)
       then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       return (Result => Result_OK,
@@ -144,11 +144,11 @@ is
       Attributes : constant Relative_Index_Type := Document (Add (Document'First, State.Offset)).Attributes;
    begin
       if Overflow (State.Offset, Attributes) then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       if Attributes = Invalid_Relative_Index then
-         return (Result => Result_Not_Found);
+         return (Result => Result_Not_Found, Offset => 0);
       end if;
 
       Tmp_State := Add (State.Offset, Attributes);
@@ -159,7 +159,7 @@ is
          or else Overflow (Tmp_State, Document (Add (Document'First, Tmp_State)).Value)
          or else Add (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) >= Document'Length
       then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       return (Result => Result_OK,
@@ -177,11 +177,11 @@ is
       Next      : constant Relative_Index_Type := Document (Add (Document'First, State.Offset)).Next_Attribute;
    begin
       if Overflow (State.Offset, Next) then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       if Next = Invalid_Relative_Index then
-         return (Result => Result_Not_Found);
+         return (Result => Result_Not_Found, Offset => 0);
       end if;
 
       Tmp_State := Add (State.Offset, Next);
@@ -191,7 +191,7 @@ is
          or else Overflow (Tmp_State, Document (Add (Document'First, Tmp_State)).Value)
          or else Add (Tmp_State, Document (Add (Document'First, Tmp_State)).Value) >= Document'Length
       then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       return (Result => Result_OK,
@@ -348,7 +348,7 @@ is
                                                       First        => Attr_Start);
       begin
          if not Pos.Valid then
-            return (Result => Result_Invalid);
+            return (Result => Result_Invalid, Offset => 0);
          end if;
 
          return Find_Sibling (State           => State,
@@ -374,7 +374,7 @@ is
    begin
 
       if not Is_Open (Result_State, Document) then
-         return (Result => Result_Invalid);
+         return (Result => Result_Invalid, Offset => 0);
       end if;
 
       loop
@@ -416,7 +416,7 @@ is
 
          Result_State := Child (Result_State, Document);
          if Result_State.Result /= Result_OK then
-            return (Result => Result_Not_Found);
+            return (Result => Result_Not_Found, Offset => 0);
          end if;
       end loop;
 
@@ -440,7 +440,7 @@ is
       Value_Matches   : Boolean;
    begin
       if Attribute_Name'Length > Scratch_Buffer'Length then
-         return (Result => Result_Overflow);
+         return (Result => Result_Overflow, Offset => 0);
       end if;
 
       while Result_State.Result = Result_OK
@@ -496,7 +496,7 @@ is
          Result_State := Next_Attribute (Result_State, Document);
       end loop;
 
-      return (Result => Result_Not_Found);
+      return (Result => Result_Not_Found, Offset => 0);
    end Find_Attribute;
 
    ------------------
@@ -516,7 +516,7 @@ is
       Scratch_Buffer : String (1 .. Scratch_Buffer_Length) := (others => ASCII.NUL);
    begin
       if Sibling_Name'Length >= Scratch_Buffer'Length then
-         return (Result => Result_Overflow);
+         return (Result => Result_Overflow, Offset => 0);
       end if;
 
       while Result_State.Result = Result_OK
@@ -556,7 +556,7 @@ is
          Result_State := Sibling (Result_State, Document);
       end loop;
 
-      return (Result => Result_Not_Found);
+      return (Result => Result_Not_Found, Offset => 0);
    end Find_Sibling;
 
    -------------------

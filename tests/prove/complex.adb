@@ -77,7 +77,7 @@ begin
       Ada.Text_IO.Put_Line ("<!-- Name: " & Data (Data'First .. Last));
 
       Attr := SXML.Query.Attribute (Root, Outer);
-      while Attr.Result = SXML.Result_OK loop
+      while SXML.Query.State_Result (Attr) = SXML.Result_OK loop
          pragma Loop_Invariant (SXML.Query.Is_Attribute (Attr, Outer));
          pragma Loop_Invariant (SXML.Query.Is_Valid (Attr, Outer));
          pragma Loop_Invariant (SXML.Query.Is_Valid_Value (Attr, Outer));
@@ -90,9 +90,9 @@ begin
       end loop;
 
       State := SXML.Query.Path (Root, Outer, "/outer/header4");
-      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
+      if SXML.Query.State_Result (State) = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
          Attr := SXML.Query.Find_Attribute (State, Outer, "hattr43");
-         if Attr.Result = SXML.Result_OK then
+         if SXML.Query.State_Result (Attr) = SXML.Result_OK then
             SXML.Query.Name (Attr, Outer, Name_Result, Name, Name_Last);
             SXML.Query.Value (Attr, Outer, Result, Data, Last);
             if Name_Result = SXML.Result_OK and Result = SXML.Result_OK then
@@ -112,33 +112,33 @@ begin
          end if;
 
       else
-         Ada.Text_IO.Put_Line ("   ERROR: " & State.Result'Img);
+         Ada.Text_IO.Put_Line ("   ERROR: " & SXML.Query.State_Result (State)'Img);
       end if;
 
       State := SXML.Query.Path (Root, Outer, "/outer/header1");
-      if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
+      if SXML.Query.State_Result (State) = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
          State := SXML.Query.Find_Sibling (State, Outer, "header2");
-         if State.Result = SXML.Result_OK then
+         if SXML.Query.State_Result (State) = SXML.Result_OK then
             State := SXML.Query.Sibling (State, Outer);
-            if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
+            if SXML.Query.State_Result (State) = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
                SXML.Query.Name (State, Outer, Result, Data, Last);
                if Result = SXML.Result_OK then
                   Ada.Text_IO.Put_Line ("   FOUND " & Data (Data'First .. Last));
                   State := SXML.Query.Child (State, Outer);
-                  if State.Result = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
+                  if SXML.Query.State_Result (State) = SXML.Result_OK and then SXML.Query.Is_Open (State, Outer) then
                      SXML.Query.Name (State, Outer, Result, Data, Last);
                      if Result = SXML.Result_OK then
                         Ada.Text_IO.Put_Line ("   FOUND " & Data (Data'First .. Last));
                      end if;
                   end if;
                else
-                  Ada.Text_IO.Put_Line ("   ERROR: header3 not found - " & State.Result'Img);
+                  Ada.Text_IO.Put_Line ("   ERROR: header3 not found - " & SXML.Query.State_Result (State)'Img);
                end if;
             else
-               Ada.Text_IO.Put_Line ("   ERROR: header3 not found - " & State.Result'Img);
+               Ada.Text_IO.Put_Line ("   ERROR: header3 not found - " & SXML.Query.State_Result (State)'Img);
             end if;
          else
-            Ada.Text_IO.Put_Line ("   ERROR: header2 not found - " & State.Result'Img);
+            Ada.Text_IO.Put_Line ("   ERROR: header2 not found - " & SXML.Query.State_Result (State)'Img);
          end if;
       end if;
 

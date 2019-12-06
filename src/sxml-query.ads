@@ -13,11 +13,19 @@ package SXML.Query
 is
    pragma Annotate (GNATprove, Terminating, SXML.Query);
 
-   type State_Type (Result : Result_Type := Result_Invalid) is private;
-   --  @field  Result Result of the last operation
+   type State_Type is private;
 
    Invalid_State : constant State_Type;
    Initial_State : constant State_Type;
+
+   ------------------
+   -- State_Result --
+   ------------------
+
+   --  Return result of state
+   --
+   --  @param State  Current query state
+   function State_Result (State : State_Type) return Result_Type;
 
    ------------
    -- Offset --
@@ -27,7 +35,7 @@ is
    --
    --  @param State  Current query state
    function Offset (State : State_Type) return Offset_Type with
-     Pre => State.Result = Result_OK,
+     Pre => State_Result (State) = Result_OK,
      Ghost;
 
    --------------
@@ -41,7 +49,7 @@ is
    function Is_Valid (State    : State_Type;
                       Document : Document_Type) return Boolean with
      Ghost,
-     Post => Is_Valid'Result = (Document'Length > 0 and (if State.Result = Result_OK
+     Post => Is_Valid'Result = (Document'Length > 0 and (if State_Result (State) = Result_OK
                                                          then Offset (State) < Document'Length));
 
    -------------
@@ -54,7 +62,7 @@ is
    --  @param Document  Document
    function Is_Open (State    : State_Type;
                      Document : Document_Type) return Boolean with
-     Pre => State.Result = Result_OK and Is_Valid (State, Document);
+     Pre => State_Result (State) = Result_OK and Is_Valid (State, Document);
 
    ----------------
    -- Is_Content --
@@ -67,7 +75,7 @@ is
    function Is_Content (State    : State_Type;
                         Document : Document_Type) return Boolean with
      Ghost,
-     Pre => State.Result = Result_OK and Is_Valid (State, Document);
+     Pre => State_Result (State) = Result_OK and Is_Valid (State, Document);
 
    ------------------
    -- Is_Attribute --
@@ -80,7 +88,7 @@ is
    function Is_Attribute (State    : State_Type;
                           Document : Document_Type) return Boolean with
      Ghost,
-     Pre => State.Result = Result_OK and Is_Valid (State, Document);
+     Pre => State_Result (State) = Result_OK and Is_Valid (State, Document);
 
    ----------
    -- Init --
@@ -109,7 +117,7 @@ is
                    Data     : out Content_Type;
                    Last     : out Natural) with
      Pre  => Valid_Content (Data'First, Data'Last)
-             and then State.Result = Result_OK
+             and then State_Result (State) = Result_OK
              and then Is_Valid (State, Document)
              and then (Is_Open (State, Document) or Is_Attribute (State, Document)),
      Post => (if Result = Result_OK then Last in Data'Range);
@@ -125,9 +133,9 @@ is
    --  @return          Result of operation
    function Child (State    : State_Type;
                    Document : Document_Type) return State_Type with
-     Pre  => State.Result = Result_OK
+     Pre  => State_Result (State) = Result_OK
              and then Is_Valid (State, Document),
-     Post => (if Child'Result.Result = Result_OK
+     Post => (if State_Result (Child'Result) = Result_OK
               then Offset (Child'Result) > Offset (State)
                    and then (Is_Valid (Child'Result, Document)
                              and then (Is_Open (Child'Result, Document)
@@ -144,11 +152,11 @@ is
    --  @return          Result of operation
    function Sibling (State    : State_Type;
                      Document : Document_Type) return State_Type with
-     Pre => State.Result = Result_OK
+     Pre => State_Result (State) = Result_OK
             and then Is_Valid (State, Document)
             and then (Is_Open (State, Document)
                       or Is_Content (State, Document)),
-     Post => (if Sibling'Result.Result = Result_OK
+     Post => (if State_Result (Sibling'Result) = Result_OK
               then Offset (Sibling'Result) > Offset (State)
                    and then (Is_Valid (Sibling'Result, Document)
                              and then (Is_Open (Sibling'Result, Document)
@@ -161,7 +169,7 @@ is
    --  Find sibling by name, beginning at State. The result has to match Sibling_Name, Attribute_Name and
    --  Attribute_Value. The special value "*" can be used to match any name or value. If State passed to the function
    --  already is a match, it is returned directly. If not, a matching sibling is searched. If no matching sibling
-   --  is found, State.Result will have the value Result_Not_Found.
+   --  is found, State_Result (State) will have the value Result_Not_Found.
    --
    --  @param State            Current state
    --  @param Document         Document
@@ -174,11 +182,11 @@ is
                           Sibling_Name    : String := "*";
                           Attribute_Name  : String := "*";
                           Attribute_Value : String := "*") return State_Type with
-     Pre  => State.Result = Result_OK
+     Pre  => State_Result (State) = Result_OK
              and then Is_Valid (State, Document)
              and then (Is_Open (State, Document)
                        or Is_Content (State, Document)),
-     Post => (if Find_Sibling'Result.Result = Result_OK
+     Post => (if State_Result (Find_Sibling'Result) = Result_OK
               then Offset (Find_Sibling'Result) >= Offset (State)
                    and then (Is_Valid (Find_Sibling'Result, Document)
                              and then Is_Open (Find_Sibling'Result, Document)));
@@ -194,10 +202,10 @@ is
    --  @return          Result of operation
    function Attribute (State    : State_Type;
                        Document : Document_Type) return State_Type with
-     Pre  => State.Result = Result_OK
+     Pre  => State_Result (State) = Result_OK
              and then Is_Valid (State, Document)
              and then Is_Open (State, Document),
-     Post => (if Attribute'Result.Result = Result_OK
+     Post => (if State_Result (Attribute'Result) = Result_OK
               then (Is_Valid (Attribute'Result, Document)
                     and then Is_Attribute (Attribute'Result, Document)
                     and then Is_Valid_Value (Attribute'Result, Document)));
@@ -214,7 +222,7 @@ is
    function Has_Attribute (State          : State_Type;
                            Document       : Document_Type;
                            Attribute_Name : String) return Boolean with
-     Pre  => State.Result = Result_OK
+     Pre  => State_Result (State) = Result_OK
              and then Is_Valid (State, Document)
              and then Is_Open (State, Document);
 
@@ -236,7 +244,7 @@ is
                         Result         : out Result_Type;
                         Data           : out Content_Type;
                         Last           : out Natural) with
-     Pre   => State.Result = Result_OK
+     Pre   => State_Result (State) = Result_OK
               and then Is_Valid (State, Document)
               and then Is_Open (State, Document)
               and then Data'Length > 0
@@ -253,7 +261,7 @@ is
    --  @param Document  Document
    function Is_Valid_Value (State    : State_Type;
                             Document : Document_Type) return Boolean with
-     Pre => State.Result = Result_OK
+     Pre => State_Result (State) = Result_OK
             and then Is_Valid (State, Document)
             and then Is_Attribute (State, Document);
 
@@ -274,7 +282,7 @@ is
                     Data     : out Content_Type;
                     Last     : out Natural) with
      Pre => Valid_Content (Data'First, Data'Last)
-            and then State.Result = Result_OK
+            and then State_Result (State) = Result_OK
             and then Is_Valid (State, Document)
             and then Is_Attribute (State, Document)
             and then Is_Valid_Value (State, Document),
@@ -293,10 +301,10 @@ is
    --  @return          Result of operation
    function Next_Attribute (State    : State_Type;
                             Document : Document_Type) return State_Type with
-     Pre => State.Result = Result_OK
+     Pre => State_Result (State) = Result_OK
             and then Is_Valid (State, Document)
             and then Is_Attribute (State, Document),
-     Post => (if Next_Attribute'Result.Result = Result_OK
+     Post => (if State_Result (Next_Attribute'Result) = Result_OK
               then Offset (Next_Attribute'Result) > Offset (State)
                    and then (Is_Valid (Next_Attribute'Result, Document)
                              and then Is_Attribute (Next_Attribute'Result, Document)
@@ -317,11 +325,11 @@ is
                             Document        : Document_Type;
                             Attribute_Name  : String := "*";
                             Attribute_Value : String := "*") return State_Type with
-     Pre => State.Result = Result_OK
+     Pre => State_Result (State) = Result_OK
             and then Is_Valid (State, Document)
             and then Is_Open (State, Document),
      Post => Is_Valid (Find_Attribute'Result, Document)
-             and then (if Find_Attribute'Result.Result = Result_OK
+             and then (if State_Result (Find_Attribute'Result) = Result_OK
                        then Is_Attribute (Find_Attribute'Result, Document)
                             and then Is_Valid_Value (Find_Attribute'Result, Document));
 
@@ -342,23 +350,21 @@ is
                   Query_String : String) return State_Type with
      Pre  => Query_String'First > 0
              and then Query_String'Length > 0
-             and then State.Result = Result_OK
+             and then State_Result (State) = Result_OK
              and then Is_Valid (State, Document),
-     Post => (if State.Result = Result_OK then Is_Valid (Path'Result, Document));
+     Post => (if State_Result (State) = Result_OK then Is_Valid (Path'Result, Document));
 
 private
 
-   type State_Type (Result : Result_Type := Result_Invalid) is
+   type State_Type is
       record
-         case Result is
-            when Result_OK =>
-               Offset : Offset_Type;
-            when others =>
-               null;
-         end case;
+         Result : Result_Type := Result_Invalid;
+         Offset : Offset_Type := 0;
       end record;
 
-   Invalid_State : constant State_Type := (Result => Result_Invalid);
+   function State_Result (State : State_Type) return Result_Type is (State.Result);
+
+   Invalid_State : constant State_Type := (Result => Result_Invalid, Offset => 0);
    Initial_State : constant State_Type := (Result => Result_OK, Offset => 0);
 
 end SXML.Query;
