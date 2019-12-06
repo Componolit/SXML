@@ -73,7 +73,7 @@ is
    Proof_Switches :=
    (
       "-j0",
-      "--prover=altergo,z3,cvc4",
+      "--prover=z3,cvc4",
       "--steps=1000",
       "--memlimit=1000",
       "--checks-as-errors",
