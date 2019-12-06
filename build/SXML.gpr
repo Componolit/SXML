@@ -70,4 +70,18 @@ is
       for Documentation_Dir use "../doc/api";
    end Documentation;
 
+   Proof_Switches :=
+   (
+      "-j0",
+      "--prover=altergo,z3,cvc4",
+      "--steps=1000",
+      "--memlimit=1000",
+      "--checks-as-errors",
+      "--warnings=error",
+      "--no-counterexample"
+   );
+
+   package Prove is
+      for Proof_Switches ("Ada") use Proof_Switches;
+   end Prove;
 end SXML;

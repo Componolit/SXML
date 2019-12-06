@@ -1,17 +1,18 @@
 MODE ?= strict
 BOUNDED ?= false
 CODEPEER ?= off
-GNATPROVE_OPTS = --prover=z3,cvc4 -j0 --memlimit=2000 --codepeer=$(CODEPEER) --output-header --steps=5500 --checks-as-errors
+GNATPROVE_OPTS += --prover=z3,cvc4 -j0 --memlimit=2000 --codepeer=$(CODEPEER) --output-header --steps=5500 --checks-as-errors
 GPRBUILD_OPTS = -s -p -XMode=$(MODE) -XBounded=$(BOUNDED)
 WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 --waitretry=5 --random-wait --no-clobber
+GNATPROVE ?= gnatprove
 GNATCHECK ?= $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
 TEST_OPTS ?= ulimit -s 40; ulimit -a;
 
 all:
 	$(GNATCHECK) -P build/SXML
 	@gprbuild $(GPRBUILD_OPTS) -P build/SXML
-	@time gnatprove $(GNATPROVE_OPTS) -P build/SXML
-	@time gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
+	@time $(GNATPROVE) $(GNATPROVE_OPTS) -P build/SXML
+	@time $(GNATPROVE) $(GNATPROVE_OPTS) -P tests/prove/prove
 
 test: build/SXML.gpr
 	$(GNATCHECK) -P build/SXML
@@ -21,10 +22,10 @@ test: build/SXML.gpr
 prove: prove_tests prove_lib
 
 prove_lib:
-	@time gnatprove $(GNATPROVE_OPTS) -P build/SXML
+	@time $(GNATPROVE) $(GNATPROVE_OPTS) -P build/SXML
 
-prove_tests:
-	@time gnatprove $(GNATPROVE_OPTS) -P tests/prove/prove
+prove_tests: prove_lib
+	@time $(GNATPROVE) $(GNATPROVE_OPTS) -P tests/prove/prove
 
 doc: doc/api/index.html
 
@@ -76,9 +77,11 @@ examples::
 
 clean:
 	gnatclean -P build/SXML
-	gnatprove -P build/SXML --clean
+	$(GNATPROVE) -P build/SXML --clean
 	gnatclean -P tests/execute/tests.gpr
 	gnatclean -P examples/examples
-	gnatprove -P examples/examples --clean
+	$(GNATPROVE) -P examples/examples --clean
 	gnatclean -P examples/fuzzdriver
+	gnatclean -P tests/prove/prove
+	$(GNATPROVE) -P tests/prove/prove --clean
 	rm -rf obj

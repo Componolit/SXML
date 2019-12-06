@@ -4,4 +4,8 @@ project Prove is
    for Source_Dirs use (".");
    for Main use ("exec.adb", "doc.adb", "complex.adb");
    for Exec_Dir use "../../obj";
+
+   package Prove is
+      for Proof_Switches ("Ada") use SXML.Proof_Switches;
+   end Prove;
 end Prove;
