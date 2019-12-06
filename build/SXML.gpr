@@ -74,7 +74,7 @@ is
    (
       "-j0",
       "--prover=z3,cvc4",
-      "--steps=1000",
+      "--steps=5000",
       "--memlimit=1000",
       "--checks-as-errors",
       "--warnings=error",
