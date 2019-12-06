@@ -10,10 +10,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Initial_State",
-      "docHref": "docs/sxml__query___spec.html#L20C4",
+      "docHref": "docs/sxml__query___spec.html#L19C4",
       "declared": "SXML.Query",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml-query.ads.html#L20"
+      "srcHref": "srcs/sxml-query.ads.html#L19"
     },
     {
       "label": "Invalid_Index",
@@ -31,10 +31,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Invalid_State",
-      "docHref": "docs/sxml__query___spec.html#L19C4",
+      "docHref": "docs/sxml__query___spec.html#L18C4",
       "declared": "SXML.Query",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml-query.ads.html#L19"
+      "srcHref": "srcs/sxml-query.ads.html#L18"
     },
     {
       "label": "Null_Attributes",

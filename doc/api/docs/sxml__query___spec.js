@@ -11,7 +11,7 @@ GNATdoc.Documentation = {
         {
           "label": "Initial_State",
           "qualifier": "",
-          "line": 20,
+          "line": 19,
           "column": 4,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -22,7 +22,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 20,
+                  "number": 19,
                   "children": [
                     {
                       "kind": "span",
@@ -73,7 +73,7 @@ GNATdoc.Documentation = {
         {
           "label": "Invalid_State",
           "qualifier": "",
-          "line": 19,
+          "line": 18,
           "column": 4,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -84,7 +84,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 19,
+                  "number": 18,
                   "children": [
                     {
                       "kind": "span",
@@ -181,68 +181,6 @@ GNATdoc.Documentation = {
                     },
                     {
                       "kind": "span",
-                      "cssClass": "identifier",
-                      "text": "("
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": "Result",
-                      "href": "docs/sxml__query___spec.html#L16C21"
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "text",
-                      "text": " "
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": ":"
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "text",
-                      "text": " "
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": "Result_Type",
-                      "href": "docs/sxml___spec.html#L18C9"
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "text",
-                      "text": " "
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": ":="
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "text",
-                      "text": " "
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": "Result_Invalid"
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "identifier",
-                      "text": ")"
-                    },
-                    {
-                      "kind": "span",
-                      "cssClass": "text",
-                      "text": " "
-                    },
-                    {
-                      "kind": "span",
                       "cssClass": "keyword",
                       "text": "is"
                     },
@@ -265,28 +203,6 @@ GNATdoc.Documentation = {
                 }
               ]
             }
-          ],
-          "fields": [
-            {
-              "label": "Result",
-              "line": 16,
-              "column": 21,
-              "type": {
-                "label": "SXML.Result_Type",
-                "docHref": "docs/sxml___spec.html#L18C9"
-              },
-              "description": [
-                {
-                  "kind": "paragraph",
-                  "children": [
-                    {
-                      "kind": "span",
-                      "text": "Result of the last operation\n"
-                    }
-                  ]
-                }
-              ]
-            }
           ]
         }
       ],
@@ -297,7 +213,7 @@ GNATdoc.Documentation = {
         {
           "label": "Attribute",
           "qualifier": "",
-          "line": 195,
+          "line": 203,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -308,7 +224,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 195,
+                  "number": 203,
                   "children": [
                     {
                       "kind": "span",
@@ -329,7 +245,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute",
-                      "href": "docs/sxml__query___spec.html#L195C13"
+                      "href": "docs/sxml__query___spec.html#L203C13"
                     },
                     {
                       "kind": "span",
@@ -345,7 +261,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L195C24"
+                      "href": "docs/sxml__query___spec.html#L203C24"
                     },
                     {
                       "kind": "span",
@@ -366,7 +282,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -377,7 +293,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 196,
+                  "number": 204,
                   "children": [
                     {
                       "kind": "span",
@@ -388,7 +304,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L196C24"
+                      "href": "docs/sxml__query___spec.html#L204C24"
                     },
                     {
                       "kind": "span",
@@ -435,7 +351,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -451,18 +367,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 197,
+                  "number": 205,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre  => State.Result = Result_OK"
+                      "text": "     Pre  => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 198,
+                  "number": 206,
                   "children": [
                     {
                       "kind": "span",
@@ -493,7 +409,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 199,
+                  "number": 207,
                   "children": [
                     {
                       "kind": "span",
@@ -524,7 +440,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 200,
+                  "number": 208,
                   "children": [
                     {
                       "kind": "span",
@@ -539,13 +455,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Attribute'Result.Result = Result_OK"
+                      "text": " State_Result (Attribute'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 201,
+                  "number": 209,
                   "children": [
                     {
                       "kind": "span",
@@ -566,7 +482,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 202,
+                  "number": 210,
                   "children": [
                     {
                       "kind": "span",
@@ -597,7 +513,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 203,
+                  "number": 211,
                   "children": [
                     {
                       "kind": "span",
@@ -646,7 +562,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 195,
+              "line": 203,
               "column": 24,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -666,7 +582,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 196,
+              "line": 204,
               "column": 24,
               "type": {
                 "label": "SXML.Document_Type",
@@ -702,7 +618,7 @@ GNATdoc.Documentation = {
         {
           "label": "Attribute",
           "qualifier": "",
-          "line": 233,
+          "line": 241,
           "column": 14,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -713,7 +629,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 233,
+                  "number": 241,
                   "children": [
                     {
                       "kind": "span",
@@ -734,7 +650,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute",
-                      "href": "docs/sxml__query___spec.html#L233C14"
+                      "href": "docs/sxml__query___spec.html#L241C14"
                     },
                     {
                       "kind": "span",
@@ -750,7 +666,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L233C25"
+                      "href": "docs/sxml__query___spec.html#L241C25"
                     },
                     {
                       "kind": "span",
@@ -771,7 +687,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -782,7 +698,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 234,
+                  "number": 242,
                   "children": [
                     {
                       "kind": "span",
@@ -793,7 +709,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L234C25"
+                      "href": "docs/sxml__query___spec.html#L242C25"
                     },
                     {
                       "kind": "span",
@@ -825,7 +741,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 235,
+                  "number": 243,
                   "children": [
                     {
                       "kind": "span",
@@ -836,7 +752,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Name",
-                      "href": "docs/sxml__query___spec.html#L235C25"
+                      "href": "docs/sxml__query___spec.html#L243C25"
                     },
                     {
                       "kind": "span",
@@ -867,7 +783,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 236,
+                  "number": 244,
                   "children": [
                     {
                       "kind": "span",
@@ -878,7 +794,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Result",
-                      "href": "docs/sxml__query___spec.html#L236C25"
+                      "href": "docs/sxml__query___spec.html#L244C25"
                     },
                     {
                       "kind": "span",
@@ -920,7 +836,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 237,
+                  "number": 245,
                   "children": [
                     {
                       "kind": "span",
@@ -931,7 +847,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Data",
-                      "href": "docs/sxml__query___spec.html#L237C25"
+                      "href": "docs/sxml__query___spec.html#L245C25"
                     },
                     {
                       "kind": "span",
@@ -973,7 +889,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 238,
+                  "number": 246,
                   "children": [
                     {
                       "kind": "span",
@@ -984,7 +900,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Last",
-                      "href": "docs/sxml__query___spec.html#L238C25"
+                      "href": "docs/sxml__query___spec.html#L246C25"
                     },
                     {
                       "kind": "span",
@@ -1035,18 +951,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 239,
+                  "number": 247,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre   => State.Result = Result_OK"
+                      "text": "     Pre   => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 240,
+                  "number": 248,
                   "children": [
                     {
                       "kind": "span",
@@ -1077,7 +993,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 241,
+                  "number": 249,
                   "children": [
                     {
                       "kind": "span",
@@ -1108,7 +1024,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 242,
+                  "number": 250,
                   "children": [
                     {
                       "kind": "span",
@@ -1139,7 +1055,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 243,
+                  "number": 251,
                   "children": [
                     {
                       "kind": "span",
@@ -1170,7 +1086,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 244,
+                  "number": 252,
                   "children": [
                     {
                       "kind": "span",
@@ -1229,7 +1145,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 233,
+              "line": 241,
               "column": 25,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -1249,7 +1165,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 234,
+              "line": 242,
               "column": 25,
               "type": {
                 "label": "SXML.Document_Type",
@@ -1269,7 +1185,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Name",
-              "line": 235,
+              "line": 243,
               "column": 25,
               "type": {
                 "label": "String"
@@ -1288,7 +1204,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Result",
-              "line": 236,
+              "line": 244,
               "column": 25,
               "type": {
                 "label": "SXML.Result_Type",
@@ -1308,7 +1224,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Data",
-              "line": 237,
+              "line": 245,
               "column": 25,
               "type": {
                 "label": "SXML.Content_Type",
@@ -1328,7 +1244,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Last",
-              "line": 238,
+              "line": 246,
               "column": 25,
               "type": {
                 "label": "Natural"
@@ -1350,7 +1266,7 @@ GNATdoc.Documentation = {
         {
           "label": "Child",
           "qualifier": "",
-          "line": 126,
+          "line": 134,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -1361,7 +1277,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 126,
+                  "number": 134,
                   "children": [
                     {
                       "kind": "span",
@@ -1382,7 +1298,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Child",
-                      "href": "docs/sxml__query___spec.html#L126C13"
+                      "href": "docs/sxml__query___spec.html#L134C13"
                     },
                     {
                       "kind": "span",
@@ -1398,7 +1314,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L126C20"
+                      "href": "docs/sxml__query___spec.html#L134C20"
                     },
                     {
                       "kind": "span",
@@ -1419,7 +1335,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -1430,7 +1346,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 127,
+                  "number": 135,
                   "children": [
                     {
                       "kind": "span",
@@ -1441,7 +1357,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L127C20"
+                      "href": "docs/sxml__query___spec.html#L135C20"
                     },
                     {
                       "kind": "span",
@@ -1488,7 +1404,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -1504,18 +1420,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 128,
+                  "number": 136,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre  => State.Result = Result_OK"
+                      "text": "     Pre  => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 129,
+                  "number": 137,
                   "children": [
                     {
                       "kind": "span",
@@ -1546,7 +1462,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 130,
+                  "number": 138,
                   "children": [
                     {
                       "kind": "span",
@@ -1561,13 +1477,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Child'Result.Result = Result_OK"
+                      "text": " State_Result (Child'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 131,
+                  "number": 139,
                   "children": [
                     {
                       "kind": "span",
@@ -1588,7 +1504,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 132,
+                  "number": 140,
                   "children": [
                     {
                       "kind": "span",
@@ -1619,7 +1535,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 133,
+                  "number": 141,
                   "children": [
                     {
                       "kind": "span",
@@ -1650,7 +1566,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 134,
+                  "number": 142,
                   "children": [
                     {
                       "kind": "span",
@@ -1689,7 +1605,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 126,
+              "line": 134,
               "column": 20,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -1709,7 +1625,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 127,
+              "line": 135,
               "column": 20,
               "type": {
                 "label": "SXML.Document_Type",
@@ -1745,7 +1661,7 @@ GNATdoc.Documentation = {
         {
           "label": "Find_Attribute",
           "qualifier": "",
-          "line": 316,
+          "line": 324,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -1756,7 +1672,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 316,
+                  "number": 324,
                   "children": [
                     {
                       "kind": "span",
@@ -1777,7 +1693,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Find_Attribute",
-                      "href": "docs/sxml__query___spec.html#L316C13"
+                      "href": "docs/sxml__query___spec.html#L324C13"
                     },
                     {
                       "kind": "span",
@@ -1793,7 +1709,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L316C29"
+                      "href": "docs/sxml__query___spec.html#L324C29"
                     },
                     {
                       "kind": "span",
@@ -1814,7 +1730,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -1825,7 +1741,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 317,
+                  "number": 325,
                   "children": [
                     {
                       "kind": "span",
@@ -1836,7 +1752,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L317C29"
+                      "href": "docs/sxml__query___spec.html#L325C29"
                     },
                     {
                       "kind": "span",
@@ -1868,7 +1784,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 318,
+                  "number": 326,
                   "children": [
                     {
                       "kind": "span",
@@ -1879,7 +1795,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Name",
-                      "href": "docs/sxml__query___spec.html#L318C29"
+                      "href": "docs/sxml__query___spec.html#L326C29"
                     },
                     {
                       "kind": "span",
@@ -1930,7 +1846,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 319,
+                  "number": 327,
                   "children": [
                     {
                       "kind": "span",
@@ -1941,7 +1857,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Value",
-                      "href": "docs/sxml__query___spec.html#L319C29"
+                      "href": "docs/sxml__query___spec.html#L327C29"
                     },
                     {
                       "kind": "span",
@@ -2007,7 +1923,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -2023,18 +1939,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 320,
+                  "number": 328,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre => State.Result = Result_OK"
+                      "text": "     Pre => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 321,
+                  "number": 329,
                   "children": [
                     {
                       "kind": "span",
@@ -2065,7 +1981,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 322,
+                  "number": 330,
                   "children": [
                     {
                       "kind": "span",
@@ -2096,7 +2012,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 323,
+                  "number": 331,
                   "children": [
                     {
                       "kind": "span",
@@ -2107,7 +2023,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 324,
+                  "number": 332,
                   "children": [
                     {
                       "kind": "span",
@@ -2142,13 +2058,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Find_Attribute'Result.Result = Result_OK"
+                      "text": " State_Result (Find_Attribute'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 325,
+                  "number": 333,
                   "children": [
                     {
                       "kind": "span",
@@ -2169,7 +2085,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 326,
+                  "number": 334,
                   "children": [
                     {
                       "kind": "span",
@@ -2218,7 +2134,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 316,
+              "line": 324,
               "column": 29,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -2238,7 +2154,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 317,
+              "line": 325,
               "column": 29,
               "type": {
                 "label": "SXML.Document_Type",
@@ -2258,7 +2174,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Name",
-              "line": 318,
+              "line": 326,
               "column": 29,
               "type": {
                 "label": "String"
@@ -2277,7 +2193,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Value",
-              "line": 319,
+              "line": 327,
               "column": 29,
               "type": {
                 "label": "String"
@@ -2312,7 +2228,7 @@ GNATdoc.Documentation = {
         {
           "label": "Find_Sibling",
           "qualifier": "",
-          "line": 172,
+          "line": 180,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -2323,7 +2239,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 172,
+                  "number": 180,
                   "children": [
                     {
                       "kind": "span",
@@ -2344,7 +2260,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Find_Sibling",
-                      "href": "docs/sxml__query___spec.html#L172C13"
+                      "href": "docs/sxml__query___spec.html#L180C13"
                     },
                     {
                       "kind": "span",
@@ -2360,7 +2276,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L172C27"
+                      "href": "docs/sxml__query___spec.html#L180C27"
                     },
                     {
                       "kind": "span",
@@ -2381,7 +2297,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -2392,7 +2308,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 173,
+                  "number": 181,
                   "children": [
                     {
                       "kind": "span",
@@ -2403,7 +2319,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L173C27"
+                      "href": "docs/sxml__query___spec.html#L181C27"
                     },
                     {
                       "kind": "span",
@@ -2435,7 +2351,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 174,
+                  "number": 182,
                   "children": [
                     {
                       "kind": "span",
@@ -2446,7 +2362,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Sibling_Name",
-                      "href": "docs/sxml__query___spec.html#L174C27"
+                      "href": "docs/sxml__query___spec.html#L182C27"
                     },
                     {
                       "kind": "span",
@@ -2497,7 +2413,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 175,
+                  "number": 183,
                   "children": [
                     {
                       "kind": "span",
@@ -2508,7 +2424,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Name",
-                      "href": "docs/sxml__query___spec.html#L175C27"
+                      "href": "docs/sxml__query___spec.html#L183C27"
                     },
                     {
                       "kind": "span",
@@ -2559,7 +2475,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 176,
+                  "number": 184,
                   "children": [
                     {
                       "kind": "span",
@@ -2570,7 +2486,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Value",
-                      "href": "docs/sxml__query___spec.html#L176C27"
+                      "href": "docs/sxml__query___spec.html#L184C27"
                     },
                     {
                       "kind": "span",
@@ -2636,7 +2552,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -2652,18 +2568,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 177,
+                  "number": 185,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre  => State.Result = Result_OK"
+                      "text": "     Pre  => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 178,
+                  "number": 186,
                   "children": [
                     {
                       "kind": "span",
@@ -2694,7 +2610,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 179,
+                  "number": 187,
                   "children": [
                     {
                       "kind": "span",
@@ -2725,7 +2641,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 180,
+                  "number": 188,
                   "children": [
                     {
                       "kind": "span",
@@ -2746,7 +2662,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 181,
+                  "number": 189,
                   "children": [
                     {
                       "kind": "span",
@@ -2761,13 +2677,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Find_Sibling'Result.Result = Result_OK"
+                      "text": " State_Result (Find_Sibling'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 182,
+                  "number": 190,
                   "children": [
                     {
                       "kind": "span",
@@ -2788,7 +2704,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 183,
+                  "number": 191,
                   "children": [
                     {
                       "kind": "span",
@@ -2819,7 +2735,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 184,
+                  "number": 192,
                   "children": [
                     {
                       "kind": "span",
@@ -2872,7 +2788,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "span",
-                  "text": "is found, State.Result will have the value Result_Not_Found.\n"
+                  "text": "is found, State_Result (State) will have the value Result_Not_Found.\n"
                 }
               ]
             }
@@ -2880,7 +2796,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 172,
+              "line": 180,
               "column": 27,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -2900,7 +2816,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 173,
+              "line": 181,
               "column": 27,
               "type": {
                 "label": "SXML.Document_Type",
@@ -2920,7 +2836,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Sibling_Name",
-              "line": 174,
+              "line": 182,
               "column": 27,
               "type": {
                 "label": "String"
@@ -2939,7 +2855,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Name",
-              "line": 175,
+              "line": 183,
               "column": 27,
               "type": {
                 "label": "String"
@@ -2958,7 +2874,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Value",
-              "line": 176,
+              "line": 184,
               "column": 27,
               "type": {
                 "label": "String"
@@ -2993,7 +2909,7 @@ GNATdoc.Documentation = {
         {
           "label": "Has_Attribute",
           "qualifier": "",
-          "line": 214,
+          "line": 222,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -3004,7 +2920,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 214,
+                  "number": 222,
                   "children": [
                     {
                       "kind": "span",
@@ -3025,7 +2941,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Has_Attribute",
-                      "href": "docs/sxml__query___spec.html#L214C13"
+                      "href": "docs/sxml__query___spec.html#L222C13"
                     },
                     {
                       "kind": "span",
@@ -3041,7 +2957,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L214C28"
+                      "href": "docs/sxml__query___spec.html#L222C28"
                     },
                     {
                       "kind": "span",
@@ -3062,7 +2978,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -3073,7 +2989,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 215,
+                  "number": 223,
                   "children": [
                     {
                       "kind": "span",
@@ -3084,7 +3000,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L215C28"
+                      "href": "docs/sxml__query___spec.html#L223C28"
                     },
                     {
                       "kind": "span",
@@ -3116,7 +3032,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 216,
+                  "number": 224,
                   "children": [
                     {
                       "kind": "span",
@@ -3127,7 +3043,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Attribute_Name",
-                      "href": "docs/sxml__query___spec.html#L216C28"
+                      "href": "docs/sxml__query___spec.html#L224C28"
                     },
                     {
                       "kind": "span",
@@ -3188,18 +3104,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 217,
+                  "number": 225,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre  => State.Result = Result_OK"
+                      "text": "     Pre  => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 218,
+                  "number": 226,
                   "children": [
                     {
                       "kind": "span",
@@ -3230,7 +3146,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 219,
+                  "number": 227,
                   "children": [
                     {
                       "kind": "span",
@@ -3279,7 +3195,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 214,
+              "line": 222,
               "column": 28,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -3299,7 +3215,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 215,
+              "line": 223,
               "column": 28,
               "type": {
                 "label": "SXML.Document_Type",
@@ -3319,7 +3235,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Attribute_Name",
-              "line": 216,
+              "line": 224,
               "column": 28,
               "type": {
                 "label": "String"
@@ -3341,7 +3257,7 @@ GNATdoc.Documentation = {
         {
           "label": "Init",
           "qualifier": "",
-          "line": 92,
+          "line": 100,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -3352,7 +3268,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 92,
+                  "number": 100,
                   "children": [
                     {
                       "kind": "span",
@@ -3373,7 +3289,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Init",
-                      "href": "docs/sxml__query___spec.html#L92C13"
+                      "href": "docs/sxml__query___spec.html#L100C13"
                     },
                     {
                       "kind": "span",
@@ -3389,7 +3305,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L92C19"
+                      "href": "docs/sxml__query___spec.html#L100C19"
                     },
                     {
                       "kind": "span",
@@ -3436,7 +3352,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -3482,7 +3398,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 93,
+                  "number": 101,
                   "children": [
                     {
                       "kind": "span",
@@ -3511,7 +3427,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "Document",
-              "line": 92,
+              "line": 100,
               "column": 19,
               "type": {
                 "label": "SXML.Document_Type",
@@ -3534,7 +3450,7 @@ GNATdoc.Documentation = {
         {
           "label": "Is_Open",
           "qualifier": "",
-          "line": 55,
+          "line": 63,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -3545,7 +3461,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 55,
+                  "number": 63,
                   "children": [
                     {
                       "kind": "span",
@@ -3566,7 +3482,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Is_Open",
-                      "href": "docs/sxml__query___spec.html#L55C13"
+                      "href": "docs/sxml__query___spec.html#L63C13"
                     },
                     {
                       "kind": "span",
@@ -3582,7 +3498,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L55C22"
+                      "href": "docs/sxml__query___spec.html#L63C22"
                     },
                     {
                       "kind": "span",
@@ -3603,7 +3519,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -3614,7 +3530,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 56,
+                  "number": 64,
                   "children": [
                     {
                       "kind": "span",
@@ -3625,7 +3541,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L56C22"
+                      "href": "docs/sxml__query___spec.html#L64C22"
                     },
                     {
                       "kind": "span",
@@ -3687,12 +3603,12 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 57,
+                  "number": 65,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre => State.Result = Result_OK "
+                      "text": "     Pre => State_Result (State) = Result_OK "
                     },
                     {
                       "kind": "span",
@@ -3726,7 +3642,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 55,
+              "line": 63,
               "column": 22,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -3746,7 +3662,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 56,
+              "line": 64,
               "column": 22,
               "type": {
                 "label": "SXML.Document_Type",
@@ -3769,7 +3685,7 @@ GNATdoc.Documentation = {
         {
           "label": "Is_Valid_Value",
           "qualifier": "",
-          "line": 254,
+          "line": 262,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -3780,7 +3696,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 254,
+                  "number": 262,
                   "children": [
                     {
                       "kind": "span",
@@ -3801,7 +3717,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Is_Valid_Value",
-                      "href": "docs/sxml__query___spec.html#L254C13"
+                      "href": "docs/sxml__query___spec.html#L262C13"
                     },
                     {
                       "kind": "span",
@@ -3817,7 +3733,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L254C29"
+                      "href": "docs/sxml__query___spec.html#L262C29"
                     },
                     {
                       "kind": "span",
@@ -3838,7 +3754,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -3849,7 +3765,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 255,
+                  "number": 263,
                   "children": [
                     {
                       "kind": "span",
@@ -3860,7 +3776,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L255C29"
+                      "href": "docs/sxml__query___spec.html#L263C29"
                     },
                     {
                       "kind": "span",
@@ -3922,18 +3838,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 256,
+                  "number": 264,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre => State.Result = Result_OK"
+                      "text": "     Pre => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 257,
+                  "number": 265,
                   "children": [
                     {
                       "kind": "span",
@@ -3964,7 +3880,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 258,
+                  "number": 266,
                   "children": [
                     {
                       "kind": "span",
@@ -4013,7 +3929,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 254,
+              "line": 262,
               "column": 29,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -4033,7 +3949,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 255,
+              "line": 263,
               "column": 29,
               "type": {
                 "label": "SXML.Document_Type",
@@ -4056,7 +3972,7 @@ GNATdoc.Documentation = {
         {
           "label": "Name",
           "qualifier": "",
-          "line": 106,
+          "line": 114,
           "column": 14,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -4067,7 +3983,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 106,
+                  "number": 114,
                   "children": [
                     {
                       "kind": "span",
@@ -4088,7 +4004,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Name",
-                      "href": "docs/sxml__query___spec.html#L106C14"
+                      "href": "docs/sxml__query___spec.html#L114C14"
                     },
                     {
                       "kind": "span",
@@ -4104,7 +4020,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L106C20"
+                      "href": "docs/sxml__query___spec.html#L114C20"
                     },
                     {
                       "kind": "span",
@@ -4125,7 +4041,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -4136,7 +4052,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 107,
+                  "number": 115,
                   "children": [
                     {
                       "kind": "span",
@@ -4147,7 +4063,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L107C20"
+                      "href": "docs/sxml__query___spec.html#L115C20"
                     },
                     {
                       "kind": "span",
@@ -4179,7 +4095,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 108,
+                  "number": 116,
                   "children": [
                     {
                       "kind": "span",
@@ -4190,7 +4106,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Result",
-                      "href": "docs/sxml__query___spec.html#L108C20"
+                      "href": "docs/sxml__query___spec.html#L116C20"
                     },
                     {
                       "kind": "span",
@@ -4232,7 +4148,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 109,
+                  "number": 117,
                   "children": [
                     {
                       "kind": "span",
@@ -4243,7 +4159,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Data",
-                      "href": "docs/sxml__query___spec.html#L109C20"
+                      "href": "docs/sxml__query___spec.html#L117C20"
                     },
                     {
                       "kind": "span",
@@ -4285,7 +4201,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 110,
+                  "number": 118,
                   "children": [
                     {
                       "kind": "span",
@@ -4296,7 +4212,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Last",
-                      "href": "docs/sxml__query___spec.html#L110C20"
+                      "href": "docs/sxml__query___spec.html#L118C20"
                     },
                     {
                       "kind": "span",
@@ -4347,7 +4263,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 111,
+                  "number": 119,
                   "children": [
                     {
                       "kind": "span",
@@ -4358,7 +4274,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 112,
+                  "number": 120,
                   "children": [
                     {
                       "kind": "span",
@@ -4383,13 +4299,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " State.Result = Result_OK"
+                      "text": " State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 113,
+                  "number": 121,
                   "children": [
                     {
                       "kind": "span",
@@ -4420,7 +4336,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 114,
+                  "number": 122,
                   "children": [
                     {
                       "kind": "span",
@@ -4461,7 +4377,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 115,
+                  "number": 123,
                   "children": [
                     {
                       "kind": "span",
@@ -4520,7 +4436,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 106,
+              "line": 114,
               "column": 20,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -4540,7 +4456,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 107,
+              "line": 115,
               "column": 20,
               "type": {
                 "label": "SXML.Document_Type",
@@ -4560,7 +4476,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Result",
-              "line": 108,
+              "line": 116,
               "column": 20,
               "type": {
                 "label": "SXML.Result_Type",
@@ -4580,7 +4496,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Data",
-              "line": 109,
+              "line": 117,
               "column": 20,
               "type": {
                 "label": "SXML.Content_Type",
@@ -4600,7 +4516,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Last",
-              "line": 110,
+              "line": 118,
               "column": 20,
               "type": {
                 "label": "Natural"
@@ -4622,7 +4538,7 @@ GNATdoc.Documentation = {
         {
           "label": "Next_Attribute",
           "qualifier": "",
-          "line": 294,
+          "line": 302,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -4633,7 +4549,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 294,
+                  "number": 302,
                   "children": [
                     {
                       "kind": "span",
@@ -4654,7 +4570,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Next_Attribute",
-                      "href": "docs/sxml__query___spec.html#L294C13"
+                      "href": "docs/sxml__query___spec.html#L302C13"
                     },
                     {
                       "kind": "span",
@@ -4670,7 +4586,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L294C29"
+                      "href": "docs/sxml__query___spec.html#L302C29"
                     },
                     {
                       "kind": "span",
@@ -4691,7 +4607,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -4702,7 +4618,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 295,
+                  "number": 303,
                   "children": [
                     {
                       "kind": "span",
@@ -4713,7 +4629,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L295C29"
+                      "href": "docs/sxml__query___spec.html#L303C29"
                     },
                     {
                       "kind": "span",
@@ -4760,7 +4676,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -4776,18 +4692,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 296,
+                  "number": 304,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre => State.Result = Result_OK"
+                      "text": "     Pre => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 297,
+                  "number": 305,
                   "children": [
                     {
                       "kind": "span",
@@ -4818,7 +4734,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 298,
+                  "number": 306,
                   "children": [
                     {
                       "kind": "span",
@@ -4849,7 +4765,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 299,
+                  "number": 307,
                   "children": [
                     {
                       "kind": "span",
@@ -4864,13 +4780,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Next_Attribute'Result.Result = Result_OK"
+                      "text": " State_Result (Next_Attribute'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 300,
+                  "number": 308,
                   "children": [
                     {
                       "kind": "span",
@@ -4891,7 +4807,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 301,
+                  "number": 309,
                   "children": [
                     {
                       "kind": "span",
@@ -4922,7 +4838,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 302,
+                  "number": 310,
                   "children": [
                     {
                       "kind": "span",
@@ -4953,7 +4869,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 303,
+                  "number": 311,
                   "children": [
                     {
                       "kind": "span",
@@ -5002,7 +4918,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 294,
+              "line": 302,
               "column": 29,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -5022,7 +4938,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 295,
+              "line": 303,
               "column": 29,
               "type": {
                 "label": "SXML.Document_Type",
@@ -5058,7 +4974,7 @@ GNATdoc.Documentation = {
         {
           "label": "Path",
           "qualifier": "",
-          "line": 340,
+          "line": 348,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -5069,7 +4985,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 340,
+                  "number": 348,
                   "children": [
                     {
                       "kind": "span",
@@ -5090,7 +5006,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Path",
-                      "href": "docs/sxml__query___spec.html#L340C13"
+                      "href": "docs/sxml__query___spec.html#L348C13"
                     },
                     {
                       "kind": "span",
@@ -5106,7 +5022,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L340C19"
+                      "href": "docs/sxml__query___spec.html#L348C19"
                     },
                     {
                       "kind": "span",
@@ -5127,7 +5043,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -5138,7 +5054,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 341,
+                  "number": 349,
                   "children": [
                     {
                       "kind": "span",
@@ -5149,7 +5065,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L341C19"
+                      "href": "docs/sxml__query___spec.html#L349C19"
                     },
                     {
                       "kind": "span",
@@ -5181,7 +5097,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 342,
+                  "number": 350,
                   "children": [
                     {
                       "kind": "span",
@@ -5192,7 +5108,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Query_String",
-                      "href": "docs/sxml__query___spec.html#L342C19"
+                      "href": "docs/sxml__query___spec.html#L350C19"
                     },
                     {
                       "kind": "span",
@@ -5238,7 +5154,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -5254,7 +5170,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 343,
+                  "number": 351,
                   "children": [
                     {
                       "kind": "span",
@@ -5265,7 +5181,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 344,
+                  "number": 352,
                   "children": [
                     {
                       "kind": "span",
@@ -5296,7 +5212,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 345,
+                  "number": 353,
                   "children": [
                     {
                       "kind": "span",
@@ -5321,13 +5237,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " State.Result = Result_OK"
+                      "text": " State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 346,
+                  "number": 354,
                   "children": [
                     {
                       "kind": "span",
@@ -5358,7 +5274,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 347,
+                  "number": 355,
                   "children": [
                     {
                       "kind": "span",
@@ -5373,7 +5289,7 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " State.Result = Result_OK "
+                      "text": " State_Result (State) = Result_OK "
                     },
                     {
                       "kind": "span",
@@ -5415,7 +5331,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 340,
+              "line": 348,
               "column": 19,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -5435,7 +5351,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 341,
+              "line": 349,
               "column": 19,
               "type": {
                 "label": "SXML.Document_Type",
@@ -5455,7 +5371,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Query_String",
-              "line": 342,
+              "line": 350,
               "column": 19,
               "type": {
                 "label": "String"
@@ -5490,7 +5406,7 @@ GNATdoc.Documentation = {
         {
           "label": "Sibling",
           "qualifier": "",
-          "line": 145,
+          "line": 153,
           "column": 13,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -5501,7 +5417,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 145,
+                  "number": 153,
                   "children": [
                     {
                       "kind": "span",
@@ -5522,7 +5438,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Sibling",
-                      "href": "docs/sxml__query___spec.html#L145C13"
+                      "href": "docs/sxml__query___spec.html#L153C13"
                     },
                     {
                       "kind": "span",
@@ -5538,7 +5454,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L145C22"
+                      "href": "docs/sxml__query___spec.html#L153C22"
                     },
                     {
                       "kind": "span",
@@ -5559,7 +5475,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -5570,7 +5486,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 146,
+                  "number": 154,
                   "children": [
                     {
                       "kind": "span",
@@ -5581,7 +5497,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L146C22"
+                      "href": "docs/sxml__query___spec.html#L154C22"
                     },
                     {
                       "kind": "span",
@@ -5628,7 +5544,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -5644,18 +5560,18 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 147,
+                  "number": 155,
                   "children": [
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": "     Pre => State.Result = Result_OK"
+                      "text": "     Pre => State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 148,
+                  "number": 156,
                   "children": [
                     {
                       "kind": "span",
@@ -5686,7 +5602,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 149,
+                  "number": 157,
                   "children": [
                     {
                       "kind": "span",
@@ -5717,7 +5633,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 150,
+                  "number": 158,
                   "children": [
                     {
                       "kind": "span",
@@ -5738,7 +5654,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 151,
+                  "number": 159,
                   "children": [
                     {
                       "kind": "span",
@@ -5753,13 +5669,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " Sibling'Result.Result = Result_OK"
+                      "text": " State_Result (Sibling'Result) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 152,
+                  "number": 160,
                   "children": [
                     {
                       "kind": "span",
@@ -5780,7 +5696,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 153,
+                  "number": 161,
                   "children": [
                     {
                       "kind": "span",
@@ -5811,7 +5727,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 154,
+                  "number": 162,
                   "children": [
                     {
                       "kind": "span",
@@ -5842,7 +5758,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 155,
+                  "number": 163,
                   "children": [
                     {
                       "kind": "span",
@@ -5881,7 +5797,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 145,
+              "line": 153,
               "column": 22,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -5901,7 +5817,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 146,
+              "line": 154,
               "column": 22,
               "type": {
                 "label": "SXML.Document_Type",
@@ -5935,9 +5851,151 @@ GNATdoc.Documentation = {
           }
         },
         {
+          "label": "State_Result",
+          "qualifier": "",
+          "line": 28,
+          "column": 13,
+          "src": "srcs/sxml-query.ads.html",
+          "summary": [
+          ],
+          "description": [
+            {
+              "kind": "code",
+              "children": [
+                {
+                  "kind": "line",
+                  "number": 28,
+                  "children": [
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": "   "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "keyword",
+                      "text": "function"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": "State_Result",
+                      "href": "docs/sxml__query___spec.html#L28C13"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": "("
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": "State",
+                      "href": "docs/sxml__query___spec.html#L28C27"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": ":"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": "State_Type",
+                      "href": "docs/sxml__query___spec.html#L359C9"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": ")"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "keyword",
+                      "text": "return"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "text",
+                      "text": " "
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": "Result_Type",
+                      "href": "docs/sxml___spec.html#L18C9"
+                    },
+                    {
+                      "kind": "span",
+                      "cssClass": "identifier",
+                      "text": ";"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "kind": "paragraph",
+              "children": [
+                {
+                  "kind": "span",
+                  "text": "Return result of state\n"
+                }
+              ]
+            }
+          ],
+          "parameters": [
+            {
+              "label": "State",
+              "line": 28,
+              "column": 27,
+              "type": {
+                "label": "SXML.Query.State_Type",
+                "docHref": "docs/sxml__query___spec.html#L16C9"
+              },
+              "description": [
+                {
+                  "kind": "paragraph",
+                  "children": [
+                    {
+                      "kind": "span",
+                      "text": "Current query state\n"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "label": "Value",
           "qualifier": "",
-          "line": 271,
+          "line": 279,
           "column": 14,
           "src": "srcs/sxml-query.ads.html",
           "summary": [
@@ -5948,7 +6006,7 @@ GNATdoc.Documentation = {
               "children": [
                 {
                   "kind": "line",
-                  "number": 271,
+                  "number": 279,
                   "children": [
                     {
                       "kind": "span",
@@ -5969,7 +6027,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Value",
-                      "href": "docs/sxml__query___spec.html#L271C14"
+                      "href": "docs/sxml__query___spec.html#L279C14"
                     },
                     {
                       "kind": "span",
@@ -5985,7 +6043,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State",
-                      "href": "docs/sxml__query___spec.html#L271C21"
+                      "href": "docs/sxml__query___spec.html#L279C21"
                     },
                     {
                       "kind": "span",
@@ -6006,7 +6064,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "State_Type",
-                      "href": "docs/sxml__query___spec.html#L351C9"
+                      "href": "docs/sxml__query___spec.html#L359C9"
                     },
                     {
                       "kind": "span",
@@ -6017,7 +6075,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 272,
+                  "number": 280,
                   "children": [
                     {
                       "kind": "span",
@@ -6028,7 +6086,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Document",
-                      "href": "docs/sxml__query___spec.html#L272C21"
+                      "href": "docs/sxml__query___spec.html#L280C21"
                     },
                     {
                       "kind": "span",
@@ -6060,7 +6118,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 273,
+                  "number": 281,
                   "children": [
                     {
                       "kind": "span",
@@ -6071,7 +6129,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Result",
-                      "href": "docs/sxml__query___spec.html#L273C21"
+                      "href": "docs/sxml__query___spec.html#L281C21"
                     },
                     {
                       "kind": "span",
@@ -6113,7 +6171,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 274,
+                  "number": 282,
                   "children": [
                     {
                       "kind": "span",
@@ -6124,7 +6182,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Data",
-                      "href": "docs/sxml__query___spec.html#L274C21"
+                      "href": "docs/sxml__query___spec.html#L282C21"
                     },
                     {
                       "kind": "span",
@@ -6166,7 +6224,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 275,
+                  "number": 283,
                   "children": [
                     {
                       "kind": "span",
@@ -6177,7 +6235,7 @@ GNATdoc.Documentation = {
                       "kind": "span",
                       "cssClass": "identifier",
                       "text": "Last",
-                      "href": "docs/sxml__query___spec.html#L275C21"
+                      "href": "docs/sxml__query___spec.html#L283C21"
                     },
                     {
                       "kind": "span",
@@ -6228,7 +6286,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 276,
+                  "number": 284,
                   "children": [
                     {
                       "kind": "span",
@@ -6239,7 +6297,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 277,
+                  "number": 285,
                   "children": [
                     {
                       "kind": "span",
@@ -6264,13 +6322,13 @@ GNATdoc.Documentation = {
                     {
                       "kind": "span",
                       "cssClass": "text",
-                      "text": " State.Result = Result_OK"
+                      "text": " State_Result (State) = Result_OK"
                     }
                   ]
                 },
                 {
                   "kind": "line",
-                  "number": 278,
+                  "number": 286,
                   "children": [
                     {
                       "kind": "span",
@@ -6301,7 +6359,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 279,
+                  "number": 287,
                   "children": [
                     {
                       "kind": "span",
@@ -6332,7 +6390,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 280,
+                  "number": 288,
                   "children": [
                     {
                       "kind": "span",
@@ -6363,7 +6421,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 281,
+                  "number": 289,
                   "children": [
                     {
                       "kind": "span",
@@ -6384,7 +6442,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 282,
+                  "number": 290,
                   "children": [
                     {
                       "kind": "span",
@@ -6415,7 +6473,7 @@ GNATdoc.Documentation = {
                 },
                 {
                   "kind": "line",
-                  "number": 283,
+                  "number": 291,
                   "children": [
                     {
                       "kind": "span",
@@ -6454,7 +6512,7 @@ GNATdoc.Documentation = {
           "parameters": [
             {
               "label": "State",
-              "line": 271,
+              "line": 279,
               "column": 21,
               "type": {
                 "label": "SXML.Query.State_Type",
@@ -6474,7 +6532,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Document",
-              "line": 272,
+              "line": 280,
               "column": 21,
               "type": {
                 "label": "SXML.Document_Type",
@@ -6494,7 +6552,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Result",
-              "line": 273,
+              "line": 281,
               "column": 21,
               "type": {
                 "label": "SXML.Result_Type",
@@ -6514,7 +6572,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Data",
-              "line": 274,
+              "line": 282,
               "column": 21,
               "type": {
                 "label": "SXML.Content_Type",
@@ -6534,7 +6592,7 @@ GNATdoc.Documentation = {
             },
             {
               "label": "Last",
-              "line": 275,
+              "line": 283,
               "column": 21,
               "type": {
                 "label": "Natural"
