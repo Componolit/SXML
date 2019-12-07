@@ -356,6 +356,9 @@ is
 
 private
 
+   --  State originally was a descriminant record with Offset only present when
+   --  Result is Result_OK. This made the code unprovable with Community 2019.
+   --  Cf. Componolit/Workarounds#12
    type State_Type is
       record
          Result : Result_Type := Result_Invalid;
