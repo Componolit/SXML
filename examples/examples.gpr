@@ -11,6 +11,7 @@ is
                  "fuzzdriver.adb");
    for Source_Dirs use (".", "../tests/prove");
    for Exec_Dir use "../obj";
+   for Object_Dir use "../obj/examples";
 
    case SXML.Mode is
       when "strict" =>

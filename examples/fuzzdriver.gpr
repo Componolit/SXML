@@ -4,4 +4,5 @@ project Fuzzdriver
 is
    for Main use ("fuzzdriver.adb");
    for Exec_Dir use "../obj";
+   for Object_Dir use "../obj/fuzzdrv";
 end Fuzzdriver;

@@ -17,7 +17,7 @@ all:
 test: build/SXML.gpr
 	$(GNATCHECK) -P build/SXML
 	@gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@($(TEST_OPTS)time obj/tests)
+	@($(TEST_OPTS)time obj/tests/tests)
 
 prove: prove_tests prove_lib
 
@@ -36,17 +36,17 @@ doc/api/index.html: build/SXML.gpr
 
 testonly: build/SXML.gpr
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@($(TEST_OPTS)time obj/tests)
+	@($(TEST_OPTS)time obj/tests/tests)
 
 testbulk: export SXML_BULK_TESTS ?= 1
 testbulk: build/SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@($(TEST_OPTS)time obj/tests)
+	@($(TEST_OPTS)time obj/tests/tests)
 
 testinsane: export SXML_INSANE_TESTS ?= 1
 testinsane: build/SXML.gpr rawdata
 	gprbuild $(GPRBUILD_OPTS) -P tests/execute/tests
-	@($(TEST_OPTS)time obj/tests)
+	@($(TEST_OPTS)time obj/tests/tests)
 
 rawdata:
 	@rm -rf obj/rawdata
@@ -76,12 +76,4 @@ examples::
 	gprbuild $(GPRBUILD_OPTS) -P examples/examples
 
 clean:
-	gnatclean -P build/SXML
-	$(GNATPROVE) -P build/SXML --clean
-	gnatclean -P tests/execute/tests.gpr
-	gnatclean -P examples/examples
-	$(GNATPROVE) -P examples/examples --clean
-	gnatclean -P examples/fuzzdriver
-	gnatclean -P tests/prove/prove
-	$(GNATPROVE) -P tests/prove/prove --clean
 	rm -rf obj

@@ -3,6 +3,8 @@ with "../contrib/basalt/basalt";
 
 project SXML
 is
+   for Create_Missing_Dirs use "true";
+
    type Mode_Type is ("strict", "sloppy", "debug", "stack", "fuzz");
    Mode : Mode_Type := external ("Mode", "strict");
 
