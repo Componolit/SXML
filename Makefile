@@ -7,6 +7,7 @@ WGET_OPTS = --recursive --continue --progress=dot:mega --show-progress --wait=1 
 GNATPROVE ?= gnatprove
 GNATCHECK ?= $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
 TEST_OPTS ?= ulimit -s 40; ulimit -a;
+AFL_OPTS  ?= -x tests/afl-dict/xml.dict -t 200 -m 1024 -i tests/afl-data -o obj/fuzz
 
 all:
 	$(GNATCHECK) -P build/SXML
@@ -60,7 +61,14 @@ fuzz: GPRBUILD_OPTS += --compiler-subst=Ada,afl-gcc
 fuzz: export AFL_SKIP_CPUFREQ=1
 fuzz: MODE=fuzz
 fuzz: obj/fuzzdriver
-	@afl-fuzz -x tests/afl-dict/xml.dict -t 200 -m 1024 -i tests/afl-data -o obj/fuzz ./obj/fuzzdriver @@
+	@afl-fuzz $(AFL_OPTS) -M master ./obj/fuzzdriver @@
+
+fuzz-slave: export AFL_SKIP_CPUFREQ=1
+fuzz-slave:
+	@afl-fuzz $(AFL_OPTS) -S "slave-$$$$" ./obj/fuzzdriver @@
+
+fuzz-status:
+	@watch -n1 afl-whatsup -s obj/fuzz
 
 stack: MODE=stack
 stack: build/SXML.gpr
