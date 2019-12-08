@@ -134,7 +134,7 @@ XML files and that it does not crash when exposed to malicious data. We prove
 the absence of runtime errors using `gnatprove` and bounded stack usage with
 `gnatstack` (except for SXML.Generator which is inherently unbounded). We
 fuzzed the parser and serializer using American Fuzzy Lop (AFL) for more than
-35 million executions without any crash or hang. A test suite with more than
+200 million executions without any crash or hang. A test suite with more than
 3000 tests is available to test conformance of the parser.
 
 ## Absence of Runtime Errors
