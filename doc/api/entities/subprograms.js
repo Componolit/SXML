@@ -2,13 +2,6 @@ GNATdoc.EntitiesCategory = {
   "label": "Subprograms",
   "entities": [
     {
-      "label": "&",
-      "docHref": "docs/sxml___spec.html#L364C25",
-      "declared": "SXML",
-      "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L364"
-    },
-    {
       "label": "+",
       "docHref": "docs/sxml__generator___spec.html#L53C14",
       "declared": "SXML.Generator",
@@ -31,31 +24,31 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Add",
-      "docHref": "docs/sxml___spec.html#L93C13",
+      "docHref": "docs/sxml___spec.html#L95C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L93"
+      "srcHref": "srcs/sxml.ads.html#L95"
     },
     {
       "label": "Add",
-      "docHref": "docs/sxml___spec.html#L103C13",
+      "docHref": "docs/sxml___spec.html#L105C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L103"
+      "srcHref": "srcs/sxml.ads.html#L105"
     },
     {
       "label": "Add",
-      "docHref": "docs/sxml___spec.html#L113C13",
+      "docHref": "docs/sxml___spec.html#L115C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L113"
+      "srcHref": "srcs/sxml.ads.html#L115"
     },
     {
       "label": "Append",
-      "docHref": "docs/sxml___spec.html#L242C14",
+      "docHref": "docs/sxml___spec.html#L244C14",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L242"
+      "srcHref": "srcs/sxml.ads.html#L244"
     },
     {
       "label": "Attribute",
@@ -73,10 +66,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Attribute",
-      "docHref": "docs/sxml___spec.html#L271C14",
+      "docHref": "docs/sxml___spec.html#L273C14",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L271"
+      "srcHref": "srcs/sxml.ads.html#L273"
     },
     {
       "label": "C",
@@ -136,10 +129,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Get_String",
-      "docHref": "docs/sxml___spec.html#L301C14",
+      "docHref": "docs/sxml___spec.html#L303C14",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L301"
+      "srcHref": "srcs/sxml.ads.html#L303"
     },
     {
       "label": "Has_Attribute",
@@ -150,10 +143,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Has_Space",
-      "docHref": "docs/sxml___spec.html#L338C13",
+      "docHref": "docs/sxml___spec.html#L340C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L338"
+      "srcHref": "srcs/sxml.ads.html#L340"
     },
     {
       "label": "Init",
@@ -164,10 +157,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Is_Invalid",
-      "docHref": "docs/sxml___spec.html#L230C13",
+      "docHref": "docs/sxml___spec.html#L232C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L230"
+      "srcHref": "srcs/sxml.ads.html#L232"
     },
     {
       "label": "Is_Open",
@@ -178,10 +171,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Is_Open",
-      "docHref": "docs/sxml___spec.html#L220C13",
+      "docHref": "docs/sxml___spec.html#L222C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L220"
+      "srcHref": "srcs/sxml.ads.html#L222"
     },
     {
       "label": "Is_Valid_Value",
@@ -192,10 +185,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Length",
-      "docHref": "docs/sxml___spec.html#L318C13",
+      "docHref": "docs/sxml___spec.html#L320C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L318"
+      "srcHref": "srcs/sxml.ads.html#L320"
     },
     {
       "label": "Name",
@@ -213,10 +206,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Num_Elements",
-      "docHref": "docs/sxml___spec.html#L325C13",
+      "docHref": "docs/sxml___spec.html#L327C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L325"
+      "srcHref": "srcs/sxml.ads.html#L327"
     },
     {
       "label": "Num_Elements",
@@ -227,31 +220,31 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Open",
-      "docHref": "docs/sxml___spec.html#L353C14",
+      "docHref": "docs/sxml___spec.html#L355C14",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L353"
+      "srcHref": "srcs/sxml.ads.html#L355"
     },
     {
       "label": "Overflow",
-      "docHref": "docs/sxml___spec.html#L127C13",
+      "docHref": "docs/sxml___spec.html#L129C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L127"
+      "srcHref": "srcs/sxml.ads.html#L129"
     },
     {
       "label": "Overflow",
-      "docHref": "docs/sxml___spec.html#L135C13",
+      "docHref": "docs/sxml___spec.html#L137C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L135"
+      "srcHref": "srcs/sxml.ads.html#L137"
     },
     {
       "label": "Overflow",
-      "docHref": "docs/sxml___spec.html#L143C13",
+      "docHref": "docs/sxml___spec.html#L145C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L143"
+      "srcHref": "srcs/sxml.ads.html#L145"
     },
     {
       "label": "Parse",
@@ -269,10 +262,10 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Put_Content",
-      "docHref": "docs/sxml___spec.html#L256C14",
+      "docHref": "docs/sxml___spec.html#L258C14",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L256"
+      "srcHref": "srcs/sxml.ads.html#L258"
     },
     {
       "label": "Sibling",
@@ -290,31 +283,31 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "String_Length",
-      "docHref": "docs/sxml___spec.html#L285C13",
+      "docHref": "docs/sxml___spec.html#L287C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L285"
+      "srcHref": "srcs/sxml.ads.html#L287"
     },
     {
       "label": "Sub",
-      "docHref": "docs/sxml___spec.html#L155C13",
+      "docHref": "docs/sxml___spec.html#L157C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L155"
+      "srcHref": "srcs/sxml.ads.html#L157"
     },
     {
       "label": "Sub",
-      "docHref": "docs/sxml___spec.html#L165C13",
+      "docHref": "docs/sxml___spec.html#L167C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L165"
+      "srcHref": "srcs/sxml.ads.html#L167"
     },
     {
       "label": "Sub",
-      "docHref": "docs/sxml___spec.html#L175C13",
+      "docHref": "docs/sxml___spec.html#L177C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L175"
+      "srcHref": "srcs/sxml.ads.html#L177"
     },
     {
       "label": "To_String",
@@ -325,17 +318,17 @@ GNATdoc.EntitiesCategory = {
     },
     {
       "label": "Underflow",
-      "docHref": "docs/sxml___spec.html#L189C13",
+      "docHref": "docs/sxml___spec.html#L191C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L189"
+      "srcHref": "srcs/sxml.ads.html#L191"
     },
     {
       "label": "Underflow",
-      "docHref": "docs/sxml___spec.html#L197C13",
+      "docHref": "docs/sxml___spec.html#L199C13",
       "declared": "SXML",
       "declared_qualifier": "",
-      "srcHref": "srcs/sxml.ads.html#L197"
+      "srcHref": "srcs/sxml.ads.html#L199"
     },
     {
       "label": "Valid_Content",

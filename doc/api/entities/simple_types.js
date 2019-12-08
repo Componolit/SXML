@@ -72,6 +72,13 @@ GNATdoc.EntitiesCategory = {
       "srcHref": "srcs/sxml.ads.html#L54"
     },
     {
+      "label": "Null_Document_Type",
+      "docHref": "docs/sxml___spec.html#L85C12",
+      "declared": "SXML",
+      "declared_qualifier": "",
+      "srcHref": "srcs/sxml.ads.html#L85"
+    },
+    {
       "label": "Offset_Type",
       "docHref": "docs/sxml___spec.html#L51C9",
       "declared": "SXML",

@@ -34,9 +34,9 @@ prove_tests: prove_lib
 doc: doc/api/index.html
 
 doc/api/index.html: build/SXML.gpr
-	@$(GPRBUILD) -P build/SXML -Xlibtype=dynamic
-	@$(GNATDOC) -q -P build/SXML --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
-	@$(GNATDOC) -P build/SXML --no-subprojects -Xlibtype=dynamic -XRTS=native -Xcallgraph=none -w -l --enable-build
+	@$(GPRBUILD) -P build/doc
+	@$(GNATDOC) -q -P build/doc --no-subprojects -XMode=$(MODE) -w -l --enable-build
+	@$(GNATDOC) -P build/doc --no-subprojects -XMode=$(MODE) -w -l --enable-build
 
 testonly: build/SXML.gpr
 	$(GPRBUILD) $(GPRBUILD_OPTS) -P tests/execute/tests

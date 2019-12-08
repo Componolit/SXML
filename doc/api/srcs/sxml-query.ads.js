@@ -339,7 +339,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -392,7 +392,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -569,7 +569,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -770,7 +770,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -1019,7 +1019,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -1352,7 +1352,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -1642,7 +1642,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -1942,7 +1942,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -2254,7 +2254,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -2546,7 +2546,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -3126,7 +3126,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -3195,7 +3195,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -3581,7 +3581,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -3650,7 +3650,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -4184,7 +4184,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -4439,7 +4439,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -4856,7 +4856,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -4925,7 +4925,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -5321,7 +5321,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -5771,7 +5771,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -6398,7 +6398,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -6790,7 +6790,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -7423,7 +7423,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -7492,7 +7492,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -7951,7 +7951,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -8144,7 +8144,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -8588,7 +8588,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -8699,7 +8699,7 @@ GNATdoc.SourceFile = {
           "kind": "span",
           "cssClass": "identifier",
           "text": "State_Type",
-          "href": "docs/sxml__query___spec.html#L359C9"
+          "href": "docs/sxml__query___spec.html#L362C9"
         },
         {
           "kind": "span",
@@ -8878,7 +8878,55 @@ GNATdoc.SourceFile = {
     },
     {
       "kind": "line",
-      "number": 370,
+      "number": 359,
+      "children": [
+        {
+          "kind": "span",
+          "cssClass": "text",
+          "text": "   "
+        },
+        {
+          "kind": "span",
+          "cssClass": "comment",
+          "text": "--  State originally was a descriminant record with Offset only present when"
+        }
+      ]
+    },
+    {
+      "kind": "line",
+      "number": 360,
+      "children": [
+        {
+          "kind": "span",
+          "cssClass": "text",
+          "text": "   "
+        },
+        {
+          "kind": "span",
+          "cssClass": "comment",
+          "text": "--  Result is Result_OK. This made the code unprovable with Community 2019."
+        }
+      ]
+    },
+    {
+      "kind": "line",
+      "number": 361,
+      "children": [
+        {
+          "kind": "span",
+          "cssClass": "text",
+          "text": "   "
+        },
+        {
+          "kind": "span",
+          "cssClass": "comment",
+          "text": "--  Cf. Componolit/Workarounds#12"
+        }
+      ]
+    },
+    {
+      "kind": "line",
+      "number": 373,
       "children": [
         {
           "kind": "span",

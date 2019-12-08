@@ -1,0 +1,14 @@
+with "switches";
+with "../contrib/basalt/basalt";
+
+project Doc
+is
+   for Create_Missing_Dirs use "true";
+
+   package Documentation is
+      for Documentation_Dir use "../doc/api";
+   end Documentation;
+
+   for Source_Dirs use ("../src", "../src/unbounded");
+   for Object_Dir use "../obj/doc";
+end Doc;
