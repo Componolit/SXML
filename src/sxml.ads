@@ -82,6 +82,8 @@ is
                           and Document_Type'Length > 0
                           and Document_Type'Last < Index_Type'Last;
 
+   subtype Null_Document_Type is Document_Type (1 .. 1);
+
    ---------
    -- Add --
    ---------
@@ -359,16 +361,6 @@ is
      Post => Start in Document'Range and
              Is_Open (Document (Start)) and
              Position = Add (Position'Old, Length (Name));
-
-   pragma Warnings (Off, "precondition is statically False");
-   overriding function "&" (Left, Right : Document_Type) return Document_Type
-   with Pre => False;
-   --  This operator must not be used, as subtrees have to be
-   --  linked together. This is done by the * operator above.
-   --
-   --  @param Left  Unused
-   --  @param Right Unused
-   pragma Warnings (On, "precondition is statically False");
 
 private
 

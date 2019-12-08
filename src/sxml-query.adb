@@ -226,7 +226,7 @@ is
    -- Split_Query --
    -----------------
 
-   type Position_Type (Valid : Boolean) is
+   type Position_Type (Valid : Boolean := False) is
    record
       case Valid is
          when True =>

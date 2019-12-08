@@ -1,5 +1,4 @@
 with "switches";
-with "../contrib/basalt/basalt";
 
 project SXML
 is
@@ -14,9 +13,9 @@ is
    SD := ();
    case Mode is
       when "strict" | "stack" | "fuzz" =>
-         SD := ("../src");
+         SD := ("../src", "../contrib/basalt/src");
       when "debug" =>
-         SD := ("../src", "../tests/debug");
+         SD := ("../src", "../contrib/basalt/src", "../tests/debug");
       when others => null;
    end case;
 
@@ -27,6 +26,7 @@ is
          for Source_Dirs use SD & ("../src/unbounded");
    end case;
 
+   for Excluded_Source_Files use ("basalt-strings.ads", "basalt-strings.adb");
    for Object_Dir use "../obj";
 
    for Library_Name use "sxml";
@@ -35,8 +35,10 @@ is
 
    package Builder is
       case Mode is
-         when "strict" | "stack" =>
+         when "strict" =>
             for Global_Configuration_Pragmas use "default.adc";
+         when "stack" =>
+            for Global_Configuration_Pragmas use "stack.adc";
          when "fuzz" =>
             for Global_Configuration_Pragmas use "fuzz.adc";
          when "debug" =>

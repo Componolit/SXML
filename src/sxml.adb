@@ -319,16 +319,4 @@ is
       Result := Result_OK;
    end Get_String;
 
-   -------
-   -- & --
-   -------
-
-   overriding
-   function "&" (Left, Right : Document_Type) return Document_Type
-   is
-      pragma Unreferenced (Left, Right);
-   begin
-      return Null_Document;
-   end "&";
-
 end SXML;

@@ -1,0 +1,6 @@
+pragma SPARK_Mode (On);
+pragma Warnings (Off, "no contextual analysis of");
+pragma Assertion_Policy (Pre => Ignore, Post => Ignore, Ghost => Ignore);
+pragma Restrictions (No_Exceptions);
+pragma Restrictions (No_Implicit_Dynamic_Code);
+pragma Restrictions (No_Secondary_Stack);
