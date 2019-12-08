@@ -87,7 +87,6 @@ obj/fuzzdriver::
 examples::
 	$(GPRBUILD) $(GPRBUILD_OPTS) -P examples/examples
 	$(GPRBUILD) $(GPRBUILD_OPTS) -P tests/prove/prove
-	$(GPRBUILD) $(GPRBUILD_OPTS) -P tests/prove/stack
 
 clean:
 	rm -rf obj contrib/basalt/obj contrib/basalt/lib graph.vcg undefined.ciu
