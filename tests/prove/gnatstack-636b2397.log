@@ -1,0 +1,28 @@
+gnatstack -s -p -XMode=stack -XBounded=true -P tests/prove/stack
+
+Worst case analysis is *not* accurate because of external calls.
+
+List of reachable external subprograms:
+
+  <_Unwind_Resume>
+  ada.text_io.put
+  ada.text_io.put_line
+  memcmp
+  memcpy
+  memmove
+  system.img_enum_new.image_enumeration_8
+
+Accumulated stack usage information for entry points
+
+stack : total 45168 bytes
+ +-> stack
+ +-> sxml.query.path
+ +-> sxml.query.path_segment
+ +-> sxml.query.find_sibling
+ +-> sxml.query.find_attribute
+ +-> sxml.query.value
+ +-> sxml.get_string
+ +-> sxml.string_length
+ +-> memcpy *
+
+GNATstack: analysis successfully finished
