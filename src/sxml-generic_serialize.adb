@@ -25,7 +25,7 @@ is
       end record;
    Null_Traversal : constant Traversal_Type := (Invalid_Index, Mode_Invalid);
 
-   package Traversal_Stack is new Basalt.Stack (Traversal_Type);
+   package Traversal_Stack is new Basalt.Stack (Traversal_Type, Null_Traversal);
 
    S   : Traversal_Stack.Context (Depth);
    Rev : Traversal_Stack.Context (Depth);
@@ -392,6 +392,6 @@ is
    end To_String;
 
 begin -- SXML.Generic_Serialize
-   Traversal_Stack.Initialize (S, Null_Traversal);
-   Traversal_Stack.Initialize (Rev, Null_Traversal);
+   Traversal_Stack.Initialize (S);
+   Traversal_Stack.Initialize (Rev);
 end SXML.Generic_Serialize;
