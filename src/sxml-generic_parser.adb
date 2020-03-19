@@ -64,10 +64,10 @@ is
       end record;
    Null_Out : constant Out_Type := (Match_Invalid, Invalid_Index);
 
-   package Call_Stack is new Basalt.Stack (Frame_Type);
+   package Call_Stack is new Basalt.Stack (Frame_Type, Null_Frame);
    CS : Call_Stack.Context (Depth);
 
-   package Result_Stack is new Basalt.Stack (Out_Type);
+   package Result_Stack is new Basalt.Stack (Out_Type, Null_Out);
    RS : Result_Stack.Context (Depth);
 
    -----------
@@ -1182,8 +1182,8 @@ is
          Output : Out_Type;
          Limit  : Natural := Natural'Last;
       begin
-         Call_Stack.Initialize (CS, (False, Null_Local));
-         Result_Stack.Initialize (RS, (Match_Invalid, Invalid_Index));
+         Call_Stack.Initialize (CS);
+         Result_Stack.Initialize (RS);
          Call_Stack.Push (CS, (True, Null_Local));
 
          Start := Invalid_Index;
@@ -1386,6 +1386,6 @@ is
    end Parse;
 
 begin -- SXML.Generic_Parser
-   Call_Stack.Initialize (CS, Null_Frame);
-   Result_Stack.Initialize (RS, Null_Out);
+   Call_Stack.Initialize (CS);
+   Result_Stack.Initialize (RS);
 end SXML.Generic_Parser;
