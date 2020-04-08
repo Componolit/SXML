@@ -321,7 +321,9 @@ is
                 Path_Segment'Result.Result = Result_OK
               then
                 Path_Segment'Result.Offset >= State.Offset
-                and Path_Segment'Result.Offset < Document'Length);
+                and Path_Segment'Result.Offset < Document'Length
+                and (Is_Open (Path_Segment'Result, Document) or else
+                     Is_Content (Path_Segment'Result, Document)));
 
    function Path_Segment (State    : State_Type;
                           Document : Document_Type;

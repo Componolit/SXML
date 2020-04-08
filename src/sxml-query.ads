@@ -352,7 +352,10 @@ is
              and then Query_String'Length > 0
              and then State_Result (State) = Result_OK
              and then Is_Valid (State, Document),
-     Post => (if State_Result (State) = Result_OK then Is_Valid (Path'Result, Document));
+     Post => (if State_Result (State) = Result_OK then Is_Valid (Path'Result, Document))
+             and then (if State_Result (Path'Result) = Result_OK
+                       then Is_Open (Path'Result, Document) or else
+                            Is_Content (Path'Result, Document));
 
 private
 
