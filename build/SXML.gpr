@@ -73,15 +73,19 @@ is
    Proof_Switches :=
    (
       "-j0",
-      "--prover=z3,cvc4",
-      "--steps=5000",
-      "--memlimit=1000",
+      "--prover=z3,cvc4,altergo",
+      "--timeout=60",
+      "--steps=1000",
+      "--memlimit=2000",
       "--checks-as-errors",
       "--warnings=error",
-      "--no-counterexample"
+      "--no-counterexample",
+      "--no-axiom-guard"
    );
 
    package Prove is
       for Proof_Switches ("Ada") use Proof_Switches;
+      for Proof_Switches ("basalt-strings_generic.adb") use ("--steps=1500");
+      for Proof_Switches ("sxml-generator-tests.ads") use ("--steps=5000");
    end Prove;
 end SXML;

@@ -10,7 +10,7 @@ GPRBUILD ?= gprbuild
 GPRBUILD_OPTS = -s -p -XMode=$(MODE) -XBounded=$(BOUNDED)
 
 GNATPROVE ?= gnatprove
-GNATPROVE_OPTS += --prover=z3,cvc4 -j0 --memlimit=2000 --output-header --steps=5500 --checks-as-errors
+GNATPROVE_OPTS += -j0 --memlimit=2000 --output-header --checks-as-errors
 
 GNATSTACK ?= $(notdir $(firstword $(shell which gnatstack true 2> /dev/null)))
 GNATCHECK ?= $(notdir $(firstword $(shell which gnatcheck true 2> /dev/null)))
