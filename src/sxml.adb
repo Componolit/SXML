@@ -63,7 +63,7 @@ is
    -- Num_Elements --
    ------------------
 
-   function Length (D : Content_Type) return Offset_Type is
+   function Length (D : Content_Base_Type) return Offset_Type is
      ((Offset_Type (D'Length + (Data_Type'Length - 1))) / Offset_Type (Data_Type'Length));
 
    function Num_Elements (Document : Document_Base_Type) return Offset_Type is
