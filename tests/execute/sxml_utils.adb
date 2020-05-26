@@ -21,7 +21,7 @@ with Text_IO;
 
 package body SXML_Utils
 is
-   Document : access SXML.Document_Type := new SXML.Document_Type (1 .. 150000000);
+   Document : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 150000000);
 
    type String_Access is access all String;
    procedure Free is new Ada.Unchecked_Deallocation (String, String_Access);
