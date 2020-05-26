@@ -4,10 +4,25 @@ project Prove is
    for Create_Missing_Dirs use "true";
    for Source_Dirs use (".");
    for Main use ("exec.adb", "doc.adb", "complex.adb", "stack.adb");
-   for Exec_Dir use "../../obj";
-   for Object_Dir use "../../obj/prove";
+   for Exec_Dir use "../../obj/tests";
+   for Object_Dir use "../../obj/tests/prove";
+
+   Proof_Switches :=
+   (
+      "-j0",
+      "--prover=z3,cvc4,altergo",
+      "--timeout=60",
+      "--steps=2000",
+      "--memlimit=2000",
+      "--checks-as-errors",
+      "--warnings=error",
+      "--no-counterexample",
+      "--no-axiom-guard"
+   );
 
    package Prove is
-      for Proof_Switches ("Ada") use SXML.Proof_Switches;
+      for Proof_Switches ("Ada") use Proof_Switches;
+      for Proof_Switches ("execute.adb") use ("--steps=35000");
+      for Proof_Switches ("complex.adb") use ("--steps=5000");
    end Prove;
 end Prove;
