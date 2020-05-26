@@ -321,7 +321,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_Simple (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       State    : State_Type :=
          Path_Query (Context.all,
@@ -336,7 +336,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_Simple_Missing (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       State    : State_Type :=
          Path_Query (Context.all,
@@ -350,7 +350,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_Long (T : in out Test_Cases.Test_Case'Class)
    is
-      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       State : State_Type :=
          Path_Query (Context.all,
@@ -369,7 +369,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
    is
-      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       Attr  : State_Type;
       State : State_Type :=
@@ -408,7 +408,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Find_Node_By_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
-      Context : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       Elem, Attr : State_Type;
       State : State_Type :=
@@ -447,7 +447,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_With_Attribute (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
    begin
       declare
@@ -494,7 +494,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Path_Query_With_Multiple_Attributes (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
    begin
       declare
@@ -525,7 +525,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Relative_Path_Query (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       Attr     : State_Type;
       State    : State_Type := Path_Query (Context.all, "tests/data/attribute_value.xml", "/root/child3", Position);
@@ -542,7 +542,7 @@ package body SXML_Query_Tests is
 
    procedure Test_Simplified_Attribute_Value (T : in out Test_Cases.Test_Case'Class)
    is
-      Context  : access SXML.Document_Type := new SXML.Document_Type (1 .. 1000000);
+      Context  : access SXML.Document_Base_Type := new SXML.Document_Base_Type (1 .. 1000000);
       Position : Natural;
       State : State_Type :=
          Path_Query (Context.all,

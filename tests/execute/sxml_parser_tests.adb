@@ -455,11 +455,11 @@ package body SXML_Parser_Tests is
    procedure Deep_File (T : in out Test_Cases.Test_Case'Class)
    is
       use SXML;
-      type Subtree_Access is access Document_Type;
+      type Subtree_Access is access Document_Base_Type;
       procedure Free_Subtree is new Ada.Unchecked_Deallocation
-         (Object => Document_Type, Name => Subtree_Access);
+         (Object => Document_Base_Type, Name => Subtree_Access);
       File_Name : constant String := "obj/generated.xml";
-      Document   : Subtree_Access := new Document_Type (1 .. 1000000);
+      Document   : Subtree_Access := new Document_Base_Type (1 .. 1000000);
    begin
       Generate_Deep_Nodes (File_Name, 1000000);
       declare
