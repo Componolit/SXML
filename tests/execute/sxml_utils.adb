@@ -79,12 +79,12 @@ is
 
    procedure Parse_Document (File : String)
    is
-      Input : access String := Read_File (File);
+      Input : String_Access := Read_File (File);
       use SXML;
       use SXML.Parser;
       Result   : Match_Type;
       Offset   : Natural;
-      Data : access String := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
+      Data : String_Access := new String (1 .. (if Input'Length > Natural'Last / 4 then Natural'Last else 4 * Input'Length));
       Last : Natural := 1;
       Serialize_Result : Result_Type;
    begin
@@ -113,7 +113,7 @@ is
       use SXML.Parser;
       Result   : Match_Type;
       Offset   : Natural;
-      XML      : access String := new String (1 .. 2 * Input'Length);
+      XML      : String_Access := new String (1 .. 2 * Input'Length);
       Last     : Integer := 0;
       Serialize_Result : Result_Type;
    begin
